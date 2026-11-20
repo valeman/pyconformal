@@ -46,7 +46,43 @@ run with a clear error, which is safe. Its measured weaknesses:
   coverage at a 90% target.
 - **Time series:** two methods only.
 
-### 3. Mainstream calibration tools are not the best ones
+### 3. Predictive distributions, hundreds of times faster than crepes
+
+pyconformal's conformal predictive systems return the same quantiles and
+distribution-function values as crepes 0.9.1, for standard, normalized and
+Mondrian systems:
+
+| Task | Calibration / test points | crepes | pyconformal | Speed-up |
+|---|---|---|---|---|
+| 90% intervals | 10,000 / 100,000 | 0.62 s | 0.001 s | 600x |
+| 90% intervals | 100,000 / 1,000,000 | 79 s | 0.01 s | 8,100x |
+| Distribution function at the outcomes | 10,000 / 100,000 | 1.27 s | 0.02 s | 64x |
+| CRPS | 5,000 / 5,000 | 0.31 s | 0.0005 s | 656x |
+
+pyconformal never builds the full distribution for each test point: a
+quantile is one lookup, the distribution function is a binary search, and
+CRPS has a closed form.
+
+### 4. Prediction sets: right, small and fast
+
+On the same probabilities (10 classes, 90% target; `benchmarks/speed_classification.py`):
+
+| Method | Library | Coverage | Mean set size |
+|---|---|---|---|
+| APS | pyconformal | 0.900 | 1.73 |
+| APS (default) | MAPIE 1.6.0 | 0.975 | 2.05 |
+| SAPS, not randomised | pyconformal | 0.906 | 1.90 |
+| SAPS, not randomised | TorchCP 1.2.1 | **0.338** | 0.63 |
+
+MAPIE's default APS and RAPS over-cover, so their sets are larger than
+needed. TorchCP's SAPS with `randomized=False` scores the top class
+differently in calibration and in prediction and loses the guarantee (its
+default randomised mode is correct). In pyconformal one routine computes the
+scores for calibration and prediction, so the two cannot disagree. It was also
+the fastest of the four libraries in every configuration tested, by up to 2
+times over the next best (the margin is small with 1,000 classes).
+
+### 5. Mainstream calibration tools are not the best ones
 
 scikit-learn's `CalibratedClassifierCV` offers Platt scaling (its default),
 isotonic regression and temperature scaling. It does not offer Venn-Abers, the
@@ -59,7 +95,7 @@ models worse. No calibrator won on every dataset. pyconformal ships Venn-Abers
 for binary and multiclass problems, up to 128 times faster than existing
 implementations.
 
-### 4. What pyconformal does differently
+### 6. What pyconformal does differently
 
 - **Exact by construction.** One audited routine computes every conformal
   threshold in exact arithmetic.
@@ -76,10 +112,11 @@ implementations.
 - **MIT licence.** Use it anywhere, including in closed-source products.
   (TorchCP is LGPL-3.0; R's conformalForecast is GPL-3.)
 
-Available now: split conformal regression and classification, Venn-Abers
-calibration (binary and multiclass), adaptive conformal inference (ACI) and
-conformal seasonal pools (CSP) for time series. Next: conformal predictive
-distributions and conformalized quantile regression.
+Available now: split conformal regression and classification (LAC, APS, RAPS
+and SAPS scores, class-conditional sets), conformal
+predictive distributions, Venn-Abers calibration (binary and multiclass),
+adaptive conformal inference (ACI) and conformal seasonal pools (CSP) for time
+series. Next: conformalized quantile regression with a fast quantile forest.
 
 ## Install
 
@@ -111,6 +148,11 @@ model.calibrate(X_cal, y_cal)
 sets = model.predict_set(X_test)   # boolean (n, n_classes), columns = model.classes_
 ```
 
+Choose the score with `score="lac"`, `"aps"`, `"raps"` or `"saps"`, or pass an
+object such as `RAPS(penalty=0.1, k_reg=1)`. APS, RAPS and SAPS are randomised
+by default, which gives coverage at the target and smaller sets. Set
+`class_conditional=True` for coverage within every class.
+
 Already have a trained model? Pass `prefit=True` and skip `fit`.
 
 ## Probability calibration: Venn-Abers
@@ -128,6 +170,23 @@ p0_p1 = model.predict_p0_p1(X_test)          # binary: the Venn-Abers pair per s
 Works on raw scores too: `VennAbers().fit(scores_cal, y_cal).predict_proba(scores_test)`.
 Install `pyconformal[fast]` to use the compiled kernel (numba); results are
 identical with or without it.
+
+## Regression: full predictive distributions
+
+```python
+from pyconformal import ConformalPredictiveSystem
+
+cps = ConformalPredictiveSystem().fit(y_cal, model.predict(X_cal))
+y_pred = model.predict(X_test)
+cps.predict_interval(y_pred, alpha=0.1)          # (n, 2) intervals
+cps.predict_quantile(y_pred, [0.1, 0.5, 0.9])    # any quantiles
+cps.predict_cdf(y_pred, 100.0)                   # P(y <= 100) per sample
+cps.crps(y_pred, y_test)                         # CRPS per sample, exact
+```
+
+Pass `sigma_cal` / `sigma` (a difficulty estimate per sample) for
+distributions that widen on hard samples, and `groups_cal` / `groups` to
+calibrate each category separately.
 
 ## Time series: adaptive conformal inference
 

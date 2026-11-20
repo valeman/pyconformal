@@ -17,6 +17,10 @@ python nixtla_coverage.py
 | `speed_venn_abers.py` | Venn-Abers speed and agreement: pyconformal, venn-abers, MAPIE |
 | `speed_aci.py` | ACI speed and coverage: pyconformal against MAPIE |
 | `speed_csp.py` | CSP speed: pyconformal against csp-forecaster 0.2.0 |
+| `speed_predictive.py` | Conformal predictive systems: pyconformal against crepes (several minutes) |
+| `crepes_crps_check.py` | crepes CRPS for normalized systems against the definition |
+| `speed_classification.py` | Prediction sets: coverage, size and time against TorchCP, MAPIE and PUNCC (needs PyTorch) |
+| `torchcp_audit.py` | TorchCP threshold exactness and coverage, including SAPS |
 | `exactness.py` | Split-conformal threshold against the exact value, several packages |
 | `exact_rule_simulation.py` | Plain quantile against the exact finite-sample rule |
 

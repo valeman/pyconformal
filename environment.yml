@@ -12,4 +12,5 @@ dependencies:
       - build
       - twine
       - venn-abers
+      - crepes
       - -e .
