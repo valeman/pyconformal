@@ -37,6 +37,23 @@ sets = model.predict_set(X_test)   # boolean (n, n_classes), columns = model.cla
 
 Already have a trained model? Pass `prefit=True` and skip `fit`.
 
+## Probability calibration: Venn-Abers
+
+```python
+from pyconformal import VennAbersCalibrator
+
+model = VennAbersCalibrator(classifier)      # binary or multiclass
+model.fit(X_train, y_train)
+model.calibrate(X_cal, y_cal)
+proba = model.predict_proba(X_test)          # calibrated probabilities
+p0_p1 = model.predict_p0_p1(X_test)          # binary: the Venn-Abers pair per sample
+```
+
+Works on raw scores too: `VennAbers().fit(scores_cal, y_cal).predict_proba(scores_test)`.
+Install `pyconformal[fast]` to use the compiled kernel (numba); results are
+identical with or without it.
+
+
 ## The guarantee
 
 If the calibration data and the test point are exchangeable (for example,

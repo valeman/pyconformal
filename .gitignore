@@ -10,3 +10,8 @@ venv/
 htmlcov/
 .ipynb_checkpoints/
 .DS_Store
+
+# Credentials: never commit
+pypi/
+*Recovery-Codes*
+.pypirc

@@ -32,7 +32,8 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest>=7", "scikit-learn>=1.0"]
+fast = ["numba>=0.59"]
+test = ["pytest>=7", "scikit-learn>=1.0", "venn-abers>=1.5"]
 
 [project.urls]
 Homepage = "https://github.com/valeman/pyconformal"
