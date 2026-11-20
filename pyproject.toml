@@ -1,0 +1,49 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pyconformal"
+dynamic = ["version"]
+description = "Conformal prediction for Python: distribution-free prediction intervals and prediction sets with finite-sample coverage guarantees."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Valery Manokhin", email = "val@valeriy.ai" }]
+requires-python = ">=3.9"
+dependencies = ["numpy>=1.22"]
+keywords = [
+    "conformal prediction",
+    "uncertainty quantification",
+    "prediction intervals",
+    "prediction sets",
+    "machine learning",
+    "calibration",
+]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7", "scikit-learn>=1.0"]
+
+[project.urls]
+Homepage = "https://github.com/valeman/pyconformal"
+Source = "https://github.com/valeman/pyconformal"
+Issues = "https://github.com/valeman/pyconformal/issues"
+
+[tool.hatch.version]
+path = "src/pyconformal/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pyconformal"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
