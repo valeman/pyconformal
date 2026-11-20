@@ -16,9 +16,8 @@ def exact(scores, alpha):
 
 def hw_pyconformal(s, a):
     from pyconformal import SplitConformalRegressor
-    m = SplitConformalRegressor(Zero().fit(None, None), alpha=a, prefit=True)
-    m.calibrate(np.zeros((len(s), 1)), s)
-    return float(m.predict_interval(np.zeros((1, 1)))[0, 1])
+    m = SplitConformalRegressor(alpha=a).calibrate(y_pred=np.zeros(len(s)), y=s)
+    return float(m.predict_interval(y_pred=np.zeros(1))[0, 1])
 
 def hw_mapie(s, a):
     from mapie.regression import SplitConformalRegressor

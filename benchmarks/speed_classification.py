@@ -21,7 +21,7 @@ def best(f, reps=3):
 def ours(score):
     from pyconformal import SplitConformalClassifier
     def f():
-        m = SplitConformalClassifier(est, 0.1, prefit=True, score=score, random_state=0).calibrate(Pc, yc); return m.predict_set(Pt)
+        m = SplitConformalClassifier(est, 0.1, score=score, random_state=0).calibrate(Pc, yc); return m.predict_set(Pt)
     return f
 def tcp(mk):
     from torchcp.classification.predictor import SplitPredictor

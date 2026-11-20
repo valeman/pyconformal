@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "pyconformal: fast, tested conformal prediction for tabular data and time series"
+authors:
+  - family-names: Manokhin
+    given-names: Valery
+version: 0.1.0
+license: MIT
+repository-code: "https://github.com/valeman/pyconformal"

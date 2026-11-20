@@ -70,7 +70,7 @@ def test_coverage(score, alpha):
         rng = np.random.default_rng(1000 * r + int(100 * alpha))
         Pc, yc = data(rng, n_cal)
         Pt, yt = data(rng, 500)
-        m = SplitConformalClassifier(Passthrough(6), alpha, prefit=True, score=score, random_state=r)
+        m = SplitConformalClassifier(Passthrough(6), alpha, score=score, random_state=r)
         sets = m.calibrate(Pc, yc).predict_set(Pt)
         covs.append(sets[np.arange(500), yt].mean())
     mean, se = np.mean(covs), np.std(covs, ddof=1) / np.sqrt(len(covs))
@@ -86,7 +86,7 @@ def test_randomisation_makes_sets_smaller():
     Pt, _ = data(rng, 5000)
     size = {}
     for name, sc in (("rand", APS()), ("plain", APS(randomized=False))):
-        m = SplitConformalClassifier(Passthrough(6), 0.1, prefit=True, score=sc, random_state=0)
+        m = SplitConformalClassifier(Passthrough(6), 0.1, score=sc, random_state=0)
         size[name] = m.calibrate(Pc, yc).predict_set(Pt).sum(1).mean()
     assert size["rand"] < size["plain"]
 
@@ -103,18 +103,18 @@ def test_class_conditional_coverage():
             return P / P.sum(1, keepdims=True), y
         Pc, yc = make(600)
         Pt, yt = make(3000)
-        m = SplitConformalClassifier(Passthrough(3), 0.1, prefit=True, score="aps", class_conditional=True, random_state=10_000 + r)  # not the data seed
+        m = SplitConformalClassifier(Passthrough(3), 0.1, score="aps", class_conditional=True, random_state=10_000 + r)  # not the data seed
         sets = m.calibrate(Pc, yc).predict_set(Pt)
         hit = sets[np.arange(3000), yt]
         cov[r] = [hit[yt == k].mean() for k in range(3)]
     assert np.all(cov.mean(0) >= 0.895) and np.all(cov.mean(0) <= 0.915)
     # marginal calibration under-covers the hard class on the same kind of data
-    m = SplitConformalClassifier(Passthrough(3), 0.1, prefit=True, score="aps", random_state=7)
+    m = SplitConformalClassifier(Passthrough(3), 0.1, score="aps", random_state=7)
     hit = m.calibrate(Pc, yc).predict_set(Pt)[np.arange(3000), yt]
     assert hit[yt == 2].mean() < 0.86
     # a class with no calibration data is always included
     keep = yc != 1
-    m = SplitConformalClassifier(Passthrough(3), 0.1, prefit=True, class_conditional=True)
+    m = SplitConformalClassifier(Passthrough(3), 0.1, class_conditional=True)
     assert m.calibrate(Pc[keep], yc[keep]).predict_set(Pt)[:, 1].all()
 
 
@@ -135,3 +135,52 @@ def test_with_real_model_and_api():
     with pytest.raises(ValueError):
         RAPS(penalty=-1)
     assert "RAPS(penalty=0.1" in repr(RAPS(0.1, 1))
+
+
+@pytest.mark.parametrize("name", ["aps", "raps", "saps"])
+@pytest.mark.parametrize("randomized", [True, False])
+@pytest.mark.parametrize("K", [7, 300])
+def test_compiled_and_numpy_paths_agree(name, randomized, K):
+    """The compiled kernels rank only the top classes of each row. They must
+    return exactly what the full-sort NumPy code returns, ties included."""
+    from pyconformal import scores as S
+
+    if not S.HAVE_NUMBA:
+        pytest.skip("numba not installed")
+    rng = np.random.default_rng(11)
+    n = 400
+    proba = rng.dirichlet(np.full(K, 0.3), size=n)
+    proba[:5] = 1.0 / K  # every class tied
+    proba[5:10, : K // 2] = proba[5:10, K // 2 : 2 * (K // 2)]  # pairs tied
+    proba[5:10] /= proba[5:10].sum(axis=1, keepdims=True)
+    cols = rng.integers(0, K, size=n)
+    u = rng.random(n) if randomized else None
+    sc = S.get_score(name)
+    sc.randomized = randomized
+    thresholds = [0.05, 0.8, 0.999, 3.0, rng.uniform(0.2, 1.1, size=K)]
+    mixed = rng.uniform(0.2, 1.1, size=K)
+    mixed[::3] = np.inf  # classes with too little calibration data
+    thresholds.append(mixed)
+
+    def run():
+        return sc.label_scores(proba, cols, u), [sc.sets(proba, q, u) for q in thresholds]
+
+    fast_lab, fast_sets = run()
+    S.HAVE_NUMBA = False
+    try:
+        slow_lab, slow_sets = run()
+    finally:
+        S.HAVE_NUMBA = True
+    np.testing.assert_array_equal(fast_lab, slow_lab)
+    for f, sl in zip(fast_sets, slow_sets):
+        np.testing.assert_array_equal(f, sl)
+
+
+def test_parallel_search_matches_numpy():
+    from pyconformal._search import search
+
+    rng = np.random.default_rng(5)
+    a = np.sort(rng.integers(0, 500, size=3000).astype(float))
+    v = rng.integers(-5, 505, size=50_000).astype(float)
+    for side in ("left", "right"):
+        np.testing.assert_array_equal(search(a, v, side), np.searchsorted(a, v, side=side))

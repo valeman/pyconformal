@@ -21,8 +21,19 @@ python nixtla_coverage.py
 | `crepes_crps_check.py` | crepes CRPS for normalized systems against the definition |
 | `speed_classification.py` | Prediction sets: coverage, size and time against TorchCP, MAPIE and PUNCC (needs PyTorch) |
 | `torchcp_audit.py` | TorchCP threshold exactness and coverage, including SAPS |
+| `speed_split.py` | Split conformal regression: pyconformal, MAPIE, crepes, PUNCC |
+| `speed_quantile.py` | CQR against MAPIE and PUNCC; CTI against its authors' code; CIR widths |
+| `speed_forest.py` | Quantile forest against quantile-forest (Zillow): fit, predict, accuracy |
+| `speed_mstl.py` | MSTL against statsforecast and statsmodels, with output differences |
+| `speed_cross.py` | CV+ against MAPIE |
+| `speed_timeseries.py` | ACI, DtACI, AgACI, PID, NexCP, EnbPI, SPCI, cross Venn-Abers, normalized and Mondrian split, against other libraries and the papers' own code |
 | `exactness.py` | Split-conformal threshold against the exact value, several packages |
 | `exact_rule_simulation.py` | Plain quantile against the exact finite-sample rule |
 
-Results depend on package versions. The front-page figures were measured on
-20 November 2026 with the versions named there.
+`speed_timeseries.py` takes two optional arguments: a folder holding clones of
+`aangelopoulos/conformal-time-series` and `isgibbs/DtACI`, and the path to
+`Rscript`. Sections whose reference is missing are skipped and say so.
+
+Results depend on package versions and on the machine. The front-page figures
+were measured on 20 and 21 November 2026 on 2 cores, with the versions named
+there.

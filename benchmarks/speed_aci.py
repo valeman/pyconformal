@@ -23,8 +23,8 @@ for T in (2_000, 20_000, 1_000_000):
     # ours: one vectorised model call, then the replay
     def ours(nb):
         t0 = time.perf_counter()
-        aci = AdaptiveConformalInference(alpha=0.1, gamma=0.01).fit(np.abs(Ytr[h:] - model.predict(Xtr[h:])))
-        res = aci.run_intervals(model.predict(Xte), Yte, use_numba=nb)
+        aci = AdaptiveConformalInference(alpha=0.1, gamma=0.01).calibrate(y_pred=model.predict(Xtr[h:]), y=Ytr[h:])
+        res = aci.run(y_pred=model.predict(Xte), y=Yte, use_numba=nb)
         return time.perf_counter() - t0, res.coverage
     to, co = min(ours(True) for _ in range(3)) if HAVE_NUMBA else (float("nan"), float("nan"))
     tp, cp = ours(False)

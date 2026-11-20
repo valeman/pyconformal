@@ -4,10 +4,11 @@ from fractions import Fraction
 import numpy as np
 import pytest
 from sklearn.datasets import make_classification
-from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 
-from pyconformal import MulticlassVennAbers, VennAbers, VennAbersCalibrator
+from pyconformal import VennAbers as VennAbersCalibrator
+from pyconformal.venn_abers import _IVAP as VennAbers
+from pyconformal.venn_abers import _MulticlassIVAP as MulticlassVennAbers
 from pyconformal._va_kernel import HAVE_NUMBA
 
 # Every test runs with warnings as errors: Venn-Abers must be numerically clean.
@@ -184,3 +185,83 @@ def test_multiclass_agrees_with_venn_abers_package():
             )
         ours = MulticlassVennAbers(strategy).fit(P[:2000], y[:2000]).predict_proba(P[2000:])
         assert np.allclose(ours, ref, atol=1e-10), strategy
+
+
+# ------------------------------------------------------ cross Venn-Abers
+
+
+def _cva_data(rng, n):
+    X = rng.normal(size=(n, 5))
+    p = 1 / (1 + np.exp(-(1.5 * X[:, 0] - X[:, 1] + 0.5 * X[:, 2] ** 2 - 0.5)))
+    return X, (rng.uniform(size=n) < p).astype(int)
+
+
+def test_cross_venn_abers_matches_reference_package():
+    va = pytest.importorskip("venn_abers")
+    from sklearn.naive_bayes import GaussianNB
+    import pyconformal as pc
+
+    rng = np.random.default_rng(0)
+    X, y = _cva_data(rng, 600)
+    Xt, _ = _cva_data(rng, 300)
+    ours = pc.CrossVennAbers(GaussianNB(), cv=5, random_state=0).fit(X, y)
+    # the reference, fed exactly our folds: per-fold calibration scores and per-fold test scores
+    S = np.column_stack([m.predict_proba(Xt)[:, 1] for m in ours.estimators_])
+    pairs = ours.predict_pairs(Xt)
+    order = np.random.default_rng(0).permutation(600)
+    folds = np.empty(600, dtype=int)
+    folds[order] = np.arange(600) % 5
+    for k, m in enumerate(ours.estimators_):
+        cal = folds == k
+        ref = va.VennAbers()
+        with warnings.catch_warnings():  # the reference package warns about its own arithmetic
+            warnings.simplefilter("ignore")
+            ref.fit(m.predict_proba(X[cal]), y[cal])
+            _, p01 = ref.predict_proba(np.column_stack([1 - S[:, k], S[:, k]]))
+        np.testing.assert_allclose(pairs[:, k, :], p01, rtol=0, atol=1e-12)
+    p0, p1 = pairs[:, :, 0], pairs[:, :, 1]
+    gm = lambda a: np.exp(np.mean(np.log(a), axis=1))
+    np.testing.assert_allclose(ours.predict_proba(Xt)[:, 1], gm(p1) / (gm(1 - p0) + gm(p1)), atol=1e-12)
+    brier = pc.CrossVennAbers(GaussianNB(), cv=5, merge="brier", random_state=0).fit(X, y)
+    np.testing.assert_allclose(brier.predict_proba(Xt)[:, 1], np.mean(p1 + p0**2 / 2 - p1**2 / 2, axis=1), atol=1e-12)
+    np.testing.assert_array_equal(ours.predict_proba(Xt), ours.predict_proba(scores=S))
+
+
+def test_cross_venn_abers_improves_calibration():
+    from sklearn.naive_bayes import GaussianNB
+    import pyconformal as pc
+
+    rng = np.random.default_rng(1)
+    raw, cross, single = [], [], []
+    ll = lambda p, y: -np.mean(np.log(np.clip(np.where(y == 1, p, 1 - p), 1e-12, 1)))
+    for rep in range(25):
+        X, y = _cva_data(rng, 400)
+        X = np.column_stack([X, X[:, :3] + 0.01 * rng.normal(size=(400, 3))])  # duplicated features: overconfident NB
+        Xt, yt = _cva_data(rng, 3000)
+        Xt = np.column_stack([Xt, Xt[:, :3]])
+        raw.append(ll(GaussianNB().fit(X, y).predict_proba(Xt)[:, 1], yt))
+        cross.append(ll(pc.CrossVennAbers(GaussianNB(), cv=5, random_state=rep).fit(X, y).predict_proba(Xt)[:, 1], yt))
+        single.append(ll(pc.VennAbers(GaussianNB()).fit(X[:200], y[:200]).calibrate(X[200:], y[200:]).predict_proba(Xt)[:, 1], yt))
+    assert np.mean(cross) < np.mean(raw)
+    assert np.mean(cross) < np.mean(single)  # every row both trains and calibrates
+
+
+def test_cross_venn_abers_errors():
+    import pyconformal as pc
+
+    rng = np.random.default_rng(2)
+    s, y, f = rng.uniform(size=90), rng.integers(0, 2, 90), np.arange(90) % 3
+    m = pc.CrossVennAbers().calibrate(scores=s, y=y, folds=f)
+    out = m.predict_proba(scores=rng.uniform(size=(7, 3)))
+    assert out.shape == (7, 2) and np.allclose(out.sum(1), 1) and set(m.predict(scores=rng.uniform(size=(7, 3)))) <= {0, 1}
+    assert m.predict_pairs(scores=rng.uniform(size=(7, 3))).shape == (7, 3, 2)
+    with pytest.raises(ValueError):
+        m.predict_proba(scores=rng.uniform(size=(7, 2)))
+    with pytest.raises(TypeError):
+        pc.CrossVennAbers().fit(s[:, None], y)
+    with pytest.raises(ValueError):
+        pc.CrossVennAbers().calibrate(scores=s, y=y, folds=np.zeros(90))
+    with pytest.raises(ValueError):
+        pc.CrossVennAbers().calibrate(scores=s, y=np.arange(90) % 3, folds=f)
+    with pytest.raises(RuntimeError):
+        pc.CrossVennAbers().predict_proba(scores=s[:, None])

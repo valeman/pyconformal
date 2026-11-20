@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "pyconformal"
 dynamic = ["version"]
-description = "Conformal prediction for Python: distribution-free prediction intervals and prediction sets with finite-sample coverage guarantees."
+description = "Fast, tested conformal prediction for tabular data and time series: prediction intervals, prediction sets, predictive distributions and Venn-Abers calibration."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
@@ -19,9 +19,13 @@ keywords = [
     "prediction sets",
     "machine learning",
     "calibration",
+    "venn-abers",
+    "time series",
+    "forecasting",
+    "quantile regression",
 ]
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
@@ -33,7 +37,7 @@ classifiers = [
 
 [project.optional-dependencies]
 fast = ["numba>=0.59"]
-test = ["pytest>=7", "scikit-learn>=1.0", "venn-abers>=1.5", "crepes>=0.9"]
+test = ["pytest>=7", "scikit-learn>=1.0", "venn-abers>=1.5", "crepes>=0.9", "statsmodels>=0.14"]
 # tests/test_csp.py also compares against csp-forecaster when it is installed:
 #   pip install git+https://github.com/valeman/csp-forecaster
 

@@ -108,16 +108,14 @@ def test_regressor_interval_shape_and_alpha_override():
     assert np.all(wide[:, 1] - wide[:, 0] >= narrow[:, 1] - narrow[:, 0])
 
 
-def test_prefit_and_errors():
+def test_trained_model_and_errors():
     rng = np.random.default_rng(2)
     X = rng.normal(size=(100, 2))
     y = X[:, 0] + rng.normal(size=100)
     est = LinearRegression().fit(X[:50], y[:50])
-    m = SplitConformalRegressor(est, prefit=True)
+    m = SplitConformalRegressor(est)
     with pytest.raises(RuntimeError):
         m.predict_interval(X)
-    with pytest.raises(RuntimeError):
-        m.fit(X, y)
     m.calibrate(X[50:], y[50:])
     assert m.predict_interval(X).shape == (100, 2)
 
