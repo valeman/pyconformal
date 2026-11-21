@@ -67,7 +67,8 @@ from pyconformal import (SplitConformalClassifier, VennAbers,
                          ConformalPredictiveSystem, AdaptiveConformalInference)
 
 # Prediction sets
-sets = SplitConformalClassifier(clf, alpha=0.1, score="aps").calibrate(X_cal, y_cal).predict_set(X_test)
+cp = SplitConformalClassifier(clf, alpha=0.1, score="aps").calibrate(X_cal, y_cal)
+sets = cp.predict_set(X_test)
 
 # Calibrated probabilities with a validity guarantee
 proba = VennAbers(clf).calibrate(X_cal, y_cal).predict_proba(X_test)
