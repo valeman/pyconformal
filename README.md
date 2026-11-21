@@ -167,6 +167,12 @@ not measured a case where that changes its coverage.
 **No package covers both worlds.** Tabular libraries carry a couple of
 time-series methods; forecasting libraries carry a couple of conformal ones.
 
+## On real data
+
+![Coverage of 90% forecast intervals on three real series](project/assets/case_studies_summary.png)
+
+Same point forecasts, same 1,500 forecast origins per series. statsforecast's default conformal intervals cover 61% to 66% at a stated 90%; pyconformal covers 91%. The intervals are wider, because a 90% interval has to be. Figures, tables and limits: [case studies](project/docs/case_studies.md).
+
 ## Three rules the package is built on
 
 1. **Exact.** One routine computes every threshold, in exact arithmetic.
