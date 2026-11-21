@@ -30,7 +30,7 @@ cp.predict_interval(X_test)                      # covers at least 90% of the ti
 
 No model object? Pass its outputs: `cp.calibrate(y_pred=pred_cal, y=y_cal)`.
 
-**[Install](#install) · [What you get](#what-you-get) · [Quick tour](#one-interface) · [Why it exists](#why-it-exists) · [Speed](#speed-method-by-method) · [User guide](project/docs/guide.md)**
+**[Install](#install) · [What you get](#what-you-get) · [Quick tour](#one-interface) · [Why it exists](#why-it-exists) · [On real data](#on-real-data) · [Speed](#speed-method-by-method) · [User guide](project/docs/guide.md)**
 
 ## Install
 
@@ -169,9 +169,26 @@ time-series methods; forecasting libraries carry a couple of conformal ones.
 
 ## On real data
 
+We tested pyconformal against Nixtla's statsforecast 2.1.1 on three public series. statsforecast makes every point forecast; both libraries then put a 90% interval around the same forecasts, at 1,500 consecutive forecast origins per series.
+
 ![Coverage of 90% forecast intervals on three real series](project/assets/case_studies_summary.png)
 
-Same point forecasts, same 1,500 forecast origins per series. statsforecast's default conformal intervals cover 61% to 66% at a stated 90%; pyconformal covers 91%. This is plain split conformal, recalibrated at every step on all past errors; no specialised forecasting method was needed. The intervals are wider, because a 90% interval has to be. Figures, tables and limits: [case studies](project/docs/case_studies.md).
+| Series | Horizon | statsforecast, default | statsforecast, 10 windows | pyconformal |
+|---|---|---|---|---|
+| US daily births | 7 days | 61.1% | 80.8% | **91.0%** |
+| Saugeen River daily flow | 7 days | 66.0% | 79.2% | **91.3%** |
+| Victoria hourly electricity demand | 24 hours | 64.7% | 82.4% | **90.8%** |
+
+The same week of electricity demand, 24 hours ahead. Dots are outcomes outside the interval:
+
+![Victoria electricity demand: statsforecast default intervals above, pyconformal below](project/assets/case_studies_power.png)
+
+- **Nothing specialised was needed.** The pyconformal column is plain split conformal, recalibrated at every step on all past errors. It takes 30 to 100 milliseconds for a whole series, because no model is refitted.
+- **Why the default falls short.** It calibrates on two past errors per horizon, and no finite interval from two errors is a valid 90% interval ([statsforecast issue #1349](https://github.com/Nixtla/statsforecast/issues/1349)).
+- **The pyconformal intervals are wider**, because a 90% interval has to be wider than a 61% one.
+- **Limits.** Forecast errors are not exchangeable, so 91% is an observed result, not a guarantee. Three series and simple forecasters: an illustration, not a benchmark.
+
+Figures for all three series, other forecasting models and the scripts: [case studies](project/docs/case_studies.md).
 
 ## Three rules the package is built on
 
