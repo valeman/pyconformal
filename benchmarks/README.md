@@ -26,6 +26,7 @@ python nixtla_coverage.py
 | `speed_forest.py` | Quantile forest against quantile-forest (Zillow): fit, predict, accuracy |
 | `speed_mstl.py` | MSTL against statsforecast and statsmodels, with output differences |
 | `speed_cross.py` | CV+ against MAPIE |
+| `speed_multistep.py` | Multi-step split conformal and AcMCP against R's conformalForecast (pass the path to `Rscript`) |
 | `speed_timeseries.py` | ACI, DtACI, AgACI, PID, NexCP, EnbPI, SPCI, cross Venn-Abers, normalized and Mondrian split, against other libraries and the papers' own code |
 | `exactness.py` | Split-conformal threshold against the exact value, several packages |
 | `exact_rule_simulation.py` | Plain quantile against the exact finite-sample rule |
@@ -37,3 +38,5 @@ python nixtla_coverage.py
 Results depend on package versions and on the machine. The front-page figures
 were measured on 20 and 21 November 2026 on 2 cores, with the versions named
 there.
+
+`reports/` holds short, self-contained scripts that reproduce the faults reported to other packages (TorchCP, crepes, PUNCC) and the MAPIE EnbPI timing. They need only the package concerned.

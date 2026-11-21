@@ -124,7 +124,8 @@ calibration (binary and multiclass), adaptive conformal inference (ACI) and
 conformal seasonal pools (CSP) for time series, and a fast parallel quantile
 forest to feed CQR, CTI and CIR (with out-of-bag calibration), jackknife+ and
 CV+, normalized, Mondrian and weighted split regression, cross Venn-Abers,
-DtACI, AgACI, NexCP, conformal PID, EnbPI and SPCI for time series, and a fast
+DtACI, AgACI, NexCP, conformal PID, EnbPI, SPCI, multi-step split
+conformal prediction and AcMCP for time series, and a fast
 STL / MSTL decomposition for series with several seasonal periods.
 
 ## Install
@@ -147,8 +148,10 @@ Scripts are in `benchmarks/`.
 | AgACI | R code in the DtACI repository, 30 experts | 46x from scores to thresholds (4.5x on the update step alone) |
 | Conformal PID | authors' code | 106x to 112x, same thresholds |
 | NexCP | the definition recomputed each step | 236x, same thresholds |
-| EnbPI | MAPIE; PUNCC | 470x; 23x (PUNCC fails at batch size 1) |
+| EnbPI | MAPIE; PUNCC | 400x to 470x replaying a stream whose features are all known (a backtest), about 2.5x fed one row at a time; 23x (PUNCC fails at batch size 1) |
 | SPCI | the paper's loop with quantile-forest | 9x |
+| Multi-step split | R conformalForecast | over 4,000x, same intervals |
+| AcMCP | R conformalForecast | 43x with the scorecaster, about 5,000x without |
 | CV+ (10 folds) | MAPIE | 17x to 27x at prediction; MAPIE runs out of memory at 20,000 x 20,000 rows |
 | Split regression | PUNCC, crepes, MAPIE | 2x to 5x |
 | Normalized / Mondrian split | crepes | 3x / 4x |
@@ -156,7 +159,7 @@ Scripts are in `benchmarks/`.
 | APS, RAPS, SAPS sets | TorchCP, PUNCC, MAPIE | 2x at 10 classes, 3x to 7x at 100 and 1,000 |
 | CQR | MAPIE; PUNCC | 6x; 3x, same intervals |
 | CTI | authors' code | 19x, same sets |
-| Quantile forest | quantile-forest (Zillow) | fit 4x to 7x; predict 1.2x to 2x |
+| Quantile forest | quantile-forest (Zillow) | fit 6x to 9x; predict 2.5x to 4x exact, 1.6x to 3x approximate (16-core server) |
 | MSTL | statsforecast; R forecast | 6x to 7x at equal settings (145x to 520x at defaults); 5x |
 | CSP | csp-forecaster 0.2.0 | 2x to 21x |
 
@@ -333,12 +336,20 @@ A quantile regression forest (Meinshausen, 2006) written for speed: features
 are binned once, splits are found on histograms, trees grow in parallel, and
 any number of quantile levels costs one pass per sample. Needs numba
 (`pip install pyconformal[fast]`). Against quantile-forest 1.5.0 with the same
-settings (`benchmarks/speed_forest.py`, 100,000 training rows, 2 cores): fit
-in 3 s against 17 to 21 s; prediction about twice as fast as its exact mode,
-with the same accuracy. `max_samples_leaf=1` gives the approximation that is
-quantile-forest's default (one stored sample per leaf); in that mode too
-pyconformal predicts faster (0.25 s against 0.29 s for 3 levels, 0.31 s
-against 0.48 s for 99).
+settings (`benchmarks/speed_forest.py`), on a 16-core server with 100,000 and
+1,000,000 training rows:
+
+| | pyconformal | quantile-forest |
+|---|---|---|
+| Fit | 1.9 s and 27 s | 11 to 16 s and 215 to 258 s (6 to 9 times slower) |
+| Predict 20,000 rows, exact | 0.41 s and 0.62 s | 1.15 s and 1.89 s |
+| Predict, one sample per leaf | 0.14 s and 0.40 s | 0.25 s and 0.66 s |
+| Accuracy (pinball loss) | same to the third decimal | |
+
+`max_samples_leaf=1` is the approximation that quantile-forest uses by
+default (one stored sample per leaf). The server was busy during the test, so
+read the ratios, not the seconds. Prediction has since been made about a third
+faster on one thread; that change has not been re-measured on the server.
 
 `cir.calibrate_oob(y_train)` calibrates on the forest's out-of-bag
 predictions, so no data is set aside. In our runs CQR with out-of-bag
@@ -394,6 +405,50 @@ Four more online methods take the same calls as ACI:
 | `AgACI` | Combines the thresholds of 30 ACI experts by online aggregation | 4.4 s |
 | `NonexchangeableConformal` (NexCP) | Old scores count less: weight `rho ** age` | 0.3 s |
 | `ConformalPID` | Moves the threshold itself up after a miss, down after a cover | 0.09 s |
+
+### Several steps ahead: multi-step split conformal prediction
+
+```python
+from pyconformal import MultiStepSplitConformal
+
+ms = MultiStepSplitConformal(alpha=0.1)
+result = ms.run(y_pred=F, y=y)            # F[t, h - 1]: forecast for time t made h steps earlier
+result.intervals                           # (T, H, 2), one calibration per horizon
+ms.predict_interval(y_pred=next_forecasts) # the H steps after the history
+```
+
+Each horizon has its own errors, and the interval for a target uses only the
+errors that were known when its forecast was made. Same results as `scp` in
+the R package conformalForecast, in about 10 ms against 42 s for 3,000 time steps and
+12 horizons (`benchmarks/speed_multistep.py`). At a few calibration sizes the
+R package takes one rank higher than the exact rule (floating-point rounding);
+pyconformal computes the rank exactly.
+
+### Several steps ahead, online: AcMCP
+
+```python
+from pyconformal import AcMCP
+
+ac = AcMCP(alpha=0.1, min_calibration=50)
+result = ac.run(y_pred=F, y=y)             # same inputs as MultiStepSplitConformal
+ac.predict_interval(y_pred=next_forecasts)
+```
+
+Autocorrelated multi-step conformal prediction (Wang and Hyndman) tracks the
+two ends of the interval at each horizon from past misses, adds an integrator,
+and forecasts the next error with an MA(h - 1) model and a regression on the
+shorter horizons. Without the scorecaster the results equal `acmcp` in the R
+package conformalForecast to 14 digits, in 0.8 ms against 3.9 s (1,000 time
+steps, 6 horizons). With the scorecaster: 2.5 s against 107 s; the median
+difference from R is 0.00001 and the largest 0.01, because both fit the MA
+model with an iterative optimiser and R's stops earlier, sometimes at a worse
+fit. `refit_every=10` refits the MA model every tenth step and is about 8
+times faster again.
+
+Two things differ from the R defaults on purpose. `KI=None` scales the
+integrator by the largest error seen so far; R's default uses the largest
+error of the whole history, which is not known at the time. Pass a number to
+reproduce R. The scorecaster needs numba to run at a useful speed.
 
 ### Ensembles without a calibration set: EnbPI and SPCI
 

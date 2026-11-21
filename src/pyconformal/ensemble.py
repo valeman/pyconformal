@@ -162,7 +162,16 @@ class EnbPI(_Conformal):
         else:
             if X is None or self.estimators_ is None:
                 raise TypeError("Pass X (after fit) or y_pred= with one column per member.")
-            P = np.column_stack([np.asarray(m.predict(X), dtype=float).ravel() for m in self.estimators_])
+            # predict_interval(X) followed by update(X, y) asks for the same
+            # rows twice; the members are only run once
+            Xa = np.asarray(X)
+            last = getattr(self, "_last_members", None)
+            if last is not None and last[0] is self.estimators_ and Xa.size <= 4096 and Xa.shape == last[1].shape and np.array_equal(Xa, last[1]):
+                P = last[2]
+            else:
+                P = np.column_stack([np.asarray(m.predict(X), dtype=float).ravel() for m in self.estimators_])
+                if Xa.size <= 4096 and Xa.dtype != object:
+                    self._last_members = (self.estimators_, Xa.copy(), P)
         if P.ndim != 2 or P.shape[1] != self.n_members_:
             raise ValueError(f"Expected predictions of shape (n_samples, {self.n_members_}).")
         return P

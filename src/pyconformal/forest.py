@@ -165,7 +165,7 @@ def _build_forest(Xb, y, seeds, n_draw, bootstrap, mtry, min_leaf, max_depth, fe
 
 
 @njit(parallel=True, cache=True)
-def _predict(Xb, ys, nodes, b, rk, levels, out_q, out_mean, inbag):
+def _predict(Xb, ys, nodes, b, rk, levels, out_q, out_mean, inbag, block):
     """Weighted quantiles (levels ascending) and mean for every row.
 
     ``rk`` holds, for every tree, the rank of each training outcome among all
@@ -175,7 +175,6 @@ def _predict(Xb, ys, nodes, b, rk, levels, out_q, out_mean, inbag):
     """
     n = Xb.shape[0]
     T = nodes.shape[0]
-    block = 256
     for blk in prange((n + block - 1) // block):
         first = blk * block
         m = min(block, n - first)
@@ -188,34 +187,54 @@ def _predict(Xb, ys, nodes, b, rk, levels, out_q, out_mean, inbag):
         # processor overlaps them instead of waiting on one row at a time.
         leaf = np.empty((m, T), dtype=np.int64)
         cur = np.empty(m, dtype=np.int64)
+        act = np.empty(m, dtype=np.int64)
         for t in range(T):
             tree = nodes[t]
             cur[:] = 0
-            moving = True
-            while moving:
-                moving = False
-                for r in range(m):
+            for r in range(m):
+                act[r] = r
+            left = m
+            while left > 0:  # only rows that have not reached a leaf yet
+                k = 0
+                for j in range(left):
+                    r = act[j]
                     w = tree[cur[r]]
                     f = w >> 40
                     if f != 0:
                         cur[r] = (w & 0xFFFFFFFF) + (Xb[first + r, f - 1] > ((w >> 32) & 0xFF))
-                        moving = True
+                        act[k] = r
+                        k += 1
+                left = k
             if inbag.shape[0] == 0:
                 for r in range(m):
                     leaf[r, t] = cur[r]
             else:  # out-of-bag: a tree that trained on the row does not vote
                 for r in range(m):
                     leaf[r, t] = -1 if inbag[t, first + r] else cur[r]
+        starts = np.empty(T, dtype=np.int64)
+        sizes = np.empty(T, dtype=np.int64)
+        cap = 2048
+        pos = np.empty(cap + 1, dtype=np.int64)
+        sr = np.empty(cap, dtype=np.int64)
+        sw = np.empty(cap)
         for r in range(m):
-            _pool(first + r, leaf[r], ys, nodes, b, rk, levels, out_q, out_mean)
+            need = 0
+            for t in range(T):
+                if leaf[r, t] >= 0:
+                    need += b[t, leaf[r, t]]
+            if need > cap:  # grow the work buffers, rarely
+                cap = 2 * need
+                pos = np.empty(cap + 1, dtype=np.int64)
+                sr = np.empty(cap, dtype=np.int64)
+                sw = np.empty(cap)
+            _pool(first + r, leaf[r], ys, nodes, b, rk, levels, out_q, out_mean, starts, sizes, pos, sr, sw)
 
 
 @njit(cache=True)
-def _pool(i, leaf, ys, nodes, b, rk, levels, out_q, out_mean):
+def _pool(i, leaf, ys, nodes, b, rk, levels, out_q, out_mean, starts, sizes, pos, sr, sw):
+        # starts, sizes, pos, sr and sw are work buffers owned by the caller
         T = nodes.shape[0]
         nq = levels.shape[0]
-        starts = np.empty(T, dtype=np.int64)
-        sizes = np.empty(T, dtype=np.int64)
         total = 0
         rmin = np.int64(2**62)
         rmax = np.int64(-1)
@@ -251,14 +270,13 @@ def _pool(i, leaf, ys, nodes, b, rk, levels, out_q, out_mean):
         if nq == 0:
             return
         span = rmax - rmin + 1
-        pos = np.zeros(total + 1, dtype=np.int64)
+        for k in range(total + 1):
+            pos[k] = 0
         for t in range(T):
             for j in range(starts[t], starts[t] + sizes[t]):
                 pos[((rk[t, j] - rmin) * total) // span + 1] += 1
         for k in range(total):
             pos[k + 1] += pos[k]
-        sr = np.empty(total, dtype=np.int64)
-        sw = np.empty(total)
         for t in range(T):
             if sizes[t] == 0:
                 continue
@@ -296,30 +314,35 @@ def _pool(i, leaf, ys, nodes, b, rk, levels, out_q, out_mean):
 
 
 @njit(parallel=True, cache=True)
-def _predict_one(Xb, ys, nodes, rep, levels, out_q, out_mean):
+def _predict_one(Xb, ys, nodes, rep, levels, out_q, out_mean, block):
     """As ``_predict`` with one stored sample per leaf: every tree contributes
     one outcome with equal weight."""
     n = Xb.shape[0]
     T = nodes.shape[0]
     nq = levels.shape[0]
-    block = 256
     for blk in prange((n + block - 1) // block):
         first = blk * block
         m = min(block, n - first)
         ranks = np.empty((m, T), dtype=np.int64)
         cur = np.empty(m, dtype=np.int64)
+        act = np.empty(m, dtype=np.int64)
         for t in range(T):
             tree = nodes[t]
             cur[:] = 0
-            moving = True
-            while moving:
-                moving = False
-                for r in range(m):
+            for r in range(m):
+                act[r] = r
+            left = m
+            while left > 0:  # only rows that have not reached a leaf yet
+                k = 0
+                for j in range(left):
+                    r = act[j]
                     w = tree[cur[r]]
                     f = w >> 40
                     if f != 0:
                         cur[r] = (w & 0xFFFFFFFF) + (Xb[first + r, f - 1] > ((w >> 32) & 0xFF))
-                        moving = True
+                        act[k] = r
+                        k += 1
+                left = k
             for r in range(m):
                 ranks[r, t] = rep[t, cur[r]]
         for r in range(m):
@@ -334,6 +357,17 @@ def _predict_one(Xb, ys, nodes, rep, levels, out_q, out_mean):
 
 
 _NO_BAG = np.empty((0, 0), dtype=np.bool_)
+_BLOCK = [0]  # 0 = choose from the number of rows and threads
+
+
+def _block(n):
+    """Rows handled together per thread. Larger blocks reuse each tree's nodes
+    more before moving on; smaller blocks keep every thread busy."""
+    if _BLOCK[0]:
+        return _BLOCK[0]
+    from numba import get_num_threads
+
+    return int(min(4096, max(256, -(-n // (4 * get_num_threads())))))
 
 
 class QuantileForest:
@@ -507,9 +541,9 @@ class QuantileForest:
         out_q = np.empty((X.shape[0], q.size))
         out_mean = np.empty(X.shape[0])
         if self._rep is not None:
-            _predict_one(self._bin(X), self._ys, self._nodes, self._rep, q[order], out_q, out_mean)
+            _predict_one(self._bin(X), self._ys, self._nodes, self._rep, q[order], out_q, out_mean, _block(X.shape[0]))
         else:
-            _predict(self._bin(X), self._ys, self._nodes, self._b, self._rk, q[order], out_q, out_mean, _NO_BAG)
+            _predict(self._bin(X), self._ys, self._nodes, self._b, self._rk, q[order], out_q, out_mean, _NO_BAG, _block(X.shape[0]))
         if quantiles is None:
             return out_mean
         res = np.empty_like(out_q)
@@ -539,7 +573,7 @@ class QuantileForest:
         order = np.argsort(q, kind="stable")
         out_q = np.empty((n, q.size))
         out_mean = np.empty(n)
-        _predict(self._Xb, self._ys, self._nodes, self._b, self._rk, q[order], out_q, out_mean, inbag)
+        _predict(self._Xb, self._ys, self._nodes, self._b, self._rk, q[order], out_q, out_mean, inbag, _block(n))
         if np.any(np.isnan(out_mean)):
             raise RuntimeError(
                 "Some rows were in every tree's sample, so they have no out-of-bag "

@@ -7,6 +7,7 @@ from pyconformal.csp import ConformalSeasonalPool, CSPResult
 from pyconformal.ensemble import SPCI, EnbPI, EnsembleResult
 from pyconformal.forest import QuantileForest
 from pyconformal.mstl import mstl, stl
+from pyconformal.multistep import AcMCP, MultiStepResult, MultiStepSplitConformal
 from pyconformal.online import (
     ACIResult,
     AdaptiveConformalInference,
@@ -29,6 +30,7 @@ __version__ = "0.1.0"
 
 __all__ = [
     "APS",
+    "AcMCP",
     "AgACI",
     "ConformalPID",
     "LAC",
@@ -48,6 +50,8 @@ __all__ = [
     "ConformalThresholdedIntervals",
     "ConformalizedQuantileRegressor",
     "ConformalSeasonalPool",
+    "MultiStepResult",
+    "MultiStepSplitConformal",
     "NonexchangeableConformal",
     "QuantileForest",
     "SplitConformalClassifier",

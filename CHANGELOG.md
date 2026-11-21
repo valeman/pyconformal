@@ -27,6 +27,7 @@ method works from model outputs or from a model.
 **Time series**
 - Adaptive conformal inference (ACI), DtACI, AgACI, NexCP, conformal PID
 - EnbPI and SPCI
+- Multi-step split conformal prediction and AcMCP
 - Conformal seasonal pools (CSP)
 - STL and MSTL decomposition
 

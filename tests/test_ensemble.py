@@ -110,3 +110,28 @@ def test_spci_stepwise_and_errors():
     assert free.predict_interval(y_pred=rng.normal(size=(3, 4))).shape == (3, 2)
     with pytest.raises(ValueError):
         free.predict_interval(y_pred=rng.normal(size=(3, 5)))
+
+
+def test_enbpi_update_reuses_member_predictions():
+    from sklearn.linear_model import LinearRegression
+
+    class Counting(LinearRegression):
+        calls = 0
+
+        def predict(self, X):
+            Counting.calls += 1
+            return super().predict(X)
+
+    rng = np.random.default_rng(0)
+    X = rng.normal(size=(120, 3))
+    y = X.sum(axis=1) + rng.normal(size=120)
+    a = pc.EnbPI(Counting(), n_bootstraps=5, random_state=0).fit(X[:100], y[:100])
+    b = pc.EnbPI(LinearRegression(), n_bootstraps=5, random_state=0).fit(X[:100], y[:100])
+    Counting.calls = 0
+    for i in range(100, 120):
+        ia = a.predict_interval(X[i : i + 1])
+        a.update(X[i : i + 1], y[i : i + 1])
+        ib = b.predict_interval(X[i : i + 1])
+        b.update(y=y[i : i + 1], y_pred=np.column_stack([m.predict(X[i : i + 1]) for m in b.estimators_]))
+        np.testing.assert_allclose(ia, ib)
+    assert Counting.calls == 20 * a.n_members_
