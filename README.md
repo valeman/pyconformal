@@ -194,7 +194,7 @@ the code released with the paper that proposed the method.
 
 | Method | Compared with | Times faster |
 |---|---|---|
-| Venn-Abers | venn-abers, MAPIE | up to 188x (13x to 23x at 10,000 to 100,000 points), same outputs |
+| Venn-Abers | venn-abers, MAPIE | up to 188x (11x to 29x at 10,000 to 100,000 calibration points), same outputs |
 | Cross Venn-Abers | venn-abers | 3x |
 | Predictive distributions; CRPS | crepes | 64x to 8,000x; 280x to 760x |
 | Split regression | PUNCC, crepes, MAPIE | 2x to 5x |
@@ -222,7 +222,7 @@ Read these with three things in mind. **Backtest and live use are different
 measurements:** in a backtest pyconformal calls the model once for the whole
 history, where MAPIE's interface calls it at every step; fed one row at a
 time, the model call dominates in both. **Some gains depend on the data:**
-Venn-Abers is about level with existing code on scores rounded to two
+Venn-Abers is 3 to 6 times faster, not 188, on scores rounded to two
 decimals. **Small things are small:** split conformal takes milliseconds in
 every package.
 
