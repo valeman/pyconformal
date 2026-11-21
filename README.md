@@ -80,7 +80,8 @@ cps.predict_quantile(X_test, [0.05, 0.5, 0.95]); cps.predict_cdf(X_test, 100.0)
 # Time series: replay a history, then go live
 aci = AdaptiveConformalInference(alpha=0.1)
 aci.run(y_pred=forecasts, y=actuals).coverage
-aci.predict_interval(y_pred=next_forecast); aci.update(y_pred=next_forecast, y=next_actual)
+aci.predict_interval(y_pred=next_forecast)
+aci.update(y_pred=next_forecast, y=next_actual)
 ```
 
 Results are plain NumPy arrays. The **[user guide](project/docs/guide.md)** has a
