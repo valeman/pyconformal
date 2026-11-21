@@ -97,7 +97,7 @@ Version 0.1.0 is not on PyPI yet. Until it is:
 pip install "pyconformal[fast] @ git+https://github.com/valeman/pyconformal"
 ```
 
-Python 3.9 or later.
+Python 3.10 or later.
 
 ## One interface
 
