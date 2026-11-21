@@ -47,6 +47,8 @@ About 1,390 targets per horizon in each row. Widths are in the units of the seri
 
 **pyconformal reaches the stated level on the same forecasts.** The point forecasts are identical. Only the calibration differs.
 
+**Nothing specialised was needed.** The pyconformal intervals come from plain split conformal prediction, the simplest method there is: forecast plus or minus a quantile of past absolute errors. It is applied per horizon and recalibrated at every step on all the errors known so far, which costs milliseconds because no model is refitted. No adaptive, weighted or forecasting-specific conformal method was used for the headline numbers. statsforecast uses the same idea; the gap comes from how many errors are used and which quantile is taken.
+
 **The intervals are wider, because they have to be.** A 61% interval is narrower than a 90% interval. The narrow one is not a better interval; it is a different interval with the wrong label.
 
 ## What it looks like
