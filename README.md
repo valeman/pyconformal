@@ -280,7 +280,25 @@ You can also buy me a coffee:
   <a href="https://buymeacoffee.com/valeman"><img src="project/assets/buymeacoffee_qr.png" alt="QR code for buymeacoffee.com/valeman" width="120"></a>
 </p>
 
-## Licence
+## Licence and disclaimer
 
 MIT. Copyright (c) 2026 Valery Manokhin. Use it anywhere, including in
 closed-source products.
+
+The software is provided "as is", without warranty of any kind, express or
+implied, including the warranties of merchantability, fitness for a particular
+purpose and non-infringement. The author accepts no liability for any claim,
+damages or other loss arising from its use. The full terms are in
+[LICENSE](LICENSE).
+
+The coverage guarantees described here are mathematical statements that hold
+under stated assumptions, such as exchangeable data and a calibration set kept
+apart from training. They are not a guarantee about your data, your model or
+any particular decision. You are responsible for checking that the assumptions
+fit your use and for validating results before relying on them, especially in
+medical, financial, legal or safety-critical settings. Nothing here is
+professional advice.
+
+Comparisons with other packages describe the versions and settings named, as
+measured on the dates given. Other packages change; check current versions
+before relying on a comparison.
