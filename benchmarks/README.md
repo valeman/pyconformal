@@ -23,6 +23,7 @@ python nixtla_coverage.py
 | `torchcp_audit.py` | TorchCP threshold exactness and coverage, including SAPS |
 | `speed_split.py` | Split conformal regression: pyconformal, MAPIE, crepes, PUNCC |
 | `speed_quantile.py` | CQR against MAPIE and PUNCC; CTI against its authors' code; CIR widths |
+| `speed_cir.py` | CIR and CIR+ against the authors' code (pass the path of a clone of github.com/orince/CIR; needs torch and torchcp) |
 | `speed_forest.py` | Quantile forest against quantile-forest (Zillow): fit, predict, accuracy |
 | `speed_mstl.py` | MSTL against statsforecast and statsmodels, with output differences |
 | `speed_cross.py` | CV+ against MAPIE |

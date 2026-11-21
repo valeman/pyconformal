@@ -586,9 +586,16 @@ class ConformalInterquantileRegressor(_Interquantile):
       consecutive intervals, which is not always the same window;
       ``window="shortest"`` gives that variant, without the finite-sample
       guarantee.
-    * For CIR+ the paper leaves the scaling constant open. Here the added
-      length is divided by the sample's full predicted range, and the extra
-      step is taken when the resulting score is at most the threshold.
+    * For CIR+ the added length is divided by the sample's full predicted
+      range, and the extra step is taken when the resulting score is at
+      most the threshold. The authors' code divides by 100 times the
+      largest calibration outcome instead, which depends on the units and
+      sign of the outcome.
+
+    ``window="shortest"`` returns the same intervals as the authors' code
+    (github.com/orince/CIR) when the calibration size is such that the two
+    rank rules agree; their rank is one higher when ``(1 - alpha) * (n + 1)``
+    is a whole number.
 
     Parameters
     ----------

@@ -14,7 +14,7 @@ def make(T):
     y = np.cumsum(rng.normal(size=n)) * 0.1 + rng.standard_t(3, size=n) * np.where(np.arange(n) > n // 2, 3.0, 1.0)
     X = np.column_stack([y[i:n - L + i] for i in range(L)]); Y = y[L:]
     return X[:T0], Y[:T0], X[T0:], Y[T0:]
-AdaptiveConformalInference().run(np.ones(3))  # compile once
+AdaptiveConformalInference().run(scores=np.ones(3))  # compile once
 print(f"\n{'steps':>9} {'MAPIE s':>9} {'ms/step':>8} {'ours s':>9} {'us/step':>8} {'ours numpy s':>12} {'speed-up':>9}  coverage MAPIE / ours")
 for T in (2_000, 20_000, 1_000_000):
     Xtr, Ytr, Xte, Yte = make(T)
@@ -39,3 +39,25 @@ for T in (2_000, 20_000, 1_000_000):
         print(f"{T:9,} {tm:9.2f} {1e3 * tm / T:8.2f} {to:9.4f} {1e6 * to / T:8.2f} {tp:12.3f} {tm / to:8.0f}x  {hit / T:.3f} / {co:.3f}")
     else:
         print(f"{T:9,} {'not run':>9} {'':>8} {to:9.4f} {1e6 * to / T:8.2f} {tp:12.3f} {'':>9}  - / {co:.3f}")
+
+# The same task fed one row at a time in both packages: call the model, get the
+# interval, observe, update. Here the model call is inside pyconformal's loop too.
+T = 2_000
+Xtr, Ytr, Xte, Yte = make(T); h = T0 // 2
+model = LinearRegression().fit(Xtr[:h], Ytr[:h])
+m = TimeSeriesRegressor(model, method="aci", cv="prefit"); m.fit(Xtr[h:], Ytr[h:])
+t0 = time.perf_counter()
+for t in range(T):
+    m.predict(Xte[t:t + 1], confidence_level=0.9, allow_infinite_bounds=True)
+    m.adapt_conformal_inference(Xte[t:t + 1], Yte[t:t + 1], gamma=0.01, confidence_level=0.9)
+tm = (time.perf_counter() - t0) / T
+aci = AdaptiveConformalInference(alpha=0.1, gamma=0.01).calibrate(y_pred=model.predict(Xtr[h:]), y=Ytr[h:])
+t0 = time.perf_counter()
+for t in range(T):
+    p = model.predict(Xte[t:t + 1]); aci.predict_interval(y_pred=p); aci.update(y_pred=p, y=Yte[t:t + 1])
+to = (time.perf_counter() - t0) / T
+t0 = time.perf_counter()
+for t in range(T): model.predict(Xte[t:t + 1])
+tmod = (time.perf_counter() - t0) / T
+print(f"\none row at a time: MAPIE {tm * 1e6:.0f} us per step, pyconformal {to * 1e6:.0f} us ({tm / to:.1f}x); one model call alone {tmod * 1e6:.0f} us")
+

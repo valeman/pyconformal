@@ -38,10 +38,12 @@ run with a clear error, which is safe. Its measured weaknesses:
   (60.7 s against 0.48 s for 1,000,000 calibration points), with hundreds of
   numerical warnings on every fit. pyconformal does the whole computation in
   integers with a single division at the end, so it emits none.
-- **Online time series (ACI):** 0.41 ms per step. pyconformal's ACI runs the
-  same task in 0.17 to 0.25 microseconds per step, about 1,600 to 2,400 times
-  faster, with the same coverage. MAPIE calls the model one row at a time;
-  pyconformal never puts the model inside the update loop.
+- **Online time series (ACI):** 0.41 to 0.57 ms per step. Replaying a history
+  whose forecasts are already in hand, pyconformal takes 0.17 to 0.25
+  microseconds per step, about 1,600 to 2,400 times faster, with the same
+  coverage: it never puts the model inside the update loop. Fed one row at a
+  time with the model called at every step, it takes about 0.09 ms, 6 to 7
+  times faster; nearly all of that is the model call itself.
 - **APS and RAPS prediction sets are larger than needed:** 95.5% and 96.3%
   coverage at a 90% target.
 - **Time series:** two methods only.
@@ -143,7 +145,7 @@ Scripts are in `benchmarks/`.
 |---|---|---|
 | Venn-Abers | venn-abers, MAPIE | 3x to 188x faster, same outputs |
 | Cross Venn-Abers | venn-abers | 3x faster (model training included on both sides) |
-| ACI | authors' code; MAPIE | 286x; about 2,000x |
+| ACI | authors' code; MAPIE | 286x; about 2,000x replaying a history, 6x to 8x one row at a time |
 | DtACI | authors' R code | 357x from scores to thresholds (66x on the update step alone) |
 | AgACI | R code in the DtACI repository, 30 experts | 46x from scores to thresholds (4.5x on the update step alone) |
 | Conformal PID | authors' code | 106x to 112x, same thresholds |
@@ -159,11 +161,12 @@ Scripts are in `benchmarks/`.
 | APS, RAPS, SAPS sets | TorchCP, PUNCC, MAPIE | 2x at 10 classes, 3x to 7x at 100 and 1,000 |
 | CQR | MAPIE; PUNCC | 6x; 3x, same intervals |
 | CTI | authors' code | 19x, same sets |
+| CIR; CIR+ | authors' code | 13x to 16x (identical intervals with `window="shortest"`); 22x |
 | Quantile forest | quantile-forest (Zillow) | fit 6x to 9x; predict 2.5x to 4x exact, 1.6x to 3x approximate (16-core server) |
 | MSTL | statsforecast; R forecast | 6x to 7x at equal settings (145x to 520x at defaults); 5x |
 | CSP | csp-forecaster 0.2.0 | 2x to 21x |
 
-CIR has no public reference code to compare with. Where a difference in
+Where a difference in
 output exists it is stated in the benchmark: crepes picks one rank too high
 in Mondrian groups whose size plus one is a multiple of ten (floating-point
 rounding of the rank), which affected 1 group in 20 in our run.
@@ -313,6 +316,15 @@ follows the skew with one interval; CTI can also split into several intervals
 for outcomes with more than one mode. On a skewed example
 (`benchmarks/speed_quantile.py`, 90% target, all at 90% coverage): mean width
 5.59 for CQR, 5.18 for CIR, 5.02 for CIR+ and 4.95 for CTI.
+
+Against the CIR authors' code (`benchmarks/speed_cir.py`): with
+`window="shortest"` pyconformal returns the same interval as their code on
+every one of 200,000 test points, in 0.12 s against 1.85 s. The default uses
+the same growing window in calibration and prediction, which is what the
+coverage proof needs; their code scores calibration points with the growing
+window and predicts with the shortest window of that many intervals. For
+CIR+ their code covered 89.90% at a 90% target over 3,000 repetitions
+(standard error 0.03); pyconformal's covered 90.00%.
 
 Speed on the same quantile predictions: CQR in 3 ms for 100,000 calibration
 and 1,000,000 test points (PUNCC 10 ms, MAPIE 20 ms, identical intervals);
