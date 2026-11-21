@@ -49,23 +49,28 @@ passed every one of the 84 coverage configurations we ran, and we found no
 setting in which it returns an invalid interval. Its problems are speed,
 memory, and sets that are larger than they need to be:
 
-| | MAPIE 1.6.0 | pyconformal | |
-|---|---|---|---|
-| Venn-Abers, 1,000,000 points | 61.9 s, 244 to 360 numerical warnings per fit | 0.33 s, none | 188x, identical output |
-| ACI, backtest of 20,000 steps | 8.1 s | 0.003 s | about 2,000x, same coverage |
-| ACI, one row at a time | 0.57 ms per step | 0.09 ms | 6x to 8x |
-| EnbPI, backtest | 5.5 ms per step | 0.012 ms | 400x to 470x, same coverage |
-| EnbPI, one row at a time | 5.8 ms per step | 2.2 ms | 2.5x |
-| CV+ prediction, 2,000 to 5,000 training rows | 2 to 5 s | 0.12 to 0.18 s | 17x to 27x |
-| CV+, 20,000 training by 20,000 test rows | out of memory on a 7 GB machine | runs; also at 100,000 rows | |
-| CQR, 1,000,000 test points | 19.7 ms | 3.2 ms | 6x, identical intervals |
-| Prediction sets (LAC, APS, RAPS), 10 to 1,000 classes | 0.010 to 1.8 s | 0.001 to 0.36 s | 5x to 10x |
-| Split regression, 1,000,000 test points | 8.9 ms | 1.9 ms | 4.7x (milliseconds either way) |
-| APS at a 90% target, default settings | covers 97.5%, mean set 2.05 classes | covers 89.9%, mean set 1.73 | sets 18% larger than needed |
-| RAPS at a 90% target, default settings | covers 96.9%, mean set 2.11 classes | covers 89.9%, mean set 1.73 | sets 22% larger than needed |
-| RAPS with 1,000 classes | raised an error | runs | |
-| Time-series methods | 2 (ACI, EnbPI) | 10 | |
-| Predictive distributions, CTI, CIR | not available | available | |
+| | MAPIE 1.6.0 | pyconformal | Times faster | Output |
+|---|---|---|---|---|
+| Venn-Abers, 1,000,000 points | 61.9 s, 244 to 360 numerical warnings per fit | 0.33 s, none | **188x** | identical |
+| ACI, backtest of 20,000 steps | 8.1 s | 0.003 s | **about 2,000x** | same coverage |
+| ACI, one row at a time | 0.57 ms per step | 0.09 ms | **6x to 8x** | same coverage |
+| EnbPI, backtest | 5.5 ms per step | 0.012 ms | **400x to 470x** | same coverage |
+| EnbPI, one row at a time | 5.8 ms per step | 2.2 ms | **2.5x** | same coverage |
+| CV+ prediction, 2,000 to 5,000 training rows | 2 to 5 s | 0.12 to 0.18 s | **17x to 27x** | same coverage |
+| CV+, 20,000 training by 20,000 test rows | out of memory on a 7 GB machine | runs; also at 100,000 rows | | |
+| CQR, 1,000,000 test points | 19.7 ms | 3.2 ms | **6x** | identical |
+| Prediction sets (LAC, APS, RAPS), 10 to 1,000 classes | 0.010 to 1.8 s | 0.001 to 0.36 s | **5x to 10x** | |
+| Split regression, 1,000,000 test points | 8.9 ms | 1.9 ms | **4.7x** | identical |
+
+Sets and scope:
+
+| | MAPIE 1.6.0 | pyconformal |
+|---|---|---|
+| APS at a 90% target, default settings | covers 97.5%, mean set 2.05 classes (18% larger than needed) | covers 89.9%, mean set 1.73 |
+| RAPS at a 90% target, default settings | covers 96.9%, mean set 2.11 classes (22% larger than needed) | covers 89.9%, mean set 1.73 |
+| RAPS with 1,000 classes | raised an error | runs |
+| Time-series methods | 2 (ACI, EnbPI) | 10 |
+| Predictive distributions, CTI, CIR | not available | available |
 
 The backtest rows and the one-row-at-a-time rows measure different things: in
 a backtest pyconformal calls the model once for the whole history, where
@@ -75,13 +80,19 @@ not measured a case where that changes its coverage.
 
 **Other correct packages are slow in the same way.**
 
-| Task | Other package | pyconformal | |
-|---|---|---|---|
-| Venn-Abers calibration, 1,000,000 points | 61.5 s (venn-abers) | 0.33 s | 188x, identical output |
-| Predictive intervals, 1,000,000 test points | 79 s (crepes) | 0.01 s | 8,100x, identical output |
-| Multi-step forecast intervals, 3,000 steps × 12 horizons | 42 s (R conformalForecast) | 0.01 s | over 4,000x, identical output |
-| MSTL decomposition, 100,000 points | 19.3 s (statsforecast, its defaults) | 0.098 s | about 200x; 6x to 7x at equal settings |
-| Quantile forest, fit on 1,000,000 rows (16 cores) | 215 s (quantile-forest) | 27 s | 8x, same accuracy |
+| Task | Other package | pyconformal | Times faster | Output |
+|---|---|---|---|---|
+| Venn-Abers calibration, 1,000,000 points | 61.5 s (venn-abers) | 0.33 s | **188x** | identical |
+| Predictive intervals, 1,000,000 test points | 79 s (crepes) | 0.01 s | **8,100x** | identical |
+| Predictive distribution function, 1,000,000 test points | 145 s (crepes) | 0.26 s | **556x** | identical |
+| CRPS, 5,000 test points | 0.31 s (crepes) | 0.0005 s | **656x** | identical without difficulty estimates |
+| Multi-step forecast intervals, 3,000 steps × 12 horizons | 42 s (R conformalForecast) | 0.01 s | **over 4,000x** | identical |
+| AcMCP, 1,000 steps × 6 horizons | 107 s (R conformalForecast) | 2.5 s | **43x** | median difference 0.00001 |
+| Conformal PID, per step | 10 to 14 µs (authors' code) | 0.09 to 0.13 µs | **106x to 112x** | identical |
+| CTI, 200,000 test points | 0.43 s (authors' code) | 0.023 s | **19x** | identical |
+| CIR, 200,000 test points | 1.85 s (authors' code) | 0.12 s | **16x** | identical in the authors' mode |
+| MSTL decomposition, 100,000 points | 19.3 s (statsforecast, its defaults) | 0.098 s | **about 200x** (6x to 7x at equal settings) | identical at equal settings |
+| Quantile forest, fit on 1,000,000 rows (16 cores) | 215 s (quantile-forest) | 27 s | **8x** | same accuracy |
 
 **No package covers both worlds.** Tabular libraries carry a couple of
 time-series methods; forecasting libraries carry a couple of conformal ones.
@@ -166,9 +177,9 @@ section and an example for every method.
 Same inputs on both sides, on a 2-core machine with numba. "Authors' code" is
 the code released with the paper that proposed the method.
 
-| Method | Compared with | pyconformal is |
+| Method | Compared with | Times faster |
 |---|---|---|
-| Venn-Abers | venn-abers, MAPIE | up to 188x faster (13x to 23x at 10,000 to 100,000 points), same outputs |
+| Venn-Abers | venn-abers, MAPIE | up to 188x (13x to 23x at 10,000 to 100,000 points), same outputs |
 | Cross Venn-Abers | venn-abers | 3x |
 | Predictive distributions; CRPS | crepes | 64x to 8,000x; 280x to 760x |
 | Split regression | PUNCC, crepes, MAPIE | 2x to 5x |
