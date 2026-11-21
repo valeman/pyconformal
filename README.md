@@ -30,7 +30,7 @@ No model object? Pass its outputs: `cp.calibrate(y_pred=pred_cal, y=y_cal)`.
 A conformal method makes one promise: a 90% interval covers at least 90% of
 the time, for any model, at any sample size. We tested the current releases of
 the main packages on plain i.i.d. data, where that promise must hold
-(20 November 2026; every number has a script in [`extras/benchmarks/`](extras/benchmarks/)).
+(20 November 2026; every number has a script in [`project/benchmarks/`](project/benchmarks/)).
 
 **Some widely used software breaks the promise.**
 
@@ -177,7 +177,7 @@ aci.run(y_pred=forecasts, y=actuals).coverage
 aci.predict_interval(y_pred=next_forecast); aci.update(y_pred=next_forecast, y=next_actual)
 ```
 
-Results are plain NumPy arrays. The **[user guide](extras/docs/guide.md)** has a
+Results are plain NumPy arrays. The **[user guide](project/docs/guide.md)** has a
 section and an example for every method.
 
 ## Speed, method by method
@@ -247,10 +247,10 @@ from one machine.
 
 ## More
 
-- [User guide](extras/docs/guide.md): every method, with examples.
-- [Benchmarks](extras/benchmarks/): the script behind every number on this page, and
+- [User guide](project/docs/guide.md): every method, with examples.
+- [Benchmarks](project/benchmarks/): the script behind every number on this page, and
   short scripts that reproduce each fault using only the package concerned.
-- [Changelog](extras/CHANGELOG.md) · [How to cite](CITATION.cff)
+- [Changelog](project/CHANGELOG.md) · [How to cite](project/CITATION.cff)
 
 ## Learn conformal prediction
 
@@ -273,7 +273,7 @@ You can also buy me a coffee:
 
 <a href="https://buymeacoffee.com/valeman"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy me a coffee" height="50"></a>
 
-<a href="https://buymeacoffee.com/valeman"><img src="extras/assets/buymeacoffee_qr.png" alt="QR code for buymeacoffee.com/valeman" width="160"></a>
+<a href="https://buymeacoffee.com/valeman"><img src="project/assets/buymeacoffee_qr.png" alt="QR code for buymeacoffee.com/valeman" width="160"></a>
 
 ## Licence
 

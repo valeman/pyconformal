@@ -38,7 +38,7 @@ classifiers = [
 [project.optional-dependencies]
 fast = ["numba>=0.59"]
 test = ["pytest>=7", "scikit-learn>=1.0", "venn-abers>=1.5", "crepes>=0.9", "statsmodels>=0.14"]
-# extras/tests/test_csp.py also compares against csp-forecaster when it is installed:
+# project/tests/test_csp.py also compares against csp-forecaster when it is installed:
 #   pip install git+https://github.com/valeman/csp-forecaster
 
 [project.urls]
@@ -47,10 +47,10 @@ Source = "https://github.com/valeman/pyconformal"
 Issues = "https://github.com/valeman/pyconformal/issues"
 
 [tool.hatch.version]
-path = "src/pyconformal/__init__.py"
+path = "project/src/pyconformal/__init__.py"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/pyconformal"]
+packages = ["project/src/pyconformal"]
 
 [tool.pytest.ini_options]
-testpaths = ["extras/tests"]
+testpaths = ["project/tests"]
