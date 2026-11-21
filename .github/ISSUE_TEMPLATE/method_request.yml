@@ -1,0 +1,50 @@
+name: Method request
+description: Ask for a conformal prediction method to be added
+title: "[Method] "
+labels: ["method request"]
+body:
+  - type: input
+    id: method
+    attributes:
+      label: Method
+      description: Name of the method.
+    validations:
+      required: true
+  - type: input
+    id: paper
+    attributes:
+      label: Paper
+      description: Link to the paper that proposed it.
+    validations:
+      required: true
+  - type: input
+    id: code
+    attributes:
+      label: Existing code
+      description: Link to the authors' code or another implementation, and its licence, if any.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Regression
+        - Classification
+        - Probability calibration
+        - Predictive distributions
+        - Time series
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it is worth adding
+      description: What it does that the methods already in the package do not.
+    validations:
+      required: true
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Contribution
+      options:
+        - label: I would like to implement this myself

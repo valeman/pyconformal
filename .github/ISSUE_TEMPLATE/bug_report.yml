@@ -1,0 +1,27 @@
+name: Bug report
+description: Wrong coverage, a wrong number, a crash, or a result that differs from the paper
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you expected and what you got.
+    validations:
+      required: true
+  - type: textarea
+    id: code
+    attributes:
+      label: Code that reproduces it
+      description: The shortest script that shows the problem, with a fixed random seed.
+      render: python
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: pyconformal, Python, NumPy, and Numba if installed.
+    validations:
+      required: true
