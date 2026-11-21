@@ -6,7 +6,12 @@
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-green)](LICENSE)
 [![Dependencies: NumPy only](https://img.shields.io/badge/dependencies-NumPy%20only-informational)](pyproject.toml)
 [![GitHub stars](https://img.shields.io/github/stars/valeman/pyconformal?style=social)](https://github.com/valeman/pyconformal/stargazers)
-[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/valeman)
+
+<p>
+  <a href="https://buymeacoffee.com/valeman"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="60" width="255"></a>
+  &nbsp;&nbsp;
+  <a href="https://buymeacoffee.com/valeman"><img src="project/assets/buymeacoffee_qr.png" alt="QR code for buymeacoffee.com/valeman" width="120"></a>
+</p>
 
 **Conformal prediction that is exact, fast, and covers both tabular data and time series.**
 
@@ -30,7 +35,7 @@ No model object? Pass its outputs: `cp.calibrate(y_pred=pred_cal, y=y_cal)`.
 A conformal method makes one promise: a 90% interval covers at least 90% of
 the time, for any model, at any sample size. We tested the current releases of
 the main packages on plain i.i.d. data, where that promise must hold
-(20 November 2026; every number has a script in [`project/benchmarks/`](project/benchmarks/)).
+(20 November 2026).
 
 **Some widely used software breaks the promise.**
 
@@ -248,8 +253,6 @@ from one machine.
 ## More
 
 - [User guide](project/docs/guide.md): every method, with examples.
-- [Benchmarks](project/benchmarks/): the script behind every number on this page, and
-  short scripts that reproduce each fault using only the package concerned.
 - [Changelog](project/CHANGELOG.md) · [How to cite](project/CITATION.cff)
 
 ## Learn conformal prediction
@@ -271,9 +274,11 @@ from one machine.
 If pyconformal saves you time, a star on GitHub helps other people find it.
 You can also buy me a coffee:
 
-<a href="https://buymeacoffee.com/valeman"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy me a coffee" height="50"></a>
-
-<a href="https://buymeacoffee.com/valeman"><img src="project/assets/buymeacoffee_qr.png" alt="QR code for buymeacoffee.com/valeman" width="160"></a>
+<p>
+  <a href="https://buymeacoffee.com/valeman"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="60" width="255"></a>
+  &nbsp;&nbsp;
+  <a href="https://buymeacoffee.com/valeman"><img src="project/assets/buymeacoffee_qr.png" alt="QR code for buymeacoffee.com/valeman" width="120"></a>
+</p>
 
 ## Licence
 

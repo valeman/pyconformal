@@ -1,6 +1,6 @@
 # pyconformal user guide
 
-One section per family of methods, each with a short example. Every speed figure names the script in [`benchmarks/`](../benchmarks/) that produces it.
+One section per family of methods, each with a short example.
 
 ## One scheme for every method
 
