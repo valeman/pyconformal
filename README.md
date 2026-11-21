@@ -26,29 +26,61 @@ the main packages on plain i.i.d. data, where that promise must hold
 
 **Some widely used software breaks the promise.**
 
-| Package | Setting | Target | Measured coverage |
+| Package | Setting | Target | Measured |
 |---|---|---|---|
-| statsforecast 2.1.1, mlforecast 1.1.0 | default (2 calibration windows) | 90% | 63–65% |
-| Darts 0.48.1 | `cal_length=3` | 90% | 75% |
-| TorchCP 1.2.1 | `SAPS(randomized=False)`, an accurate classifier | 90% | 2.5–36% |
+| statsforecast 2.1.1 | default (2 calibration windows) | 90% | 63–65% coverage |
+| mlforecast 1.1.0 | default (2 calibration windows) | 90% | 63–65% coverage |
+| Darts 0.48.1 | `cal_length=3` | 90% | 75% coverage |
+| conformalpy 1.0.0 | 3 calibration points | 90% | 75% coverage; threshold exact in 124 of 1,240 cases |
+| TorchCP 1.2.1 | `SAPS(randomized=False)`, an accurate classifier | 90% | 2.5–36% coverage |
+| crepes 0.9.1 | CRPS with difficulty estimates | | 7.19 reported where 2.19 is correct |
+| crepes 0.9.1 | 9 calibration points | 90% | infinite interval where a finite one is valid |
+| PUNCC 0.9.3 | EnbPI updated after every observation | | crashes |
 
-None raised a warning. With two calibration errors no finite 90% interval is
-valid; at least nine are needed, and the only honest answer below that is an
-infinite interval. (The statsforecast behaviour is
+None of the coverage failures raised a warning. With two calibration errors no
+finite 90% interval is valid; at least nine are needed, and the only honest
+answer below that is an infinite interval. (The statsforecast behaviour is
 [issue #1349](https://github.com/Nixtla/statsforecast/issues/1349). TorchCP's
-default, randomised mode is correct.)
+default, randomised mode is correct. The crepes and PUNCC items do not affect
+the coverage of their intervals.)
 
-**Software that is correct is often slow.** MAPIE passed every one of the 84
-coverage configurations we ran, and so did almost everything we tested in
-PUNCC and crepes. But the same answers can be had far faster:
+**MAPIE is correct. Its costs are elsewhere.** It
+passed every one of the 84 coverage configurations we ran, and we found no
+setting in which it returns an invalid interval. Its problems are speed,
+memory, and sets that are larger than they need to be:
+
+| | MAPIE 1.6.0 | pyconformal | |
+|---|---|---|---|
+| Venn-Abers, 1,000,000 points | 61.9 s, 244 to 360 numerical warnings per fit | 0.33 s, none | 188x, identical output |
+| ACI, backtest of 20,000 steps | 8.1 s | 0.003 s | about 2,000x, same coverage |
+| ACI, one row at a time | 0.57 ms per step | 0.09 ms | 6x to 8x |
+| EnbPI, backtest | 5.5 ms per step | 0.012 ms | 400x to 470x, same coverage |
+| EnbPI, one row at a time | 5.8 ms per step | 2.2 ms | 2.5x |
+| CV+ prediction, 2,000 to 5,000 training rows | 2 to 5 s | 0.12 to 0.18 s | 17x to 27x |
+| CV+, 20,000 training by 20,000 test rows | out of memory on a 7 GB machine | runs; also at 100,000 rows | |
+| CQR, 1,000,000 test points | 19.7 ms | 3.2 ms | 6x, identical intervals |
+| Prediction sets (LAC, APS, RAPS), 10 to 1,000 classes | 0.010 to 1.8 s | 0.001 to 0.36 s | 5x to 10x |
+| Split regression, 1,000,000 test points | 8.9 ms | 1.9 ms | 4.7x (milliseconds either way) |
+| APS at a 90% target, default settings | covers 97.5%, mean set 2.05 classes | covers 89.9%, mean set 1.73 | sets 18% larger than needed |
+| RAPS at a 90% target, default settings | covers 96.9%, mean set 2.11 classes | covers 89.9%, mean set 1.73 | sets 22% larger than needed |
+| RAPS with 1,000 classes | raised an error | runs | |
+| Time-series methods | 2 (ACI, EnbPI) | 10 | |
+| Predictive distributions, CTI, CIR | not available | available | |
+
+The backtest rows and the one-row-at-a-time rows measure different things: in
+a backtest pyconformal calls the model once for the whole history, where
+MAPIE's interface calls it at every step. MAPIE's ACI also clips its working
+level to between 0 and 1, which the method's proof does not allow for; we have
+not measured a case where that changes its coverage.
+
+**Other correct packages are slow in the same way.**
 
 | Task | Other package | pyconformal | |
 |---|---|---|---|
-| Venn-Abers calibration, 1,000,000 points | 61.5 s (venn-abers, MAPIE) | 0.33 s | 188x, identical output |
+| Venn-Abers calibration, 1,000,000 points | 61.5 s (venn-abers) | 0.33 s | 188x, identical output |
 | Predictive intervals, 1,000,000 test points | 79 s (crepes) | 0.01 s | 8,100x, identical output |
 | Multi-step forecast intervals, 3,000 steps × 12 horizons | 42 s (R conformalForecast) | 0.01 s | over 4,000x, identical output |
-| Backtest of adaptive conformal inference, 20,000 steps | 8.1 s (MAPIE) | 0.003 s | about 2,000x, same coverage |
-| CV+ prediction | 2–5 s (MAPIE) | 0.12–0.18 s | 17–27x, same coverage |
+| MSTL decomposition, 100,000 points | 19.3 s (statsforecast, its defaults) | 0.098 s | about 200x; 6x to 7x at equal settings |
 | Quantile forest, fit on 1,000,000 rows (16 cores) | 215 s (quantile-forest) | 27 s | 8x, same accuracy |
 
 **No package covers both worlds.** Tabular libraries carry a couple of
