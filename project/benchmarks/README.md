@@ -41,3 +41,5 @@ were measured on 20 and 21 November 2026 on 2 cores, with the versions named
 there.
 
 `reports/` holds short, self-contained scripts that reproduce the faults reported to other packages (TorchCP, crepes, PUNCC) and the MAPIE EnbPI timing. They need only the package concerned.
+
+`review_experiments.py` holds the extra experiments of the technical paper: latency one row at a time with a stub model, stress cases for Venn-Abers, the approximate forest mode, very large label sets, and the CIR ablation.

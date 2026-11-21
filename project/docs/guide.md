@@ -157,6 +157,13 @@ window and predicts with the shortest window of that many intervals. For
 CIR+ their code covered 89.90% at a 90% target over 3,000 repetitions
 (standard error 0.03); pyconformal's covered 90.00%.
 
+The choice of window matters when the outcome has more than one mode. On a
+two-mode outcome (`benchmarks/review_experiments.py cir`) the authors' rule
+covered 88.3% at a 90% target and 76.7% at an 80% target, in their own code
+and in ours with `window="shortest"`; the default covered 90.5% and 80.4%.
+For outcomes like that, CTI is the better tool: it may return two intervals,
+and its sets were 30% to 40% shorter than any single interval.
+
 Speed on the same quantile predictions: CQR in 3 ms for 100,000 calibration
 and 1,000,000 test points (PUNCC 10 ms, MAPIE 20 ms, identical intervals);
 CTI 19 times faster than its authors' code, identical sets.
