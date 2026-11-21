@@ -1,5 +1,13 @@
 # pyconformal
 
+[![tests](https://github.com/valeman/pyconformal/actions/workflows/tests.yml/badge.svg)](https://github.com/valeman/pyconformal/actions/workflows/tests.yml)
+[![PyPI](https://img.shields.io/pypi/v/pyconformal)](https://pypi.org/project/pyconformal/)
+[![Python](https://img.shields.io/badge/python-3.10%20%7C%203.12%20%7C%203.14-blue)](pyproject.toml)
+[![Licence: MIT](https://img.shields.io/badge/licence-MIT-green)](LICENSE)
+[![Dependencies: NumPy only](https://img.shields.io/badge/dependencies-NumPy%20only-informational)](pyproject.toml)
+[![GitHub stars](https://img.shields.io/github/stars/valeman/pyconformal?style=social)](https://github.com/valeman/pyconformal/stargazers)
+[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/valeman)
+
 **Conformal prediction that is exact, fast, and covers both tabular data and time series.**
 
 Prediction intervals, prediction sets, predictive distributions and calibrated
@@ -243,9 +251,29 @@ from one machine.
 - [Benchmarks](extras/benchmarks/): the script behind every number on this page, and
   short scripts that reproduce each fault using only the package concerned.
 - [Changelog](extras/CHANGELOG.md) · [How to cite](CITATION.cff)
-- Background: [Classifier Calibration at Scale](https://arxiv.org/abs/2601.19944)
-  (why Venn-Abers) and
+
+## Learn conformal prediction
+
+- **[Awesome Conformal Prediction](https://github.com/valeman/awesome-conformal-prediction)**:
+  the curated list of papers, tutorials, videos and libraries, maintained by
+  the author of this package.
+- **Books by the author**
+  - [Applied Conformal Prediction](https://valeman.gumroad.com/l/appliedconformalprediction)
+  - [Practical Guide to Applied Conformal Prediction in Python](https://github.com/PacktPublishing/Practical-Guide-to-Applied-Conformal-Prediction) (Packt, 2023)
+  - [Mastering Modern Time Series Forecasting](https://valeman.gumroad.com/l/MasteringModernTimeSeriesForecasting)
+- **Papers behind two of the methods**:
+  [Classifier Calibration at Scale](https://arxiv.org/abs/2601.19944) (why
+  Venn-Abers) and
   [Conformal Seasonal Pools](https://arxiv.org/abs/2605.03789).
+
+## Support the project
+
+If pyconformal saves you time, a star on GitHub helps other people find it.
+You can also buy me a coffee:
+
+<a href="https://buymeacoffee.com/valeman"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy me a coffee" height="50"></a>
+
+<a href="https://buymeacoffee.com/valeman"><img src="extras/assets/buymeacoffee_qr.png" alt="QR code for buymeacoffee.com/valeman" width="160"></a>
 
 ## Licence
 
