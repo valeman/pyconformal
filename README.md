@@ -22,7 +22,7 @@ No model object? Pass its outputs: `cp.calibrate(y_pred=pred_cal, y=y_cal)`.
 A conformal method makes one promise: a 90% interval covers at least 90% of
 the time, for any model, at any sample size. We tested the current releases of
 the main packages on plain i.i.d. data, where that promise must hold
-(20 November 2026; every number has a script in [`benchmarks/`](benchmarks/)).
+(20 November 2026; every number has a script in [`extras/benchmarks/`](extras/benchmarks/)).
 
 **Some widely used software breaks the promise.**
 
@@ -126,7 +126,7 @@ aci.run(y_pred=forecasts, y=actuals).coverage
 aci.predict_interval(y_pred=next_forecast); aci.update(y_pred=next_forecast, y=next_actual)
 ```
 
-Results are plain NumPy arrays. The **[user guide](docs/guide.md)** has a
+Results are plain NumPy arrays. The **[user guide](extras/docs/guide.md)** has a
 section and an example for every method.
 
 ## Speed, method by method
@@ -196,10 +196,10 @@ from one machine.
 
 ## More
 
-- [User guide](docs/guide.md): every method, with examples.
-- [Benchmarks](benchmarks/): the script behind every number on this page, and
+- [User guide](extras/docs/guide.md): every method, with examples.
+- [Benchmarks](extras/benchmarks/): the script behind every number on this page, and
   short scripts that reproduce each fault using only the package concerned.
-- [Changelog](CHANGELOG.md) · [How to cite](CITATION.cff)
+- [Changelog](extras/CHANGELOG.md) · [How to cite](CITATION.cff)
 - Background: [Classifier Calibration at Scale](https://arxiv.org/abs/2601.19944)
   (why Venn-Abers) and
   [Conformal Seasonal Pools](https://arxiv.org/abs/2605.03789).

@@ -38,7 +38,7 @@ classifiers = [
 [project.optional-dependencies]
 fast = ["numba>=0.59"]
 test = ["pytest>=7", "scikit-learn>=1.0", "venn-abers>=1.5", "crepes>=0.9", "statsmodels>=0.14"]
-# tests/test_csp.py also compares against csp-forecaster when it is installed:
+# extras/tests/test_csp.py also compares against csp-forecaster when it is installed:
 #   pip install git+https://github.com/valeman/csp-forecaster
 
 [project.urls]
@@ -53,4 +53,4 @@ path = "src/pyconformal/__init__.py"
 packages = ["src/pyconformal"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["extras/tests"]
