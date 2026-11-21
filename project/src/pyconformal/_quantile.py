@@ -48,8 +48,9 @@ def conformal_quantile(scores, alpha: float, *, allow_inf: bool = False) -> floa
             raise ValueError("scores must not be NaN or -inf.")
     elif not np.all(np.isfinite(scores)):
         raise ValueError("scores must be finite.")
-    # Exact rational arithmetic: in floating point (19 + 1) * (1 - 0.05)
-    # is 19.000000000000004, which would wrongly round k up to 20.
+    # Exact rational arithmetic on the decimal value of alpha. Floating point
+    # can land on the wrong side of a whole number: (49 + 1) * (1 - 0.58) is
+    # 21.000000000000004, which a ceiling would round up to 22.
     k = math.ceil((n + 1) * (1 - Fraction(repr(alpha))))
     if k > n:
         return math.inf

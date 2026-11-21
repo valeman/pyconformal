@@ -13,7 +13,7 @@ from __future__ import annotations
 import math
 
 # Guards against (n + 1) * (1 - alpha) landing a hair above an integer in
-# floating point (for example 19.000000000000004 instead of 19).
+# floating point (for example 21.000000000000004 instead of 21).
 _RANK_TOL = 1e-9
 
 

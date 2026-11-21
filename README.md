@@ -1,19 +1,19 @@
 # pyconformal
 
+**Conformal prediction that is exact, fast, and covers both tabular data and time series.**
+
 [![tests](https://github.com/valeman/pyconformal/actions/workflows/tests.yml/badge.svg)](https://github.com/valeman/pyconformal/actions/workflows/tests.yml)
-[![PyPI](https://img.shields.io/pypi/v/pyconformal)](https://pypi.org/project/pyconformal/)
+[![Version](https://img.shields.io/badge/version-0.1.0-orange)](project/CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.12%20%7C%203.14-blue)](pyproject.toml)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-green)](LICENSE)
 [![Dependencies: NumPy only](https://img.shields.io/badge/dependencies-NumPy%20only-informational)](pyproject.toml)
 [![GitHub stars](https://img.shields.io/github/stars/valeman/pyconformal?style=social)](https://github.com/valeman/pyconformal/stargazers)
 
 <p>
-  <a href="https://buymeacoffee.com/valeman"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="60" width="255"></a>
+  <a href="https://buymeacoffee.com/valeman"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="50" width="213"></a>
   &nbsp;&nbsp;
-  <a href="https://buymeacoffee.com/valeman"><img src="project/assets/buymeacoffee_qr.png" alt="QR code for buymeacoffee.com/valeman" width="120"></a>
+  <a href="https://buymeacoffee.com/valeman"><img src="project/assets/buymeacoffee_qr.png" alt="QR code for buymeacoffee.com/valeman" width="90"></a>
 </p>
-
-**Conformal prediction that is exact, fast, and covers both tabular data and time series.**
 
 Prediction intervals, prediction sets, predictive distributions and calibrated
 probabilities with finite-sample guarantees, for any model. About thirty
@@ -29,6 +29,61 @@ cp.predict_interval(X_test)                      # covers at least 90% of the ti
 ```
 
 No model object? Pass its outputs: `cp.calibrate(y_pred=pred_cal, y=y_cal)`.
+
+**[Install](#install) · [What you get](#what-you-get) · [Quick tour](#one-interface) · [Why it exists](#why-it-exists) · [Speed](#speed-method-by-method) · [User guide](project/docs/guide.md)**
+
+## Install
+
+```bash
+pip install "pyconformal[fast] @ git+https://github.com/valeman/pyconformal"
+```
+
+This installs version 0.1.0 with numba for speed; drop `[fast]` for a NumPy-only install. The PyPI release of 0.1.0 is coming; until then `pip install pyconformal` gives an early placeholder.
+
+Python 3.10 or later.
+
+## What you get
+
+| | Methods |
+|---|---|
+| **Regression** | Split conformal (normalized, Mondrian, weighted) · jackknife+ and CV+ · CQR · CTI · CIR and CIR+ · a parallel quantile forest with out-of-bag calibration |
+| **Classification** | LAC · APS · RAPS · SAPS, randomised or not, marginal or per class |
+| **Probability calibration** | Venn-Abers and cross Venn-Abers, binary and multiclass |
+| **Predictive distributions** | Conformal predictive systems: quantiles, distribution function, intervals, exact CRPS |
+| **Time series, online** | ACI · DtACI · AgACI · NexCP · conformal PID |
+| **Time series, ensembles** | EnbPI · SPCI |
+| **Time series, several steps ahead** | Multi-step split conformal · AcMCP · conformal seasonal pools |
+| **Decomposition** | STL and MSTL, matching R to 14 decimal places |
+
+## One interface
+
+The same four verbs for every method: `fit` trains the model, `calibrate`
+uses held-out data, `predict_*` gives the output, and `update` (or `run`, for
+a whole history) serves online methods. `alpha` is the miscoverage level:
+0.1 means 90%.
+
+```python
+from pyconformal import (SplitConformalClassifier, VennAbers,
+                         ConformalPredictiveSystem, AdaptiveConformalInference)
+
+# Prediction sets
+sets = SplitConformalClassifier(clf, alpha=0.1, score="aps").calibrate(X_cal, y_cal).predict_set(X_test)
+
+# Calibrated probabilities with a validity guarantee
+proba = VennAbers(clf).calibrate(X_cal, y_cal).predict_proba(X_test)
+
+# A full predictive distribution per sample
+cps = ConformalPredictiveSystem(model).calibrate(X_cal, y_cal)
+cps.predict_quantile(X_test, [0.05, 0.5, 0.95]); cps.predict_cdf(X_test, 100.0)
+
+# Time series: replay a history, then go live
+aci = AdaptiveConformalInference(alpha=0.1)
+aci.run(y_pred=forecasts, y=actuals).coverage
+aci.predict_interval(y_pred=next_forecast); aci.update(y_pred=next_forecast, y=next_actual)
+```
+
+Results are plain NumPy arrays. The **[user guide](project/docs/guide.md)** has a
+section and an example for every method.
 
 ## Why it exists
 
@@ -81,7 +136,7 @@ Sets and scope:
 |---|---|---|
 | APS at a 90% target, default settings | covers 97.5%, mean set 2.05 classes (18% larger than needed) | covers 89.9%, mean set 1.73 |
 | RAPS at a 90% target, default settings | covers 96.9%, mean set 2.11 classes (22% larger than needed) | covers 89.9%, mean set 1.73 |
-| RAPS with 1,000 classes | raised an error | runs |
+| RAPS with 1,000 classes and 5,000 calibration points | error: needs two calibration points in every class | runs |
 | Time-series methods | 2 (ACI, EnbPI) | 10 |
 | Predictive distributions, CTI, CIR | not available | available |
 
@@ -110,27 +165,15 @@ not measured a case where that changes its coverage.
 **No package covers both worlds.** Tabular libraries carry a couple of
 time-series methods; forecasting libraries carry a couple of conformal ones.
 
-## What you get
-
-| | Methods |
-|---|---|
-| **Regression** | Split conformal (normalized, Mondrian, weighted) · jackknife+ and CV+ · CQR · CTI · CIR and CIR+ · a parallel quantile forest with out-of-bag calibration |
-| **Classification** | LAC · APS · RAPS · SAPS, randomised or not, marginal or per class |
-| **Probability calibration** | Venn-Abers and cross Venn-Abers, binary and multiclass |
-| **Predictive distributions** | Conformal predictive systems: quantiles, distribution function, intervals, exact CRPS |
-| **Time series, online** | ACI · DtACI · AgACI · NexCP · conformal PID |
-| **Time series, ensembles** | EnbPI · SPCI |
-| **Time series, several steps ahead** | Multi-step split conformal · AcMCP · conformal seasonal pools |
-| **Decomposition** | STL and MSTL, matching R to 14 decimal places |
-
 ## Three rules the package is built on
 
 1. **Exact.** One routine computes every threshold, in exact arithmetic.
-   Floating point gets the rank wrong at ordinary sizes: with 19 calibration
-   points at 95%, `(n + 1) * 0.95` evaluates to `19.000000000000004`, and a
-   naive ceiling turns a valid interval into an infinite one. When no finite
-   interval is valid, you get an infinite one, never a narrow one that looks
-   fine.
+   How the rank is written matters. Ask for 90% as a confidence of 0.9 and
+   `1 - 0.9` is `0.09999999999999998` in floating point; code that truncates
+   `(n + 1) * (1 - 0.9)` then takes one rank too high whenever `n + 1` is a
+   multiple of ten, and with 9 calibration points it returns an infinite
+   interval where a finite one is valid. When no finite interval is valid,
+   you get an infinite one, never a narrow one that looks fine.
 2. **Proved.** Every method is tested three ways: against a short reference
    written from its paper, against existing code where there is any
    (venn-abers, crepes, MAPIE, PUNCC, R's `forecast` and `conformalForecast`,
@@ -141,54 +184,13 @@ time-series methods; forecasting libraries carry a couple of conformal ones.
    tested to return the same values, so installing numba changes speed and
    nothing else.
 
-## Install
-
-```bash
-pip install "pyconformal[fast]"     # with numba; plain `pyconformal` needs only NumPy
-```
-
-Version 0.1.0 is not on PyPI yet. Until it is:
-
-```bash
-pip install "pyconformal[fast] @ git+https://github.com/valeman/pyconformal"
-```
-
-Python 3.10 or later.
-
-## One interface
-
-The same four verbs for every method: `fit` trains the model, `calibrate`
-uses held-out data, `predict_*` gives the output, and `update` (or `run`, for
-a whole history) serves online methods. `alpha` is the miscoverage level:
-0.1 means 90%.
-
-```python
-from pyconformal import (SplitConformalClassifier, VennAbers,
-                         ConformalPredictiveSystem, AdaptiveConformalInference)
-
-# Prediction sets
-sets = SplitConformalClassifier(clf, alpha=0.1, score="aps").calibrate(X_cal, y_cal).predict_set(X_test)
-
-# Calibrated probabilities with a validity guarantee
-proba = VennAbers(clf).calibrate(X_cal, y_cal).predict_proba(X_test)
-
-# A full predictive distribution per sample
-cps = ConformalPredictiveSystem(model).calibrate(X_cal, y_cal)
-cps.predict_quantile(X_test, [0.05, 0.5, 0.95]); cps.predict_cdf(X_test, 100.0)
-
-# Time series: replay a history, then go live
-aci = AdaptiveConformalInference(alpha=0.1)
-aci.run(y_pred=forecasts, y=actuals).coverage
-aci.predict_interval(y_pred=next_forecast); aci.update(y_pred=next_forecast, y=next_actual)
-```
-
-Results are plain NumPy arrays. The **[user guide](project/docs/guide.md)** has a
-section and an example for every method.
-
 ## Speed, method by method
 
 Same inputs on both sides, on a 2-core machine with numba. "Authors' code" is
 the code released with the paper that proposed the method.
+
+<details>
+<summary><b>Show the full table (21 methods)</b></summary>
 
 | Method | Compared with | Times faster |
 |---|---|---|
@@ -213,6 +215,8 @@ the code released with the paper that proposed the method.
 | Multi-step split | R conformalForecast | over 4,000x, same intervals |
 | AcMCP | R conformalForecast | 43x with the scorecaster, about 5,000x without |
 | CSP | csp-forecaster | 2x to 21x |
+
+</details>
 
 Read these with three things in mind. **Backtest and live use are different
 measurements:** in a backtest pyconformal calls the model once for the whole

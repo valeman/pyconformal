@@ -81,7 +81,7 @@ def test_gamma_zero_is_online_split_conformal():
     for t in range(50):
         expected = conformal_quantile(np.concatenate([cal, stream[:t]]), 0.05)
         assert res.thresholds[t] == expected
-    # n = 19, alpha = 0.05 is the classic floating-point trap: rank must be 19
+    # n = 19, alpha = 0.05: (n + 1)(1 - alpha) is exactly 19, so the rank must be 19
     assert res.thresholds[0] == np.sort(cal)[18]
 
 
