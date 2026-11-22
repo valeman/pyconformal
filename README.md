@@ -21,19 +21,20 @@ has one ([which do](#the-guarantee-and-its-limits)). About thirty methods
 behind one interface. NumPy is the only requirement. MIT licence.
 
 ```python
+from catboost import CatBoostRegressor
 from sklearn.datasets import make_regression
-from sklearn.linear_model import LinearRegression
 from pyconformal import SplitConformalRegressor
 
 X, y = make_regression(n_samples=3000, n_features=5, noise=10, random_state=0)
 X_train, X_cal, X_test = X[:1000], X[1000:2000], X[2000:]
 y_train, y_cal, y_test = y[:1000], y[1000:2000], y[2000:]
 
-cp = SplitConformalRegressor(LinearRegression(), alpha=0.1)   # any scikit-learn-style model
+model = CatBoostRegressor(verbose=0, random_seed=0)   # or XGBoost, LightGBM, any scikit-learn-style model
+cp = SplitConformalRegressor(model, alpha=0.1)
 cp.fit(X_train, y_train)
 cp.calibrate(X_cal, y_cal)
 intervals = cp.predict_interval(X_test)                       # covers at least 90% on average
-print(((intervals[:, 0] <= y_test) & (y_test <= intervals[:, 1])).mean())   # 0.899
+print(((intervals[:, 0] <= y_test) & (y_test <= intervals[:, 1])).mean())   # 0.892
 ```
 
 No model object? Pass its outputs: `cp.calibrate(y_pred=pred_cal, y=y_cal)`.
@@ -56,7 +57,7 @@ pip install "pyconformal[fast]"
 
 Python 3.10 or later. `[fast]` adds numba. Without it everything runs on NumPy
 alone, more slowly, except `QuantileForest` and `SPCI` (which uses it): those
-two need numba. The example above also needs scikit-learn for the model.
+two need numba. The example above also needs `catboost` for the model and scikit-learn for the data.
 
 The development version, ahead of the latest release:
 
@@ -76,6 +77,18 @@ pip install "pyconformal[fast] @ git+https://github.com/valeman/pyconformal"
 | **Time series, ensembles** | EnbPI · SPCI |
 | **Time series, several steps ahead** | Multi-step split conformal · AcMCP · conformal seasonal pools |
 | **Decomposition** | STL and MSTL, matching R to 14 decimal places |
+
+## Works with CatBoost, XGBoost and LightGBM
+
+Pass the model straight in; no wrapper is needed. Tested with CatBoost 1.2,
+XGBoost 3.4 and LightGBM 4.7, regressors and classifiers:
+
+| Method | How to use it |
+|---|---|
+| Split conformal, jackknife+ and CV+, predictive systems, EnbPI | `SplitConformalRegressor(CatBoostRegressor())` |
+| CQR | two quantile models: `ConformalizedQuantileRegressor((low_model, high_model))` |
+| Prediction sets, Venn-Abers | `SplitConformalClassifier(CatBoostClassifier())`, `VennAbers(CatBoostClassifier())` |
+| CTI and CIR | need many quantile levels: pass them as `quantiles=`, or use `QuantileForest` |
 
 ## One interface
 
