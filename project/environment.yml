@@ -14,4 +14,4 @@ dependencies:
       - twine
       - venn-abers
       - crepes
-      - -e .
+      - -e ..   # the repository root, one level above this file
