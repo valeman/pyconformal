@@ -170,7 +170,7 @@ the coverage of their intervals.)
 84 coverage configurations we ran, 78 met their target (for jackknife+ and
 CV+ the target is their proven bound of 80% at a 90% setting) and 6 refused
 to run because the calibration set was too small, which is safe behaviour.
-The one fault we reproduced lies outside those 84: APS sets with `include_last_label=False` covered 81% at a 90% target in MAPIE 1.6.0 (their issue #1021); the default setting covered 95%. Its problems are speed,
+Two faults lie outside those 84, both reproduced on MAPIE 1.6.0: APS sets with `include_last_label=False` cover 81% at a 90% target (their issue #1021; the default covers 95%), and ACI clips its working level to [0, 1], which breaks its long-run guarantee on drifting data (miss rates of 14% to 33% at a 10% target, where an unclipped ACI gives 10.1%). Its problems are speed,
 memory, and sets that are larger than they need to be:
 
 | | MAPIE 1.6.0 | pyconformal | Times faster | Output |
