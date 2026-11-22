@@ -166,11 +166,11 @@ answer below that is an infinite interval. (The statsforecast behaviour is
 default, randomised mode is correct. The crepes and PUNCC items do not affect
 the coverage of their intervals.)
 
-**MAPIE is correct. Its costs are elsewhere.** Of the
+**MAPIE is correct in almost everything we tested. Its costs are elsewhere.** Of the
 84 coverage configurations we ran, 78 met their target (for jackknife+ and
 CV+ the target is their proven bound of 80% at a 90% setting) and 6 refused
 to run because the calibration set was too small, which is safe behaviour.
-We found no setting in which it returns an invalid interval. Its problems are speed,
+The one fault we reproduced lies outside those 84: APS sets with `include_last_label=False` covered 81% at a 90% target in MAPIE 1.6.0 (their issue #1021); the default setting covered 95%. Its problems are speed,
 memory, and sets that are larger than they need to be:
 
 | | MAPIE 1.6.0 | pyconformal | Times faster | Output |
