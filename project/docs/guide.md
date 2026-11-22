@@ -281,6 +281,68 @@ What to take from it:
   outcomes fell outside their predicted range. CQR was fine (width 186 to 191
   against 186 and 194 for the forests).
 
+## When the outcome is a whole distribution
+
+Sometimes each case is a distribution, seen through a sample: the ages at
+death in a country this year (input) and next year (outcome), the sale prices
+in a district, the readings of a fleet of sensors. Following "Conformal
+prediction for distribution-to-distribution regression" (arXiv:2611.06320):
+
+```python
+from sklearn.linear_model import Ridge
+from pyconformal import ConformalDistributionRegressor, cosine_coefficients
+
+A_in = cosine_coefficients(X_samples, n_terms=10)    # (n_cases, n_points) -> (n_cases, 10)
+A_out = cosine_coefficients(Y_samples, n_terms=10)
+
+cd = ConformalDistributionRegressor(Ridge(), alpha=0.1)
+cd.fit(A_in[train], A_out[train]).calibrate(A_in[cal], A_out[cal])
+
+centre, radius = cd.predict_ball(A_in[test])          # the set of distributions
+lower, upper = cd.predict_cdf_band(grid, A_in[test])  # a band for the distribution function
+```
+
+Each distribution is summarised by its first cosine coefficients; any
+multi-output regressor predicts the outcome's coefficients; the conformal
+step puts a ball around the prediction that contains the outcome's
+coefficients with probability at least `1 - alpha`. Data outside [0, 1] need
+`support=(low, high)`.
+
+- `predict_cdf_band` turns the ball into something to act on: every
+  distribution in the ball has its distribution function between the two
+  curves at every point, so the band is covered at least as often as the
+  ball. Read bounds on a quantile or a tail probability off it.
+- `weights=` gives the paper's weighted score (an ellipsoid); its code uses
+  none, which is the default. `log_volume()` is the paper's closed-form size.
+- `k_neighbors=K` is the paper's localised variant: each case's radius comes
+  from its K nearest calibration cases, so it is wider where the model is
+  worse. Its coverage is approximate. Unlike the authors' code, the radius
+  is infinite when K is too small for the level, not the largest score.
+- The class works for any vector-valued prediction, so it also serves
+  ordinary multi-output regression.
+
+The guarantee is about the outcome's coefficient vector as computed from its
+sample: nothing is promised about detail beyond the retained terms.
+
+Against the authors' code on their mixture-of-betas data
+(`benchmarks/d2d_reference.py`; 3,200 pairs of distributions, 1,000 points
+each, 10 terms, 2 cores):
+
+| Step | Authors' code | pyconformal | Faster | Output |
+|---|---|---|---|---|
+| Coefficients, 6,400 distributions | 1.42 s | 0.087 s (0.23 s without numba) | 16x (6x) | equal to 3e-15 |
+| Global radius at 100 levels | 5.4 ms | 0.7 ms | 8x | identical |
+| Localised radius, K = 500, 1,200 cases, 10 levels | 4.9 s | 0.026 s | 187x | identical |
+
+Coverage at a 90% target over 20 fresh datasets (500 calibration pairs) was
+90.06%, against 90.02% from the theory; the localised variant covered 90.7%.
+For large calibration sets the localised radius uses an exact k-d tree search
+when the features vary mostly in a few directions, as coefficients of smooth
+distributions do: with 100,000 calibration cases and K = 500 it took 1.2 s
+for 5,000 cases against 3.4 s for the matrix method. On features that vary
+equally in ten directions a tree does not help, and the matrix method is
+used.
+
 ## Time series: STL and MSTL decomposition
 
 ```python

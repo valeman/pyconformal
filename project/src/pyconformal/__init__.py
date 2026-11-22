@@ -4,6 +4,12 @@ from pyconformal._quantile import conformal_quantile
 from pyconformal.booster import QuantileBooster
 from pyconformal.classification import SplitConformalClassifier
 from pyconformal.cross import CrossConformalRegressor
+from pyconformal.distribution import (
+    ConformalDistributionRegressor,
+    cosine_cdf,
+    cosine_coefficients,
+    cosine_density,
+)
 from pyconformal.csp import ConformalSeasonalPool, CSPResult
 from pyconformal.ensemble import SPCI, EnbPI, EnsembleResult
 from pyconformal.forest import QuantileForest
@@ -27,7 +33,7 @@ from pyconformal.regression import SplitConformalRegressor
 from pyconformal.scores import APS, LAC, RAPS, SAPS
 from pyconformal.venn_abers import CrossVennAbers, VennAbers
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 __all__ = [
     "APS",
@@ -62,5 +68,9 @@ __all__ = [
     "mstl",
     "stl",
     "QuantileBooster",
+    "ConformalDistributionRegressor",
+    "cosine_coefficients",
+    "cosine_cdf",
+    "cosine_density",
     "__version__",
 ]

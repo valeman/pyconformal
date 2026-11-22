@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.3 (22 November 2026)
+
+- New: `ConformalDistributionRegressor`, conformal sets when the outcome is a
+  whole probability distribution (distribution-to-distribution regression,
+  arXiv:2611.06320), or any vector: global and localised radii, the paper's
+  weighted score and volume, and a band for the distribution function.
+  `cosine_coefficients`, `cosine_cdf` and `cosine_density` turn samples into
+  coefficients and back.
+- New benchmark, `benchmarks/d2d_reference.py`, against the authors' code.
+
 ## 0.1.2 (22 November 2026)
 
 - New: `QuantileBooster`, quantile predictions from CatBoost, XGBoost or

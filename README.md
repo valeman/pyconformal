@@ -72,6 +72,7 @@ pip install "pyconformal[fast] @ git+https://github.com/valeman/pyconformal"
 | **Regression** | Split conformal (normalized, Mondrian, weighted) · jackknife+ and CV+ · CQR · CTI · CIR and CIR+ · a parallel quantile forest with out-of-bag calibration |
 | **Classification** | LAC · APS · RAPS · SAPS, randomised or not, marginal or per class |
 | **Probability calibration** | Venn-Abers and cross Venn-Abers, binary and multiclass |
+| **Distribution-valued outcomes** | Conformal sets for distribution-to-distribution regression, with a band for the distribution function |
 | **Predictive distributions** | Conformal predictive systems: quantiles, distribution function, intervals, exact CRPS |
 | **Time series, online** | ACI · DtACI · AgACI · NexCP · conformal PID |
 | **Time series, ensembles** | EnbPI · SPCI |
@@ -256,7 +257,7 @@ Figures for all three series, other forecasting models and the scripts: [case st
    written from its paper, against existing code where there is any
    (venn-abers, crepes, MAPIE, PUNCC, R's `forecast` and `conformalForecast`,
    and the CTI and CIR authors' code), and against the guarantee itself on
-   small calibration sets. 300 tests, run with warnings as errors.
+   small calibration sets. 313 tests, run with warnings as errors.
 3. **Fast.** Each method is written for the speed its algorithm allows, with
    optional compiled kernels (numba). The compiled and plain NumPy paths are
    tested to return the same values, so installing numba changes speed and
