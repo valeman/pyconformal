@@ -89,9 +89,15 @@ class SplitConformalRegressor(_Conformal):
         self._cum_weights = None
         if weights is not None:
             w = self._positive(weights, n, "weights", allow_zero=True)
+            scale = float(w.max()) if w.size else 0.0
+            if not scale > 0.0:
+                raise ValueError("The calibration weights must not all be zero.")
             order = np.argsort(scores, kind="stable")
             self._sorted_scores = scores[order]
-            self._cum_weights = np.cumsum(w[order])
+            # weights are divided by the largest one so that their sum cannot overflow
+            self._weight_scale = scale
+            self._cum_weights = np.cumsum(w[order] / scale)
+            self._equal_weight = scale if np.all(w == scale) else None
         self.calibration_scores_ = scores
         self._cache = {}
         return self
@@ -150,13 +156,19 @@ class SplitConformalRegressor(_Conformal):
         # Weighted: the test point carries weight w(x) at +infinity. The
         # threshold is the smallest score whose cumulative calibration weight
         # reaches (1 - alpha) of the total including the test point.
+        # Rounding in the sums may only move the boundary up (a wider
+        # interval), never down. Where all weights, the test point's
+        # included, are equal, this is plain split conformal and the exact
+        # rank is used.
         w = self._positive(weights, n, "weights", allow_zero=True)
         cum = self._cum_weights
-        need = (1.0 - alpha) * (cum[-1] + w)
-        pos = np.searchsorted(cum, need * (1.0 - 1e-12), side="left")
+        need = (1.0 - alpha) * (cum[-1] + w / self._weight_scale) * (1.0 + 1e-12)
+        pos = np.searchsorted(cum, need, side="left")
         q = np.full(n, np.inf)
         ok = pos < cum.shape[0]
         q[ok] = self._sorted_scores[pos[ok]]
+        if self._equal_weight is not None:
+            q[w == self._equal_weight] = conformal_quantile(self._sorted_scores, alpha)
         return q
 
     def predict_interval(self, X=None, alpha=None, *, y_pred=None, sigma=None, groups=None, weights=None):

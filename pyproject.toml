@@ -57,3 +57,4 @@ packages = ["project/src/pyconformal"]
 
 [tool.pytest.ini_options]
 testpaths = ["project/tests"]
+filterwarnings = ["error"]

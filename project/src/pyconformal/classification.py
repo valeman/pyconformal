@@ -10,6 +10,7 @@ from pyconformal.scores import get_score
 
 
 class SplitConformalClassifier(_Conformal):
+    _calibration_attrs = ("calibration_scores_", "_n_classes")
     """Split (inductive) conformal prediction sets for classification.
 
     A class enters the prediction set when its nonconformity score is at
@@ -94,9 +95,18 @@ class SplitConformalClassifier(_Conformal):
         return self._rng.random(n) if self.score.randomized else None
 
     def _proba(self, X, proba):
+        """Probabilities, checked: finite, in [0, 1], rows summing to 1
+        within 1e-4, and after calibration one column per calibrated class."""
         P = self._output(X, proba)
         if P.ndim != 2:
             raise ValueError("Probabilities must have shape (n_samples, n_classes).")
+        if self._n_classes is not None and P.shape[1] != self._n_classes:
+            raise ValueError(f"Expected {self._n_classes} probability columns, as in calibration; got {P.shape[1]}.")
+        if P.size:
+            if not np.all(np.isfinite(P)) or P.min() < -1e-12 or P.max() > 1.0 + 1e-12:
+                raise ValueError("Probabilities must be finite and between 0 and 1.")
+            if np.max(np.abs(P.sum(axis=1) - 1.0)) > 1e-4:
+                raise ValueError("Each row of probabilities must sum to 1 (within 1e-4).")
         return P
 
     def calibrate(self, X=None, y=None, *, proba=None):
@@ -104,13 +114,18 @@ class SplitConformalClassifier(_Conformal):
         if y is None:
             raise TypeError("calibrate() needs the labels y.")
         y = np.asarray(y).ravel()
+        self._n_classes = None  # a new calibration may change the number of columns
         P = self._proba(X, proba)
         if P.shape[0] != y.shape[0]:
             raise ValueError("Probabilities and y have different numbers of rows.")
         self._n_classes = P.shape[1]
         classes = self.classes_
         if classes.shape[0] != P.shape[1]:
+            self._n_classes = None
             raise ValueError("The number of classes does not match the probability columns.")
+        if len(set(classes.tolist())) != classes.shape[0]:
+            self._n_classes = None
+            raise ValueError("The classes must be distinct.")
         index = {c: i for i, c in enumerate(classes.tolist())}
         try:
             cols = np.array([index[c] for c in y.tolist()], dtype=np.int64)
@@ -120,6 +135,7 @@ class SplitConformalClassifier(_Conformal):
             ) from None
         self.calibration_scores_ = self.score.label_scores(P, cols, self._draw_u(len(cols)))
         self._calibration_labels = cols
+        self._cache = {}
         return self
 
     def thresholds(self, alpha: float | None = None):
@@ -127,15 +143,24 @@ class SplitConformalClassifier(_Conformal):
         if self.calibration_scores_ is None:
             raise RuntimeError("Call calibrate() first.")
         alpha = self.alpha if alpha is None else _check_alpha(alpha)
+        cache = self.__dict__.setdefault("_cache", {})
+        key = (alpha, self.class_conditional)
+        if key in cache:  # computed once per level, not once per prediction
+            q = cache[key]
+            return q.copy() if isinstance(q, np.ndarray) else q
         s = self.calibration_scores_
         if not self.class_conditional:
-            return conformal_quantile(s, alpha)
-        q = np.full(len(self.classes_), np.inf)
-        for k in range(q.size):
-            sk = s[self._calibration_labels == k]
-            if sk.size:
-                q[k] = conformal_quantile(sk, alpha)
-        return q
+            q = conformal_quantile(s, alpha)
+        else:
+            q = np.full(len(self.classes_), np.inf)
+            order = np.argsort(self._calibration_labels, kind="stable")
+            counts = np.bincount(self._calibration_labels, minlength=q.size)
+            starts = np.concatenate([[0], np.cumsum(counts)])
+            for k in range(q.size):
+                if counts[k]:
+                    q[k] = conformal_quantile(s[order[starts[k] : starts[k + 1]]], alpha)
+        cache[key] = q
+        return q.copy() if isinstance(q, np.ndarray) else q
 
     def predict(self, X=None, *, proba=None):
         """Most likely class."""

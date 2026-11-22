@@ -26,7 +26,7 @@ from fractions import Fraction
 
 import numpy as np
 
-from pyconformal._base import _Conformal
+from pyconformal._base import _Conformal, _rows
 from pyconformal._quantile import _check_alpha
 
 __all__ = ["CrossConformalRegressor"]
@@ -175,7 +175,7 @@ class CrossConformalRegressor(_Conformal):
         models = []
         for k in range(K):
             test = folds == k
-            m = copy.deepcopy(self.estimator).fit(X[~test], y[~test], **fit_params)
+            m = copy.deepcopy(self.estimator).fit(X[~test], y[~test], **_rows(fit_params, ~test, len(y)))
             oof[test] = np.asarray(m.predict(X[test]), dtype=float).ravel()
             models.append(m)
         self.estimators_ = models

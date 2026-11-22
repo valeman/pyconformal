@@ -1,4 +1,5 @@
 import math
+from fractions import Fraction
 
 import numpy as np
 import pyconformal as pc
@@ -24,7 +25,13 @@ def reference_aci(cal, stream, alpha, gamma, window=None):
         if a <= 0:
             q = math.inf
         else:
-            k = math.ceil((n + 1) * (1 - a) - 1e-9)
+            # The configured level uses its decimal value exactly. Levels
+            # reached by the updates have no decimal form; the rule for them
+            # is the floating-point expression below.
+            if a == alpha:
+                k = math.ceil((n + 1) * (1 - Fraction(repr(alpha))))
+            else:
+                k = math.ceil((n + 1) * (1.0 - a))
             q = math.inf if k > n else (-math.inf if k < 1 else sorted(cal)[k - 1])
         err = s > q
         qs.append(q)
@@ -230,7 +237,10 @@ def test_nexcp_matches_definition_stepwise_and_paths():
             w = rho ** np.arange(len(past), 0, -1.0)
             o = np.argsort(past, kind="stable")
             cum = np.cumsum(np.append(w[o], 1.0)) / (w.sum() + 1.0)
-            want = np.append(past[o], np.inf)[np.searchsorted(cum, 0.9 * (1 - 1e-12))]
+            if rho == 1.0:  # equal weights: the exact split rank
+                want = np.append(past[o], np.inf)[math.ceil((len(past) + 1) * Fraction(9, 10)) - 1]
+            else:
+                want = np.append(past[o], np.inf)[np.searchsorted(cum, 0.9 * (1 + 1e-12))]
             assert res.thresholds[t] == want
             assert step.threshold() == want
             step.update(score=s[40 + t])
@@ -329,3 +339,61 @@ def test_pid_matches_definition_and_tracks():
     assert iv.intervals.shape == (50, 2)
     with pytest.raises(ValueError):
         pc.ConformalPID(lr=0.0)
+
+
+# ---------------------------------------------------------------- audit, Nov 2026
+
+def _inside(iv, y):
+    return (iv[:, 0] <= y) & (y <= iv[:, 1])
+
+
+@pytest.mark.parametrize("use_numba", KERNELS)
+@pytest.mark.parametrize("make", [lambda: pc.AdaptiveConformalInference(gamma=0.1), lambda: pc.ConformalPID(),
+                                  lambda: pc.DtACI(), lambda: pc.AgACI(), lambda: pc.NonexchangeableConformal()])
+def test_reported_coverage_is_membership_in_issued_intervals(make, use_numba):
+    """A constant series has zero errors. The issued intervals must contain
+    the outcome exactly when the step is not counted as a miss."""
+    for y in (np.zeros(1000), np.r_[np.zeros(300), np.ones(200), np.zeros(500)]):
+        res = make().run(y=y, y_pred=np.zeros_like(y), use_numba=use_numba)
+        np.testing.assert_array_equal(_inside(res.intervals, y), ~res.errors)
+        assert res.coverage == _inside(res.intervals, y).mean()
+
+
+def test_pid_does_not_stick_on_a_constant_series():
+    y = np.zeros(2000)
+    res = pc.ConformalPID().run(y=y, y_pred=y)
+    assert abs(res.coverage - 0.9) < 0.01
+    # recovers after a long constant stretch, and stepping equals replay
+    s = np.r_[np.zeros(500), np.abs(np.random.default_rng(0).normal(size=1500))]
+    whole = pc.ConformalPID().run(scores=s)
+    step = pc.ConformalPID()
+    for t, v in enumerate(s):
+        assert step.threshold() == whole.thresholds[t]
+        step.update(score=v)
+    assert abs(1 - whole.errors[500:].mean() - 0.9) < 0.02
+
+
+def test_empty_set_is_nan_interval():
+    m = pc.AdaptiveConformalInference(alpha=0.1, gamma=0.0).calibrate(scores=[1.0])
+    m.alpha_t_ = 1.5  # working level above 1: the empty set
+    assert np.isnan(m.predict_interval(y_pred=[0.0])).all()
+
+
+@pytest.mark.parametrize("use_numba", KERNELS)
+def test_fixed_level_rank_equals_split_at_float_boundaries(use_numba):
+    """gamma = 0 is split conformal; the rank must be the exact decimal rank
+    even at adjacent representable levels."""
+    rng = np.random.default_rng(11)
+    for n in (9, 19, 49, 99, 199):
+        s = rng.exponential(size=n)
+        for a in (0.1, 0.05, 0.58, 0.3, 0.7, np.nextafter(0.1, 0.0), np.nextafter(0.1, 1.0), np.nextafter(0.05, 0.0)):
+            a = float(a)
+            m = pc.AdaptiveConformalInference(alpha=a, gamma=0.0).calibrate(scores=s)
+            want = conformal_quantile(s, a)
+            assert m.threshold() == want
+            assert m.run(scores=[1.0], use_numba=use_numba).thresholds[0] == want
+
+
+def test_dtaci_update_right_after_calibrate():
+    m = pc.DtACI().calibrate(scores=[1.0, 2.0])
+    assert m.update(score=1.0) in (True, False)

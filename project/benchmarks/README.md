@@ -5,7 +5,7 @@ environment so the audited packages do not mix with your own:
 
 ```bash
 conda create -n cp-audit python=3.12 -y && conda activate cp-audit
-pip install pyconformal[fast] statsforecast mlforecast darts mapie venn-abers crepes puncc scikit-learn
+pip install "pyconformal[fast]" statsforecast mlforecast darts mapie venn-abers crepes puncc scikit-learn
 python nixtla_coverage.py
 ```
 

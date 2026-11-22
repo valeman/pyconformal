@@ -36,17 +36,26 @@ class _Scores:
         self.a = np.sort(a)
         n = self.a.size
         self.n = n
-        self.prefix = np.concatenate([[0.0], np.cumsum(self.a)])
+        # Sums are taken around a central score, so that adding a large
+        # constant to every score (and to the outcome) changes nothing:
+        # without it, prefix sums of values near 1e14 lose all the digits
+        # that the CRPS depends on.
+        self.centre = float(self.a[n // 2])
+        self.prefix = np.concatenate([[0.0], np.cumsum(self.a - self.centre)])
         # run_end[i]: index just past the run of equal scores containing i
         ends = np.flatnonzero(self.a[1:] != self.a[:-1]) + 1
         ends = np.concatenate([ends, [n]])
         starts = np.concatenate([[0], ends[:-1]])
         self.run_end = np.repeat(ends, ends - starts)
-        # Mean absolute difference between two scores (Gini mean difference).
-        self.gmd = 2.0 * float(np.dot(2.0 * np.arange(1, n + 1) - n - 1, self.a)) / (n * n)
+        # Mean absolute difference between two scores (Gini mean difference),
+        # from the gaps between consecutive scores: every term is >= 0, so
+        # nothing cancels. Gap k separates k scores from the other n - k.
+        k = np.arange(1, n)
+        self.gmd = 2.0 * float(np.dot(np.diff(self.a), k * (n - k.astype(float)))) / (n * n)
 
 
 class ConformalPredictiveSystem(_Conformal):
+    _calibration_attrs = ("_groups",)
     """Split conformal predictive system.
 
     Turns point predictions into predictive distributions. With calibration
@@ -197,8 +206,9 @@ class ConformalPredictiveSystem(_Conformal):
         p, s, parts = self._prepare(X, y_pred, sigma, groups)
         out = np.empty((p.size, qs.size))
         for sc, rows in parts:
-            ext = np.concatenate([[-np.inf], sc.a, [np.inf]])
-            a_q = ext[[min(max(_rank(sc.n, t, side), 0), sc.n + 1) for t in qs]]
+            # C_(0) = -inf and C_(n + 1) = +inf, read without copying the scores
+            r = [_rank(sc.n, t, side) for t in qs]
+            a_q = np.array([-np.inf if k <= 0 else (np.inf if k > sc.n else sc.a[k - 1]) for k in r])
             with np.errstate(invalid="ignore"):
                 out[rows] = p[rows, None] + s[rows, None] * a_q[None, :]
         return out[:, 0] if scalar else out
@@ -226,7 +236,8 @@ class ConformalPredictiveSystem(_Conformal):
         ``y`` is one threshold per sample, or a single number for all.
         ``tau`` is a number or an array in [0, 1]. Pass uniform random numbers
         to get exactly uniform values at the true outcomes; the default 0.5
-        is the deterministic midpoint.
+        is the deterministic midpoint. A missing threshold (NaN) gives NaN;
+        ``-inf`` and ``inf`` give the values at the two ends.
         """
         if y is None:
             raise TypeError("predict_cdf() needs the thresholds y.")
@@ -244,6 +255,7 @@ class ConformalPredictiveSystem(_Conformal):
             # number of calibration scores equal to z, from one search
             eq = np.where(sc.a[at] == zz, sc.run_end[at] - lt, 0)
             out[rows] = (lt + tv[rows] * (eq + 1)) / (sc.n + 1)
+        out[np.isnan(z)] = np.nan  # a missing value is not a tail probability
         return out
 
     def predict_distribution(self, X=None, *, y_pred=None, sigma=None):
@@ -264,8 +276,9 @@ class ConformalPredictiveSystem(_Conformal):
         """Continuous ranked probability score per sample (lower is better).
 
         Scores the distribution that puts mass ``1 / n`` on each support
-        point. Computed in closed form from prefix sums, in O(log n) per
-        sample, without building the distributions.
+        point (not the randomised distribution ``Q(y, tau)``). Computed in
+        closed form from prefix sums, in O(log n) per sample, without
+        building the distributions. A missing outcome (NaN) gives NaN.
         """
         if y is None:
             raise TypeError("crps() needs the outcomes y.")
@@ -279,7 +292,8 @@ class ConformalPredictiveSystem(_Conformal):
             zz = z[rows]
             k = search(sc.a, zz, "right")
             below = sc.prefix[k]
-            # sum over i of |a_i - z|
-            abs_sum = zz * k - below + (sc.prefix[-1] - below) - zz * (sc.n - k)
+            zc = zz - sc.centre
+            # sum over i of |a_i - z|, with everything measured from the centre
+            abs_sum = zc * k - below + (sc.prefix[-1] - below) - zc * (sc.n - k)
             out[rows] = s[rows] * (abs_sum / sc.n - 0.5 * sc.gmd)
         return out

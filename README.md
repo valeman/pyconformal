@@ -16,16 +16,24 @@
 </p>
 
 Prediction intervals, prediction sets, predictive distributions and calibrated
-probabilities with finite-sample guarantees, for any model. About thirty
-methods behind one interface. NumPy is the only requirement. MIT licence.
+probabilities for any model, with finite-sample guarantees wherever the method
+has one ([which do](#the-guarantee-and-its-limits)). About thirty methods
+behind one interface. NumPy is the only requirement. MIT licence.
 
 ```python
+from sklearn.datasets import make_regression
+from sklearn.linear_model import LinearRegression
 from pyconformal import SplitConformalRegressor
 
-cp = SplitConformalRegressor(model, alpha=0.1)   # any scikit-learn-style model
+X, y = make_regression(n_samples=3000, n_features=5, noise=10, random_state=0)
+X_train, X_cal, X_test = X[:1000], X[1000:2000], X[2000:]
+y_train, y_cal, y_test = y[:1000], y[1000:2000], y[2000:]
+
+cp = SplitConformalRegressor(LinearRegression(), alpha=0.1)   # any scikit-learn-style model
 cp.fit(X_train, y_train)
 cp.calibrate(X_cal, y_cal)
-cp.predict_interval(X_test)                      # covers at least 90% of the time
+intervals = cp.predict_interval(X_test)                       # covers at least 90% on average
+print(((intervals[:, 0] <= y_test) & (y_test <= intervals[:, 1])).mean())   # 0.899
 ```
 
 No model object? Pass its outputs: `cp.calibrate(y_pred=pred_cal, y=y_cal)`.
@@ -38,7 +46,17 @@ No model object? Pass its outputs: `cp.calibrate(y_pred=pred_cal, y=y_cal)`.
 pip install "pyconformal[fast]"
 ```
 
-`[fast]` adds numba for speed; `pip install pyconformal` gives a NumPy-only install. Python 3.10 or later.
+With conda, install into an environment of its own:
+
+```bash
+conda create -n pyconformal -c conda-forge python=3.12 pip
+conda activate pyconformal
+pip install "pyconformal[fast]"
+```
+
+Python 3.10 or later. `[fast]` adds numba. Without it everything runs on NumPy
+alone, more slowly, except `QuantileForest` and `SPCI` (which uses it): those
+two need numba. The example above also needs scikit-learn for the model.
 
 The development version, ahead of the latest release:
 
@@ -118,9 +136,11 @@ answer below that is an infinite interval. (The statsforecast behaviour is
 default, randomised mode is correct. The crepes and PUNCC items do not affect
 the coverage of their intervals.)
 
-**MAPIE is correct. Its costs are elsewhere.** It
-passed every one of the 84 coverage configurations we ran, and we found no
-setting in which it returns an invalid interval. Its problems are speed,
+**MAPIE is correct. Its costs are elsewhere.** Of the
+84 coverage configurations we ran, 78 met their target (for jackknife+ and
+CV+ the target is their proven bound of 80% at a 90% setting) and 6 refused
+to run because the calibration set was too small, which is safe behaviour.
+We found no setting in which it returns an invalid interval. Its problems are speed,
 memory, and sets that are larger than they need to be:
 
 | | MAPIE 1.6.0 | pyconformal | Times faster | Output |
@@ -164,7 +184,7 @@ not measured a case where that changes its coverage.
 | AcMCP, 1,000 steps × 6 horizons | 107 s (R conformalForecast) | 2.5 s | **43x** | median difference 0.00001 |
 | Conformal PID, per step | 10 to 14 µs (authors' code) | 0.09 to 0.13 µs | **106x to 112x** | identical |
 | CTI, 200,000 test points | 0.43 s (authors' code) | 0.023 s | **19x** | identical |
-| CIR, 200,000 test points | 1.85 s (authors' code) | 0.12 s | **16x** | identical in the authors' mode |
+| CIR, 200,000 test points | 1.85 s (authors' code) | 0.12 s | **16x** | identical in the authors' mode, which has no coverage guarantee (see below) |
 | MSTL decomposition, 100,000 points | 19.3 s (statsforecast, its defaults) | 0.098 s | **about 200x** (6x to 7x at equal settings) | identical at equal settings |
 | Quantile forest, fit on 1,000,000 rows (16 cores) | 215 s (quantile-forest) | 27 s | **8x** | same accuracy |
 
@@ -207,11 +227,12 @@ Figures for all three series, other forecasting models and the scripts: [case st
    written from its paper, against existing code where there is any
    (venn-abers, crepes, MAPIE, PUNCC, R's `forecast` and `conformalForecast`,
    and the CTI and CIR authors' code), and against the guarantee itself on
-   small calibration sets. 234 tests, run with warnings as errors.
+   small calibration sets. 275 tests, run with warnings as errors.
 3. **Fast.** Each method is written for the speed its algorithm allows, with
    optional compiled kernels (numba). The compiled and plain NumPy paths are
    tested to return the same values, so installing numba changes speed and
-   nothing else.
+   nothing else, apart from the two methods that need it (`QuantileForest`
+   and `SPCI`).
 
 ## Speed, method by method
 
@@ -271,17 +292,22 @@ package, on one quantile forest.
 
 ## The guarantee, and its limits
 
-If the calibration data and the test point are exchangeable (for example,
-i.i.d.), the interval or set contains the true value with probability at least
-`1 - alpha`. This is on average over test points, not for each input
-separately, and the calibration data must not have been used to train the
-model.
+What each family promises:
 
-Time series are not exchangeable. The online methods (ACI and its relatives,
-conformal PID, AcMCP) guarantee the long-run miss rate on any sequence; EnbPI,
-SPCI and conformal seasonal pools are approximate, and the guide says so where
-it matters. All of our coverage tests use synthetic data, and the timings come
-from one machine.
+| Methods | Promise |
+|---|---|
+| Split conformal regression and classification, CQR, CTI, CIR and CIR+ (default window), conformal predictive systems | If calibration and test points are exchangeable (for example i.i.d.), coverage is at least `1 - alpha`, on average over test points, not for each input. With groups, within each group. The calibration data must not have trained the model. |
+| Weighted split conformal | The same on a shifted test distribution, if the weights are the true likelihood ratios. Estimated weights carry no guarantee. |
+| Jackknife+ and CV+ | At least `1 - 2 * alpha` in the worst case; usually close to `1 - alpha` in practice. |
+| Venn-Abers | Each pair of probabilities contains a calibrated one. A single merged probability is not guaranteed to be calibrated. |
+| ACI, DtACI, conformal PID, AcMCP | On any sequence, the long-run share of misses approaches `alpha`. The reported coverage is exactly the share of outcomes inside the issued intervals; an empty set is returned as NaN bounds. AcMCP's default `Csat` depends on the length of the replayed history (as in the R package); pass `Csat` to avoid that. |
+| Multi-step split conformal | Per horizon, under exchangeable forecast errors. Covering each horizon is not covering the whole path. |
+| AgACI, NexCP, EnbPI, SPCI, conformal seasonal pools | Approximate: no finite-sample guarantee. |
+| CIR with `window="shortest"` | None. It reproduces the authors' code; on exchangeable data it can cover far below `1 - alpha`, and it warns when used. |
+
+Time series are not exchangeable, so coverage on real series is an observed
+result. Most of our coverage tests use synthetic data; the case studies above
+are on three real series. The timings come from one machine.
 
 ## More
 

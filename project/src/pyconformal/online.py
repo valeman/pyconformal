@@ -11,7 +11,8 @@ import numpy as np
 from pyconformal._base import _Conformal
 
 from pyconformal._online_kernel import (
-    _RANK_TOL,
+    _decimal,
+    _rank,
     _agaci_combine,
     _agaci_learn,
     _dtaci_step,
@@ -34,14 +35,18 @@ class ACIResult:
     ----------
     thresholds : ndarray of shape (T,)
         Score threshold used at each step, fixed before that step's outcome
-        was seen. ``inf`` means "cover everything"; ``-inf`` means the empty
-        set.
+        was seen. ``inf`` means "cover everything"; a negative threshold
+        (including ``-inf``) means the empty set.
     errors : ndarray of bool, shape (T,)
         True where the observed score exceeded the threshold (a miss).
     alphas : ndarray of shape (T,)
         Working miscoverage level used at each step.
     intervals : ndarray of shape (T, 2) or None
-        Lower and upper bounds, when predictions were supplied.
+        Lower and upper bounds, when predictions were supplied. An empty set
+        is the row ``(nan, nan)``, which contains no outcome. With the
+        absolute-error score an outcome is inside the issued interval
+        exactly when ``errors`` is False, so ``coverage`` is also the share
+        of outcomes inside the issued intervals.
     """
 
     thresholds: np.ndarray
@@ -52,6 +57,14 @@ class ACIResult:
     @property
     def coverage(self) -> float:
         return float(1.0 - self.errors.mean())
+
+
+def _band(p, q):
+    """``p -/+ q`` for the absolute-error score; a negative threshold is the
+    empty set, returned as NaN bounds."""
+    q = np.asarray(q, dtype=float)
+    h = np.where(q < 0.0, np.nan, q)
+    return np.column_stack([p - h, p + h])
 
 
 class AdaptiveConformalInference(_Conformal):
@@ -143,6 +156,9 @@ class AdaptiveConformalInference(_Conformal):
             raise ValueError("Predictions and y have different lengths.")
         return self._as_scores(np.abs(yv - p)), p
 
+    def _forget_calibration(self):
+        self.calibrate()
+
     def calibrate(self, X=None, y=None, *, y_pred=None, scores=None):
         """Start from an initial calibration set. Calling it with no
         arguments starts from nothing.
@@ -176,13 +192,22 @@ class AdaptiveConformalInference(_Conformal):
             self._scores = np.asarray(self._arrival[self._head :], dtype=float)
             self._sorted = None
 
+    @property
+    def _decimal_alpha(self):
+        """(numerator, denominator) of the decimal value of ``alpha``."""
+        cache = getattr(self, "_dec_cache", None)
+        if cache is None or cache[0] != self.alpha:
+            cache = (self.alpha, *_decimal(self.alpha))
+            self._dec_cache = cache
+        return cache[1], cache[2]
+
     def threshold(self) -> float:
         """Score threshold for the next step."""
         srt = self._online()
         n = len(srt)
         if self.alpha_t_ <= 0.0:
             return math.inf
-        k = math.ceil((n + 1) * (1.0 - self.alpha_t_) - _RANK_TOL)
+        k = _rank(n, self.alpha_t_, self.alpha, *self._decimal_alpha)
         if k > n:
             return math.inf
         if k < 1:
@@ -248,8 +273,7 @@ class AdaptiveConformalInference(_Conformal):
         self._trim()
         res = ACIResult(q, err, alphas)
         if p is not None:
-            h = np.maximum(q, 0.0)
-            res.intervals = np.column_stack([p - h, p + h])
+            res.intervals = _band(p, q)
         return res
 
     # ---------------------------------------------- regression convenience
@@ -257,13 +281,12 @@ class AdaptiveConformalInference(_Conformal):
     def predict_interval(self, X=None, *, y_pred=None):
         """Interval(s) for the next step, shape (n, 2).
 
-        Uses the absolute-error score: ``y_pred -/+ threshold``. An empty
-        prediction set (threshold ``-inf``) is returned as the single point
-        ``y_pred``.
+        Uses the absolute-error score: ``y_pred -/+ threshold``. When the
+        threshold is negative the prediction set is empty and the row is
+        ``(nan, nan)``.
         """
         p = self._output(X, y_pred).ravel()
-        h = max(self.threshold(), 0.0)
-        return np.column_stack([p - h, p + h])
+        return _band(p, np.full(p.shape[0], self.threshold()))
 
 
 class DtACI(AdaptiveConformalInference):
@@ -325,12 +348,13 @@ class DtACI(AdaptiveConformalInference):
         self.alpha_t_ = self.alpha
 
     def _adapt(self, score) -> bool:
-        srt = self._sorted
+        srt = self._online()
         n = len(srt)
         miss = score > self.threshold()
         r = bisect.bisect_left(srt, score)  # past scores strictly below
         eta, sigma = self._rates
-        self.alpha_t_ = _dtaci_step(self.expert_alphas_, self.weights_, self.gammas, self.alpha, eta, sigma, r, n)
+        self.alpha_t_ = _dtaci_step(self.expert_alphas_, self.weights_, self.gammas, self.alpha,
+                                    *self._decimal_alpha, eta, sigma, r, n)
         return miss
 
     def _replay(self, s, use_numba):
@@ -389,8 +413,12 @@ class NonexchangeableConformal(AdaptiveConformalInference):
             return math.inf
         w = self.rho ** np.arange(n, 0, -1.0)  # newest score: rho ** 1
         order = np.argsort(s, kind="stable")
-        cum = np.cumsum(w[order])
-        need = (1.0 - self.alpha) * (cum[-1] + 1.0) * (1.0 - 1e-12)
+        if self.rho == 1.0:  # equal weights: the exact split-conformal rank
+            cum = np.arange(1.0, n + 1.0)
+            need = float(_rank(n, self.alpha, self.alpha, *self._decimal_alpha))
+        else:
+            cum = np.cumsum(w[order])
+            need = (1.0 - self.alpha) * (cum[-1] + 1.0) * (1.0 + 1e-12)  # rounding may only widen
         pos = int(np.searchsorted(cum, need, side="left"))
         return math.inf if pos >= n else float(s[order][pos])
 
@@ -476,7 +504,7 @@ class AgACI(AdaptiveConformalInference):
             if a <= 0.0:
                 out[k] = math.inf
                 continue
-            kk = math.ceil((n + 1) * (1.0 - a) - _RANK_TOL)
+            kk = _rank(n, a, self.alpha, *self._decimal_alpha)
             out[k] = math.inf if kk > n else (-math.inf if kk < 1 else srt[kk - 1])
         return out
 
@@ -531,6 +559,11 @@ class ConformalPID(AdaptiveConformalInference):
     lr : float, default=0.1
         Step size. With ``proportional_lr`` it is multiplied by the range of
         the last ``burn_in`` scores, so it adapts to the scale of the data.
+        When two or more recent scores are held and all are equal, the
+        range is zero and the step would vanish, leaving the threshold stuck
+        (for example on a constant series); the largest absolute recent
+        score is used instead, and 1 if that is zero too. This departs from
+        the authors' code only in that case.
     KI : float, default=0.0
         Integrator gain; 0 turns the integrator off.
     Csat : float, default=1.0
@@ -599,6 +632,5 @@ class ConformalPID(AdaptiveConformalInference):
         q, err = self._replay_pid(s, use_numba)
         res = ACIResult(q, err, np.full(s.shape[0], self.alpha))
         if p is not None:
-            h = np.maximum(q, 0.0)
-            res.intervals = np.column_stack([p - h, p + h])
+            res.intervals = _band(p, q)
         return res

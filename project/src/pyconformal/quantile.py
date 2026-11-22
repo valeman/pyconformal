@@ -28,6 +28,8 @@ interquantile intervals. AAAI. arXiv:2601.02769.
 
 from __future__ import annotations
 
+import warnings
+
 import math
 
 import numpy as np
@@ -584,8 +586,12 @@ class ConformalInterquantileRegressor(_Interquantile):
     * The prediction interval is built with the same growing rule as the
       score. The paper's formula instead takes the shortest run of ``k``
       consecutive intervals, which is not always the same window;
-      ``window="shortest"`` gives that variant, without the finite-sample
-      guarantee. On a two-mode outcome it covered 88% at a 90% target.
+      ``window="shortest"`` gives that variant. It is there to reproduce
+      the authors' code and has **no coverage guarantee**: on a two-mode
+      outcome it covered 88% at a 90% target, and on a simple example with
+      exchangeable data it can cover 0% (calibration counts steps along one
+      sequence of windows, prediction can pick a different window of the
+      same length). It warns when used.
     * For CIR+ the added length is divided by the sample's full predicted
       range, and the extra step is taken when the resulting score is at
       most the threshold. The authors' code divides by 100 times the
@@ -606,6 +612,8 @@ class ConformalInterquantileRegressor(_Interquantile):
     plus : bool, default=False
         Use CIR+.
     window : {"greedy", "shortest"}, default="greedy"
+        "greedy" carries the coverage guarantee. "shortest" reproduces the
+        authors' code, without it.
     quantile_levels : int, array-like or None
         Levels asked from the model: an array, or a number K for K equal
         parts. Default: 100 equal parts (levels 0, 0.01, ..., 1).
@@ -624,6 +632,11 @@ class ConformalInterquantileRegressor(_Interquantile):
             raise ValueError("window must be 'greedy' or 'shortest'.")
         if plus and window == "shortest":
             raise ValueError("CIR+ is defined for window='greedy' only.")
+        if window == "shortest":
+            warnings.warn(
+                "window='shortest' reproduces the CIR authors' code and has no coverage guarantee; "
+                "it can cover far less than 1 - alpha. Use the default window='greedy' for the guarantee.",
+                UserWarning, stacklevel=2)
         self.plus = bool(plus)
         self.window = window
 

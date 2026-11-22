@@ -31,7 +31,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from pyconformal._base import _Conformal
+from pyconformal._base import _Conformal, _rows
 from pyconformal._online_kernel import aci_replay
 from pyconformal._quantile import _check_alpha, conformal_quantile
 
@@ -75,9 +75,15 @@ class EnbPI(_Conformal):
         A regressor with ``fit`` and ``predict``; copied once per member.
     alpha : float, default=0.1
     n_bootstraps : int, default=30
+        Members to train. Every residual must come from members that did
+        not see that row, so if some rows are in every bootstrap sample,
+        ``fit`` trains extra members until each row has been left out at
+        least once (``n_members_`` gives the final number).
     batch_size : int, default=1
         In ``run``, residuals are refreshed after every ``batch_size``
-        observations.
+        observations. The position within a batch carries over between
+        calls, so splitting a stream into several ``run`` calls gives the
+        same intervals as one call.
     random_state : int or None
 
     The centre of the interval is the mean of all members. The half-width is
@@ -109,22 +115,32 @@ class EnbPI(_Conformal):
         y = np.asarray(y, dtype=float).ravel()
         n, B = y.shape[0], self.n_bootstraps
         rng = np.random.default_rng(self.random_state)
-        in_bag = np.zeros((n, B), dtype=bool)
-        P = np.empty((n, B))
-        models = []
-        for b in range(B):
+        bags, preds, models = [], [], []
+        left_out = np.zeros(n, dtype=bool)
+        cap = 10 * B + 100
+        while len(models) < B or not left_out.all():
+            if len(models) >= cap:
+                raise ValueError(f"After {cap} members some rows were never left out; use more data.")
             idx = rng.integers(0, n, size=n)
-            in_bag[idx, b] = True
-            m = copy.deepcopy(self.estimator).fit(X[idx], y[idx], **fit_params)
-            P[:, b] = np.asarray(m.predict(X), dtype=float).ravel()
+            bag = np.zeros(n, dtype=bool)
+            bag[idx] = True
+            left_out |= ~bag
+            m = copy.deepcopy(self.estimator).fit(X[idx], y[idx], **_rows(fit_params, idx, n))
+            preds.append(np.asarray(m.predict(X), dtype=float).ravel())
+            bags.append(bag)
             models.append(m)
         self.estimators_ = models
-        return self.calibrate(y_pred=P, y=y, in_bag=in_bag)
+        return self.calibrate(y_pred=np.column_stack(preds), y=y, in_bag=np.column_stack(bags))
 
     def calibrate(self, X=None, y=None, *, y_pred=None, in_bag=None):
         """Residuals from member predictions on the training rows:
         ``y_pred[i, b]`` is member ``b``'s prediction for row ``i`` and
         ``in_bag[i, b]`` says whether member ``b`` was trained on row ``i``.
+
+        Each residual uses only the members that did not see that row. A
+        row that every member saw has no such prediction and is left out of
+        the residuals (EnbPI; their number is ``n_starved_``) or is an error
+        (SPCI, whose residuals must be consecutive in time).
         """
         if X is not None:
             raise TypeError("With a model, call fit(X, y).")
@@ -139,11 +155,18 @@ class EnbPI(_Conformal):
             raise ValueError("y_pred and y must be finite.")
         out = ~bag
         count = out.sum(axis=1)
-        loo = np.where(count > 0, (P * out).sum(axis=1) / np.maximum(count, 1), P.mean(axis=1))
+        has = count > 0
         self.n_members_ = P.shape[1]
-        self.n_starved_ = int((count == 0).sum())  # rows every member saw: predicted by all members
-        r = y - loo
+        self.n_starved_ = int((~has).sum())  # rows every member saw: no out-of-bag prediction
+        if self.n_starved_ and self._signed:
+            raise ValueError(f"{self.n_starved_} rows were seen by every member; SPCI needs an out-of-bag "
+                             "prediction for every row. Use more members.")
+        if not has.any():
+            raise ValueError("Every row was seen by every member; there are no out-of-bag predictions.")
+        loo = (P[has] * out[has]).sum(axis=1) / count[has]
+        r = y[has] - loo
         self.residuals_ = r if self._signed else np.abs(r)
+        self._phase, self._held = 0, None
         self._after_calibrate()
         return self
 
@@ -203,6 +226,7 @@ class EnbPI(_Conformal):
         r = y - c
         new = r if self._signed else np.abs(r)
         self.residuals_ = np.concatenate([self.residuals_, new])[new.shape[0] :]
+        self._phase, self._held = 0, None  # residuals are fresh now
         return self
 
     def run(self, X=None, y=None, *, y_pred=None) -> EnsembleResult:
@@ -218,8 +242,19 @@ class EnbPI(_Conformal):
         s = np.abs(y - c)
         # a sliding-window conformal quantile is ACI with step size 0
         q = aci_replay(self.residuals_, s, self.alpha, 0.0, self.alpha, self.residuals_.shape[0])[0]
-        if self.batch_size > 1:
-            q = q[(np.arange(q.shape[0]) // self.batch_size) * self.batch_size]
+        bs = self.batch_size
+        if bs > 1:
+            phase = getattr(self, "_phase", 0)
+            held = getattr(self, "_held", None)
+            t = np.arange(q.shape[0])
+            start = t - (phase + t) % bs  # step at which this step's batch began
+            q_new = q[np.maximum(start, 0)]
+            if held is not None:
+                q_new = np.where(start < 0, held, q_new)  # batch began in an earlier call
+            q = q_new
+            if q.shape[0]:
+                self._phase = (phase + q.shape[0]) % bs
+                self._held = float(q[-1]) if self._phase else None
         self.residuals_ = np.concatenate([self.residuals_, s])[s.shape[0] :]
         return EnsembleResult(np.column_stack([c - q, c + q]), c, s > q)
 

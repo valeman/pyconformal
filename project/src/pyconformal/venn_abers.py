@@ -15,7 +15,7 @@ import copy
 
 import numpy as np
 
-from pyconformal._base import _Conformal
+from pyconformal._base import _Conformal, _rows
 from pyconformal._va_kernel import _release_hulls, bridge_slopes, lookup
 
 __all__ = ["VennAbers", "CrossVennAbers"]
@@ -272,6 +272,7 @@ class _MulticlassIVAP:
 
 
 class VennAbers(_Conformal):
+    _calibration_attrs = ("calibrator_", "_n_classes")
     """Venn-Abers calibration of class probabilities, binary and multiclass.
 
     Turns the scores of any classifier into calibrated probabilities. For
@@ -351,13 +352,12 @@ class VennAbers(_Conformal):
         if classes.shape[0] != self._n_classes:
             raise ValueError("The number of classes does not match the model outputs.")
         if binary:
-            if y.dtype == bool:
-                positive = y
-            else:
-                known = np.isin(y, classes)
-                if not np.all(known):
-                    raise ValueError(f"Label {y[~known][0]!r} is not among the classes.")
-                positive = y == classes[1]
+            # the positive class is the second of ``classes_``, whatever the
+            # label type (bool labels included)
+            known = np.isin(y, classes)
+            if not np.all(known):
+                raise ValueError(f"Label {y[~known][0]!r} is not among the classes.")
+            positive = y == classes[1]
             self.calibrator_ = _IVAP(self.merge).fit(Z, positive, use_numba=use_numba)
         else:
             self.calibrator_ = _MulticlassIVAP(self.strategy, self.merge).fit(
@@ -466,7 +466,7 @@ class CrossVennAbers(_Conformal):
         models = []
         for k in range(K):
             test = folds == k
-            m = copy.deepcopy(self.estimator).fit(X[~test], y[~test], **fit_params)
+            m = copy.deepcopy(self.estimator).fit(X[~test], y[~test], **_rows(fit_params, ~test, len(y)))
             if not np.array_equal(np.asarray(m.classes_), classes):
                 raise ValueError("A training fold is missing one of the classes; use fewer folds.")
             oof[test] = np.asarray(m.predict_proba(X[test]), dtype=float)[:, 1]

@@ -16,11 +16,33 @@ import numpy as np
 from pyconformal._quantile import _check_alpha
 
 
+def _rows(fit_params, idx, n):
+    """Fit parameters for a subset or resample of the rows: arrays with one
+    entry per training row (such as ``sample_weight``) follow ``idx``;
+    everything else is passed unchanged."""
+    out = {}
+    for k, v in fit_params.items():
+        if hasattr(v, "__len__") and not isinstance(v, (str, bytes, dict)):
+            a = np.asarray(v)
+            if a.ndim >= 1 and a.shape[0] == n:
+                out[k] = a[idx]
+                continue
+        out[k] = v
+    return out
+
+
 class _Conformal:
     _model_method = "predict"  # what to call on the estimator
     _given = "y_pred"  # keyword that carries model outputs
+    # attributes that hold the calibration; cleared when the model is refitted
+    _calibration_attrs: tuple = ("calibration_scores_",)
 
     estimator = None
+
+    def _forget_calibration(self):
+        for a in self._calibration_attrs:
+            if hasattr(self, a):
+                setattr(self, a, None)
 
     def fit(self, X, y, **fit_params):
         """Train the underlying model on the proper training set. Skip this
@@ -31,6 +53,8 @@ class _Conformal:
                 "With model outputs, go straight to calibrate()."
             )
         self.estimator.fit(X, y, **fit_params)
+        # a new model makes the old calibration invalid: calibrate again
+        self._forget_calibration()
         return self
 
     def _output(self, X, given):
@@ -63,9 +87,17 @@ class _Conformal:
         return {n: getattr(self, n) for n in names}
 
     def set_params(self, **params):
+        """Change parameters. They are checked by building a new object
+        first, so a bad value leaves this one unchanged. Changing only
+        ``alpha`` keeps the calibration; any other change clears it."""
         valid = self.get_params()
-        for k, v in params.items():
+        for k in params:
             if k not in valid:
                 raise ValueError(f"Unknown parameter {k!r} for {type(self).__name__}.")
-            setattr(self, k, v)
+        fresh = type(self)(**{**valid, **params})
+        if set(params) <= {"alpha"}:
+            self.alpha = fresh.alpha
+            return self
+        self.__dict__.clear()
+        self.__dict__.update(fresh.__dict__)
         return self

@@ -161,6 +161,12 @@ The choice of window matters when the outcome has more than one mode. On a
 two-mode outcome (`benchmarks/review_experiments.py cir`) the authors' rule
 covered 88.3% at a 90% target and 76.7% at an 80% target, in their own code
 and in ours with `window="shortest"`; the default covered 90.5% and 80.4%.
+The authors' rule has no coverage guarantee at all: with fixed predicted
+quantiles `[0, 1, 11, 13, 15]` and every outcome equal to 2 (exchangeable
+data, 90% target), the default interval is `[0, 11]` and covers every
+outcome, while `window="shortest"` returns `[11, 15]` and covers none.
+`window="shortest"` is kept only to reproduce the authors' code, and warns
+when used.
 For outcomes like that, CTI is the better tool: it may return two intervals,
 and its sets were 30% to 40% shorter than any single interval.
 
@@ -185,7 +191,7 @@ forest.predict(X_test, quantiles=[0.05, 0.5, 0.95])   # or use it on its own
 A quantile regression forest (Meinshausen, 2006) written for speed: features
 are binned once, splits are found on histograms, trees grow in parallel, and
 any number of quantile levels costs one pass per sample. Needs numba
-(`pip install pyconformal[fast]`). Against quantile-forest 1.5.0 with the same
+(`pip install "pyconformal[fast]"`). Against quantile-forest 1.5.0 with the same
 settings (`benchmarks/speed_forest.py`), on a 16-core server with 100,000 and
 1,000,000 training rows:
 
@@ -247,6 +253,10 @@ aci.predict_interval(y_pred=next_forecast)      # then go live, one step at a ti
 aci.update(y_pred=next_forecast, y=next_actual)
 ```
 
+The reported `coverage` is the share of outcomes inside the issued
+intervals. When the working level asks for the empty set, the interval is
+returned as `(nan, nan)` and counts as a miss.
+
 Four more online methods take the same calls as ACI:
 
 | Class | Idea | 1,000,000 steps |
@@ -254,7 +264,7 @@ Four more online methods take the same calls as ACI:
 | `DtACI` | Several step sizes at once, weighted by recent performance; nothing to tune | 0.6 s |
 | `AgACI` | Combines the thresholds of 30 ACI experts by online aggregation | 4.4 s |
 | `NonexchangeableConformal` (NexCP) | Old scores count less: weight `rho ** age` | 0.3 s |
-| `ConformalPID` | Moves the threshold itself up after a miss, down after a cover | 0.09 s |
+| `ConformalPID` | Moves the threshold itself up after a miss, down after a cover. The step is proportional to the range of recent scores; when they are all equal (a constant series) a nonzero step is kept so the threshold cannot get stuck | 0.09 s |
 
 ### Several steps ahead: multi-step split conformal prediction
 
@@ -308,6 +318,13 @@ from pyconformal import EnbPI, SPCI
 enb = EnbPI(model, alpha=0.1, n_bootstraps=30).fit(X_train, y_train)
 result = enb.run(X_test, y_test)       # intervals, with residuals sliding forward
 ```
+
+Every residual comes from members that did not see that row. If some rows
+are in every bootstrap sample (likely with few members), `fit` trains extra
+members until each row has been left out at least once; `n_members_` gives
+the final number. With few members and in-bag residuals instead, coverage at
+a 90% target fell to 84% in the audit's test; with out-of-bag residuals only
+it is 90%.
 
 `SPCI` has the same calls and predicts the next error from the last few with
 the quantile forest. On errors with autocorrelation 0.9 its intervals were

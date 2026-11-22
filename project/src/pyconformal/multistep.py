@@ -232,7 +232,11 @@ class AcMCP:
         not yet known at the time; pass that number to reproduce it.)
     Csat : float or None
         Integrator saturation. None uses the formula of the conformal PID
-        paper with the length of the history and ``delta``.
+        paper with the length of the history passed to ``run`` and
+        ``delta``, as the R package does. The intervals then depend on how
+        long the replayed history is (not on its future values): replaying
+        50 steps or the first 50 of 90 steps gives different intervals.
+        Pass a number for intervals that do not depend on the length.
     delta : float, default=0.01
     refit_every : int, default=1
         Refit the MA model every this many steps. 1 follows the R package.

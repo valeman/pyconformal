@@ -12,12 +12,43 @@ from __future__ import annotations
 
 import math
 
-# Guards against (n + 1) * (1 - alpha) landing a hair above an integer in
-# floating point (for example 21.000000000000004 instead of 21).
-_RANK_TOL = 1e-9
 
 
-def _aci_py(vals, rank, n0, alpha, gamma, alpha_t, window, tree, q, err, alphas):
+def _decimal(alpha):
+    """Numerator and denominator of the decimal value of ``alpha``, the value
+    the user typed (as in :func:`conformal_quantile`)."""
+    from fractions import Fraction
+
+    f = Fraction(repr(float(alpha)))
+    return int(f.numerator), int(f.denominator)
+
+
+def _rank(n, a, alpha, num, den):
+    """Rank of the threshold among ``n`` scores at working level ``a``.
+
+    At the configured level (``a == alpha``) this is exactly
+    ``ceil((n + 1) * (1 - num / den))`` on the decimal value of ``alpha``,
+    the same rule as :func:`conformal_quantile`. The products may exceed 64
+    bits, but the remainder ``d`` is small and is exact modulo 2**64, which
+    is all the correction loop needs. Other levels arise from the adaptive
+    updates and have no decimal form; they use their floating-point value.
+    A rank above ``n`` means an infinite threshold, below 1 the empty set.
+    """
+    c = n + 1
+    if a == alpha:
+        qe = int(c * (num / den))  # floor(c * num / den), to within one
+        d = c * num - qe * den
+        while d < 0:
+            qe -= 1
+            d += den
+        while d >= den:
+            qe += 1
+            d -= den
+        return c - qe
+    return math.ceil(c * (1.0 - a))
+
+
+def _aci_py(vals, rank, n0, alpha, num, den, gamma, alpha_t, window, tree, q, err, alphas):
     """Replay a stream.
 
     vals   : all scores sorted ascending (calibration and stream together)
@@ -51,7 +82,7 @@ def _aci_py(vals, rank, n0, alpha, gamma, alpha_t, window, tree, q, err, alphas)
         if alpha_t <= 0.0:
             thr = math.inf
         else:
-            k = math.ceil((n + 1) * (1.0 - alpha_t) - _RANK_TOL)
+            k = _rank(n, alpha_t, alpha, num, den)
             if k > n:
                 thr = math.inf
             elif k < 1:
@@ -87,9 +118,19 @@ def _aci_py(vals, rank, n0, alpha, gamma, alpha_t, window, tree, q, err, alphas)
 
 
 try:  # pragma: no cover - exercised when numba is installed
+    import types as _types
+
     from numba import njit
 
-    _aci_nb = njit(cache=True, nogil=True)(_aci_py)
+    def _jit_with(fn, **deps):
+        """Compile ``fn`` with some of its global helpers replaced by their
+        compiled versions."""
+        g = dict(globals())
+        g.update(deps)
+        return njit(cache=True, nogil=True)(_types.FunctionType(fn.__code__, g, fn.__name__, fn.__defaults__))
+
+    _rank_nb = njit(cache=True, nogil=True)(_rank)
+    _aci_nb = _jit_with(_aci_py, _rank=_rank_nb)
     HAVE_NUMBA = True
 except Exception:
     _aci_nb = None
@@ -110,6 +151,7 @@ def aci_replay(cal, stream, alpha, gamma, alpha_t, window, use_numba=None):
     rank = np.empty(n0 + T, dtype=np.int64)
     rank[order] = np.arange(n0 + T)
     vals = allv[order]
+    num, den = _decimal(alpha)
     if use_numba is None:
         use_numba = HAVE_NUMBA
     if use_numba:
@@ -119,19 +161,19 @@ def aci_replay(cal, stream, alpha, gamma, alpha_t, window, use_numba=None):
         q = np.empty(T)
         err = np.empty(T, dtype=np.bool_)
         alphas = np.empty(T)
-        final = _aci_nb(vals, rank, n0, alpha, gamma, alpha_t, window, tree, q, err, alphas)
+        final = _aci_nb(vals, rank, n0, alpha, num, den, gamma, alpha_t, window, tree, q, err, alphas)
         return q, err, alphas, float(final)
     tree = [0] * (n0 + T + 1)
     q = [0.0] * T
     err = [False] * T
     alphas = [0.0] * T
     final = _aci_py(
-        vals.tolist(), rank.tolist(), n0, alpha, gamma, alpha_t, window, tree, q, err, alphas
+        vals.tolist(), rank.tolist(), n0, alpha, num, den, gamma, alpha_t, window, tree, q, err, alphas
     )
     return np.asarray(q), np.asarray(err, dtype=bool), np.asarray(alphas), float(final)
 
 
-def _dtaci_step(a, w, gammas, alpha, eta, sigma, r, n):
+def _dtaci_step(a, w, gammas, alpha, num, den, eta, sigma, r, n):
     """One DtACI update, in place. ``r`` of the ``n`` past scores are strictly
     below the new score. Returns the combined working level for the next step.
     """
@@ -149,7 +191,7 @@ def _dtaci_step(a, w, gammas, alpha, eta, sigma, r, n):
         # did expert i miss? Same rank rule as the threshold itself.
         miss = False
         if a[i] > 0.0:
-            k = math.ceil((n + 1) * (1.0 - a[i]) - _RANK_TOL)
+            k = _rank(n, a[i], alpha, num, den)
             if k <= n:
                 miss = k < 1 or r >= k
         a[i] = a[i] + gammas[i] * (alpha - (1.0 if miss else 0.0))
@@ -159,7 +201,7 @@ def _dtaci_step(a, w, gammas, alpha, eta, sigma, r, n):
     return out
 
 
-def _dtaci_py(vals, rank, low, n0, alpha, gammas, a, w, eta, sigma, alpha_t, window, tree, q, err, alphas):
+def _dtaci_py(vals, rank, low, n0, alpha, num, den, gammas, a, w, eta, sigma, alpha_t, window, tree, q, err, alphas):
     """As ``_aci_py`` with several step sizes. ``low[i]`` is the number of
     all values strictly below the i-th arrival's value."""
     N = len(vals)
@@ -183,7 +225,7 @@ def _dtaci_py(vals, rank, low, n0, alpha, gammas, a, w, eta, sigma, alpha_t, win
         if alpha_t <= 0.0:
             thr = math.inf
         else:
-            k = math.ceil((n + 1) * (1.0 - alpha_t) - _RANK_TOL)
+            k = _rank(n, alpha_t, alpha, num, den)
             if k > n:
                 thr = math.inf
             elif k < 1:
@@ -205,7 +247,7 @@ def _dtaci_py(vals, rank, low, n0, alpha, gammas, a, w, eta, sigma, alpha_t, win
         while j > 0:
             r += tree[j]
             j -= j & (-j)
-        alpha_t = _dtaci_step(a, w, gammas, alpha, eta, sigma, r, n)
+        alpha_t = _dtaci_step(a, w, gammas, alpha, num, den, eta, sigma, r, n)
         j = rank[n0 + t] + 1
         while j <= N:
             tree[j] += 1
@@ -222,14 +264,8 @@ def _dtaci_py(vals, rank, low, n0, alpha, gammas, a, w, eta, sigma, alpha_t, win
 
 
 if HAVE_NUMBA:  # pragma: no cover
-    _dtaci_step_nb = njit(cache=True, nogil=True)(_dtaci_step)
-    _g = dict(globals())
-    _g["_dtaci_step"] = _dtaci_step_nb
-    import types as _types
-
-    _dtaci_nb = njit(cache=True, nogil=True)(
-        _types.FunctionType(_dtaci_py.__code__, _g, "_dtaci_py", _dtaci_py.__defaults__)
-    )
+    _dtaci_step_nb = _jit_with(_dtaci_step, _rank=_rank_nb)
+    _dtaci_nb = _jit_with(_dtaci_py, _rank=_rank_nb, _dtaci_step=_dtaci_step_nb)
 
 
 def dtaci_replay(cal, stream, alpha, gammas, a, w, eta, sigma, alpha_t, window, use_numba=None):
@@ -252,11 +288,12 @@ def dtaci_replay(cal, stream, alpha, gammas, a, w, eta, sigma, alpha_t, window, 
     err = np.empty(T, dtype=np.bool_)
     alphas = np.empty(T)
     fn = _dtaci_nb if use_numba else _dtaci_py
-    final = fn(vals, rank, low, n0, alpha, gammas, a, w, eta, sigma, alpha_t, window, tree, q, err, alphas)
+    num, den = _decimal(alpha)
+    final = fn(vals, rank, low, n0, alpha, num, den, gammas, a, w, eta, sigma, alpha_t, window, tree, q, err, alphas)
     return q, err, alphas, float(final)
 
 
-def _nexcp_py(vals, rank, n0, alpha, lg, tree, q, err):
+def _nexcp_py(vals, rank, n0, alpha, num, den, lg, tree, q, err):
     """Replay non-exchangeable conformal prediction with geometric weights.
 
     The score that arrived ``d`` steps before the one being predicted has
@@ -275,7 +312,10 @@ def _nexcp_py(vals, rank, n0, alpha, lg, tree, q, err):
         if i >= n0:
             t = i - n0
             w_new = math.exp((i - base) * lg)  # weight of the point being predicted
-            need = (1.0 - alpha) * (total + w_new) * (1.0 - 1e-12)
+            if lg == 0.0:  # equal weights: the exact split-conformal rank
+                need = float(_rank(i, alpha, alpha, num, den))
+            else:  # rounding may only move the boundary up (wider), never down
+                need = (1.0 - alpha) * (total + w_new) * (1.0 + 1e-12)
             if total < need:
                 thr = math.inf
             else:
@@ -306,7 +346,7 @@ def _nexcp_py(vals, rank, n0, alpha, lg, tree, q, err):
 
 
 if HAVE_NUMBA:  # pragma: no cover
-    _nexcp_nb = njit(cache=True, nogil=True)(_nexcp_py)
+    _nexcp_nb = _jit_with(_nexcp_py, _rank=_rank_nb)
 
 
 def nexcp_replay(cal, stream, alpha, rho, use_numba=None):
@@ -322,7 +362,8 @@ def nexcp_replay(cal, stream, alpha, rho, use_numba=None):
     err = np.empty(T, dtype=np.bool_)
     if use_numba is None:
         use_numba = HAVE_NUMBA
-    (_nexcp_nb if use_numba else _nexcp_py)(allv[order], rank, n0, alpha, -math.log(rho), tree, q, err)
+    num, den = _decimal(alpha)
+    (_nexcp_nb if use_numba else _nexcp_py)(allv[order], rank, n0, alpha, num, den, -math.log(rho), tree, q, err)
     return q, err
 
 
@@ -388,7 +429,7 @@ def _agaci_learn(alpha, gammas, a, expert_q, eta_inv2, R, R_reg, s, pred, raw_mi
         a[k] = a[k] + gammas[k] * (alpha - (1.0 if raw_miss[k] else 0.0))
 
 
-def _agaci_py(vals, rank, n0, alpha, gammas, a, eta_inv2, R, R_reg, w, cap, window, tree, q, err, eq, miss):
+def _agaci_py(vals, rank, n0, alpha, num, den, gammas, a, eta_inv2, R, R_reg, w, cap, window, tree, q, err, eq, miss):
     N = len(vals)
     T = N - n0
     K = len(a)
@@ -411,7 +452,7 @@ def _agaci_py(vals, rank, n0, alpha, gammas, a, eta_inv2, R, R_reg, w, cap, wind
             if a[k] <= 0.0:
                 thr = math.inf
             else:
-                kk = math.ceil((n + 1) * (1.0 - a[k]) - _RANK_TOL)
+                kk = _rank(n, a[k], alpha, num, den)
                 if kk > n:
                     thr = math.inf
                 elif kk < 1:
@@ -457,17 +498,10 @@ def _agaci_py(vals, rank, n0, alpha, gammas, a, eta_inv2, R, R_reg, w, cap, wind
 
 
 if HAVE_NUMBA:  # pragma: no cover
-    import types as _types
-
-    def _jit_with(fn, **deps):
-        g = dict(globals())
-        g.update(deps)
-        return njit(cache=True, nogil=True)(_types.FunctionType(fn.__code__, g, fn.__name__, fn.__defaults__))
-
     _boa_weights_nb = njit(cache=True, nogil=True)(_boa_weights)
     _agaci_combine_nb = _jit_with(_agaci_combine, _boa_weights=_boa_weights_nb)
     _agaci_learn_nb = njit(cache=True, nogil=True)(_agaci_learn)
-    _agaci_nb = _jit_with(_agaci_py, _agaci_combine=_agaci_combine_nb, _agaci_learn=_agaci_learn_nb)
+    _agaci_nb = _jit_with(_agaci_py, _rank=_rank_nb, _agaci_combine=_agaci_combine_nb, _agaci_learn=_agaci_learn_nb)
 
 
 def agaci_replay(cal, stream, alpha, gammas, a, eta_inv2, R, R_reg, cap, window, use_numba=None):
@@ -487,7 +521,8 @@ def agaci_replay(cal, stream, alpha, gammas, a, eta_inv2, R, R_reg, cap, window,
     if use_numba is None:
         use_numba = HAVE_NUMBA
     fn = _agaci_nb if use_numba else _agaci_py
-    cap = fn(allv[order], rank, n0, alpha, gammas, a, eta_inv2, R, R_reg, np.empty(K), cap, window, tree, q, err,
+    num, den = _decimal(alpha)
+    cap = fn(allv[order], rank, n0, alpha, num, den, gammas, a, eta_inv2, R, R_reg, np.empty(K), cap, window, tree, q, err,
              np.empty(K), np.empty(K, dtype=np.bool_))
     return q, err, float(cap)
 
@@ -519,7 +554,12 @@ def _pid_py(scores, alpha, lr, KI, Csat, burn_in, proportional, state, recent, q
                     lo = v
                 if v > hi:
                     hi = v
-            lr_t = lr * (hi - lo)
+            scale = hi - lo
+            if scale <= 0.0 and held >= 2:  # recent scores all equal: keep a nonzero step
+                scale = max(abs(hi), abs(lo))
+                if scale <= 0.0:
+                    scale = 1.0
+            lr_t = lr * scale
         else:
             lr_t = lr
         covered = thr >= s
