@@ -3,7 +3,7 @@
 **Conformal prediction that is exact, fast, and covers both tabular data and time series.**
 
 [![tests](https://github.com/valeman/pyconformal/actions/workflows/tests.yml/badge.svg)](https://github.com/valeman/pyconformal/actions/workflows/tests.yml)
-[![Version](https://img.shields.io/badge/version-0.1.0-orange)](https://github.com/valeman/pyconformal/blob/main/project/CHANGELOG.md)
+[![Version](https://img.shields.io/pypi/v/pyconformal)](https://github.com/valeman/pyconformal/blob/main/project/CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.12%20%7C%203.14-blue)](pyproject.toml)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-green)](LICENSE)
 [![Dependencies: NumPy only](https://img.shields.io/badge/dependencies-NumPy%20only-informational)](pyproject.toml)
@@ -35,12 +35,16 @@ No model object? Pass its outputs: `cp.calibrate(y_pred=pred_cal, y=y_cal)`.
 ## Install
 
 ```bash
-pip install "pyconformal[fast] @ git+https://github.com/valeman/pyconformal"
+pip install "pyconformal[fast]"
 ```
 
-This installs version 0.1.0 with numba for speed; drop `[fast]` for a NumPy-only install. The PyPI release of 0.1.0 is coming; until then `pip install pyconformal` gives an early placeholder.
+`[fast]` adds numba for speed; `pip install pyconformal` gives a NumPy-only install. Python 3.10 or later.
 
-Python 3.10 or later.
+The development version, ahead of the latest release:
+
+```bash
+pip install "pyconformal[fast] @ git+https://github.com/valeman/pyconformal"
+```
 
 ## What you get
 
