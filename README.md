@@ -3,7 +3,7 @@
 **Conformal prediction that is exact, fast, and covers both tabular data and time series.**
 
 [![tests](https://github.com/valeman/pyconformal/actions/workflows/tests.yml/badge.svg)](https://github.com/valeman/pyconformal/actions/workflows/tests.yml)
-[![Version](https://img.shields.io/badge/version-0.1.0-orange)](project/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.1.0-orange)](https://github.com/valeman/pyconformal/blob/main/project/CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.12%20%7C%203.14-blue)](pyproject.toml)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-green)](LICENSE)
 [![Dependencies: NumPy only](https://img.shields.io/badge/dependencies-NumPy%20only-informational)](pyproject.toml)
@@ -12,7 +12,7 @@
 <p>
   <a href="https://buymeacoffee.com/valeman"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="50" width="213"></a>
   &nbsp;&nbsp;
-  <a href="https://buymeacoffee.com/valeman"><img src="project/assets/buymeacoffee_qr.png" alt="QR code for buymeacoffee.com/valeman" width="90"></a>
+  <a href="https://buymeacoffee.com/valeman"><img src="https://raw.githubusercontent.com/valeman/pyconformal/main/project/assets/buymeacoffee_qr.png" alt="QR code for buymeacoffee.com/valeman" width="90"></a>
 </p>
 
 Prediction intervals, prediction sets, predictive distributions and calibrated
@@ -30,7 +30,7 @@ cp.predict_interval(X_test)                      # covers at least 90% of the ti
 
 No model object? Pass its outputs: `cp.calibrate(y_pred=pred_cal, y=y_cal)`.
 
-**[Install](#install) · [What you get](#what-you-get) · [Quick tour](#one-interface) · [Why it exists](#why-it-exists) · [On real data](#on-real-data) · [Speed](#speed-method-by-method) · [User guide](project/docs/guide.md)**
+**[Install](#install) · [What you get](#what-you-get) · [Quick tour](#one-interface) · [Why it exists](#why-it-exists) · [On real data](#on-real-data) · [Speed](#speed-method-by-method) · [User guide](https://github.com/valeman/pyconformal/blob/main/project/docs/guide.md)**
 
 ## Install
 
@@ -84,7 +84,7 @@ aci.predict_interval(y_pred=next_forecast)
 aci.update(y_pred=next_forecast, y=next_actual)
 ```
 
-Results are plain NumPy arrays. The **[user guide](project/docs/guide.md)** has a
+Results are plain NumPy arrays. The **[user guide](https://github.com/valeman/pyconformal/blob/main/project/docs/guide.md)** has a
 section and an example for every method.
 
 ## Why it exists
@@ -171,7 +171,7 @@ time-series methods; forecasting libraries carry a couple of conformal ones.
 
 We tested pyconformal against Nixtla's statsforecast 2.1.1 on three public series. statsforecast makes every point forecast; both libraries then put a 90% interval around the same forecasts, at 1,500 consecutive forecast origins per series.
 
-![Coverage of 90% forecast intervals on three real series](project/assets/case_studies_summary.png)
+![Coverage of 90% forecast intervals on three real series](https://raw.githubusercontent.com/valeman/pyconformal/main/project/assets/case_studies_summary.png)
 
 | Series | Horizon | statsforecast, default | statsforecast, 10 windows | pyconformal |
 |---|---|---|---|---|
@@ -181,14 +181,14 @@ We tested pyconformal against Nixtla's statsforecast 2.1.1 on three public serie
 
 The same week of electricity demand, 24 hours ahead. Dots are outcomes outside the interval:
 
-![Victoria electricity demand: statsforecast default intervals above, pyconformal below](project/assets/case_studies_power.png)
+![Victoria electricity demand: statsforecast default intervals above, pyconformal below](https://raw.githubusercontent.com/valeman/pyconformal/main/project/assets/case_studies_power.png)
 
 - **Nothing specialised was needed.** The pyconformal column is plain split conformal, recalibrated at every step on all past errors. It takes 30 to 100 milliseconds for a whole series, because no model is refitted.
 - **Why the default falls short.** It calibrates on two past errors per horizon, and no finite interval from two errors is a valid 90% interval ([statsforecast issue #1349](https://github.com/Nixtla/statsforecast/issues/1349)).
 - **The pyconformal intervals are wider**, because a 90% interval has to be wider than a 61% one.
 - **Limits.** Forecast errors are not exchangeable, so 91% is an observed result, not a guarantee. Three series and simple forecasters: an illustration, not a benchmark.
 
-Figures for all three series, other forecasting models and the scripts: [case studies](project/docs/case_studies.md).
+Figures for all three series, other forecasting models and the scripts: [case studies](https://github.com/valeman/pyconformal/blob/main/project/docs/case_studies.md).
 
 ## Three rules the package is built on
 
@@ -281,8 +281,8 @@ from one machine.
 
 ## More
 
-- [User guide](project/docs/guide.md): every method, with examples.
-- [Changelog](project/CHANGELOG.md) · [How to cite](project/CITATION.cff)
+- [User guide](https://github.com/valeman/pyconformal/blob/main/project/docs/guide.md): every method, with examples.
+- [Changelog](https://github.com/valeman/pyconformal/blob/main/project/CHANGELOG.md) · [How to cite](https://github.com/valeman/pyconformal/blob/main/project/CITATION.cff)
 
 ## Learn conformal prediction
 
@@ -306,7 +306,7 @@ You can also buy me a coffee:
 <p>
   <a href="https://buymeacoffee.com/valeman"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="60" width="255"></a>
   &nbsp;&nbsp;
-  <a href="https://buymeacoffee.com/valeman"><img src="project/assets/buymeacoffee_qr.png" alt="QR code for buymeacoffee.com/valeman" width="120"></a>
+  <a href="https://buymeacoffee.com/valeman"><img src="https://raw.githubusercontent.com/valeman/pyconformal/main/project/assets/buymeacoffee_qr.png" alt="QR code for buymeacoffee.com/valeman" width="120"></a>
 </p>
 
 ## Licence and disclaimer
@@ -318,7 +318,7 @@ The software is provided "as is", without warranty of any kind, express or
 implied, including the warranties of merchantability, fitness for a particular
 purpose and non-infringement. The author accepts no liability for any claim,
 damages or other loss arising from its use. The full terms are in
-[LICENSE](LICENSE).
+[LICENSE](https://github.com/valeman/pyconformal/blob/main/LICENSE).
 
 The coverage guarantees described here are mathematical statements that hold
 under stated assumptions, such as exchangeable data and a calibration set kept

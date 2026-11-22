@@ -49,6 +49,9 @@ Issues = "https://github.com/valeman/pyconformal/issues"
 [tool.hatch.version]
 path = "project/src/pyconformal/__init__.py"
 
+[tool.hatch.build.targets.sdist]
+include = ["project/src", "project/tests", "project/CHANGELOG.md", "project/CITATION.cff", "README.md", "LICENSE", "pyproject.toml"]
+
 [tool.hatch.build.targets.wheel]
 packages = ["project/src/pyconformal"]
 
