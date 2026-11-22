@@ -213,6 +213,74 @@ calibration covered 91.1% at a 90% target with intervals 2% narrower than a
 half-and-half split; unlike a separate calibration set, this is not a
 finite-sample guarantee.
 
+## Quantile models from CatBoost, XGBoost and LightGBM
+
+```python
+from pyconformal import QuantileBooster, ConformalInterquantileRegressor
+
+qb = QuantileBooster("catboost", levels=19, iterations=300)   # or "xgboost", "lightgbm"
+cir = ConformalInterquantileRegressor(qb, plus=True, alpha=0.1)
+cir.fit(X_train, y_train).calibrate(X_cal, y_cal)
+cir.predict_interval(X_test)
+```
+
+`QuantileBooster` trains `levels` quantile levels (19 gives 0.05 to 0.95) with
+the named library and answers `predict(X, quantiles=...)` for any levels, which
+is what CQR, CTI and CIR ask of a model. CatBoost and XGBoost train one model
+for all levels; LightGBM trains one per level. The trained quantiles are
+sorted so they never cross, and levels in between are interpolated. Levels 0
+and 1 are set a fixed distance beyond the lowest and highest trained level,
+measured on a tenth of the training rows kept out of the boosting
+(`tail_holdout`), so that about 1% of new outcomes fall beyond each end.
+Install the library you use: `pip install "pyconformal[catboost]"`.
+
+Compared with Zillow's quantile-forest and our own forest
+(`benchmarks/quantile_models.py`; 5 random splits per dataset, half the rows
+for training, a quarter each for calibration and test, 90% target, 100 trees
+for the forests, 300 rounds for the boosters, 2 cores). Pinball loss is of
+the raw quantiles; widths are after the conformal step. Coverage after
+calibration was between 89.4% and 90.5% in every row for CQR and CIR+.
+
+| Dataset | Model | Pinball | CQR width | CIR+ width | Fit | Predict |
+|---|---|---|---|---|---|---|
+| California housing | quantile-forest (Zillow) | 0.129 | 1.87 | 1.43 | 1.5 s | 0.14 s |
+| | `QuantileForest` | 0.124 | 1.70 | 1.41 | 0.23 s | 0.08 s |
+| | CatBoost | 0.119 | 1.36 | 1.38 | 6.4 s | 0.02 s |
+| | XGBoost | 0.123 | 1.49 | 1.40 | 9.2 s | 0.28 s |
+| | LightGBM | 0.116 | 1.36 | 1.34 | 7.1 s | 0.98 s |
+| kin8nm | quantile-forest (Zillow) | 0.048 | 0.573 | 0.532 | 0.65 s | 0.07 s |
+| | `QuantileForest` | 0.045 | 0.541 | 0.513 | 0.11 s | 0.03 s |
+| | CatBoost | 0.035 | 0.427 | 0.459 | 4.2 s | 0.01 s |
+| | XGBoost | 0.045 | 0.529 | 0.557 | 7.0 s | 0.11 s |
+| | LightGBM | 0.038 | 0.529 | 0.527 | 5.2 s | 0.47 s |
+| Synthetic, skewed | quantile-forest (Zillow) | 0.455 | 5.02 | 4.70 | 1.5 s | 0.14 s |
+| | `QuantileForest` | 0.454 | 4.98 | 4.62 | 0.20 s | 0.08 s |
+| | CatBoost | 0.452 | 4.77 | 4.68 | 5.5 s | 0.02 s |
+| | XGBoost | 0.453 | 4.68 | 4.48 | 8.0 s | 0.28 s |
+| | LightGBM | 0.454 | 4.56 | 4.59 | 6.5 s | 0.78 s |
+| Synthetic, two modes | quantile-forest (Zillow) | 0.824 | 6.74 | 7.61 | 1.8 s | 0.14 s |
+| | `QuantileForest` | 0.821 | 6.67 | 8.08 | 0.21 s | 0.08 s |
+| | CatBoost | 0.825 | 6.58 | 7.38 | 5.5 s | 0.02 s |
+| | XGBoost | 0.813 | 6.50 | 6.71 | 7.7 s | 0.27 s |
+| | LightGBM | 0.825 | 6.44 | 6.59 | 6.3 s | 0.74 s |
+
+What to take from it:
+
+- **Against Zillow's forest, ours** has equal or lower pinball loss on all
+  four datasets, fits 6 to 8 times faster and predicts about twice as fast.
+  On the two-mode data its CIR+ intervals were 6% wider.
+- **Boosters** gave the shortest CQR intervals on every dataset, by up to 27%
+  on California housing, and take 20 to 40 times longer to train than our
+  forest. Their raw 5%-95% intervals cover only 71% to 87%, so they need the
+  conformal step; the forests' raw intervals cover 91% to 97%.
+- **Plain CIR over-covers with boosters** (91% to 93%), because many rows tie
+  at the same number of steps. Use `plus=True`.
+- **On small data, use the forest.** On diabetes (221 training rows) the
+  boosters' pinball loss was 11% to 20% worse than the forests', and CIR
+  returned infinite intervals for all three, because too many calibration
+  outcomes fell outside their predicted range. CQR was fine (width 186 to 191
+  against 186 and 194 for the forests).
+
 ## Time series: STL and MSTL decomposition
 
 ```python

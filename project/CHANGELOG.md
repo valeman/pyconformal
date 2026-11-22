@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.2 (22 November 2026)
+
+- New: `QuantileBooster`, quantile predictions from CatBoost, XGBoost or
+  LightGBM in the form CQR, CTI and CIR expect
+  (`ConformalInterquantileRegressor(QuantileBooster("catboost"))`). The
+  libraries are optional: `pip install "pyconformal[catboost]"`, `[xgboost]`
+  or `[lightgbm]`.
+- New benchmark, `benchmarks/quantile_models.py`: both of pyconformal's
+  quantile models against Zillow's quantile-forest on five datasets.
+- Front page: the first example uses CatBoost.
+
 ## 0.1.1 (22 November 2026)
 
 Fixes from an independent forensic audit of 0.1.0. Upgrade if you use any of

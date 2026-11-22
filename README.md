@@ -88,7 +88,23 @@ XGBoost 3.4 and LightGBM 4.7, regressors and classifiers:
 | Split conformal, jackknife+ and CV+, predictive systems, EnbPI | `SplitConformalRegressor(CatBoostRegressor())` |
 | CQR | two quantile models: `ConformalizedQuantileRegressor((low_model, high_model))` |
 | Prediction sets, Venn-Abers | `SplitConformalClassifier(CatBoostClassifier())`, `VennAbers(CatBoostClassifier())` |
-| CTI and CIR | need many quantile levels: pass them as `quantiles=`, or use `QuantileForest` |
+| CTI and CIR | need many quantile levels from one model: `ConformalInterquantileRegressor(QuantileBooster("catboost"))` |
+
+`QuantileBooster` trains the quantile levels with whichever library you name
+and hands them to CQR, CTI and CIR. Against Zillow's quantile-forest on
+California housing (5 splits, 90% target, same rows for every model):
+
+| Quantile model | Pinball loss | CQR width | CIR+ width | Fit | Predict 101 levels |
+|---|---|---|---|---|---|
+| quantile-forest (Zillow) | 0.129 | 1.87 | 1.43 | 1.5 s | 0.14 s |
+| pyconformal `QuantileForest` | 0.124 | 1.70 | 1.41 | 0.23 s | 0.08 s |
+| `QuantileBooster("catboost")` | 0.119 | 1.36 | 1.38 | 6.4 s | 0.02 s |
+| `QuantileBooster("xgboost")` | 0.123 | 1.49 | 1.40 | 9.2 s | 0.28 s |
+| `QuantileBooster("lightgbm")` | 0.116 | 1.36 | 1.34 | 7.1 s | 0.98 s |
+
+Coverage was 90% for every row. Boosters gave shorter intervals here and take
+longer to train; on a few hundred rows they overfit and the forest is the
+better choice. Five datasets and the details: [user guide](https://github.com/valeman/pyconformal/blob/main/project/docs/guide.md#quantile-models-from-catboost-xgboost-and-lightgbm).
 
 ## One interface
 
@@ -240,7 +256,7 @@ Figures for all three series, other forecasting models and the scripts: [case st
    written from its paper, against existing code where there is any
    (venn-abers, crepes, MAPIE, PUNCC, R's `forecast` and `conformalForecast`,
    and the CTI and CIR authors' code), and against the guarantee itself on
-   small calibration sets. 275 tests, run with warnings as errors.
+   small calibration sets. 300 tests, run with warnings as errors.
 3. **Fast.** Each method is written for the speed its algorithm allows, with
    optional compiled kernels (numba). The compiled and plain NumPy paths are
    tested to return the same values, so installing numba changes speed and
