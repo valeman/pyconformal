@@ -1,0 +1,11 @@
+Share of runs in which the upper bound falls BELOW the true risk (must be at most delta)
+  binary true risk 0.05 n= 100 delta= 0.1: MAPIE default bound 0.129   two-halves replica 0.129   paper's bound 0.051  ABOVE delta
+  binary true risk 0.05 n= 100 delta=0.05: MAPIE default bound 0.044   two-halves replica 0.044   paper's bound 0.024  ok
+  binary true risk 0.05 n= 500 delta= 0.1: MAPIE default bound 0.082   two-halves replica 0.082   paper's bound 0.030  ok
+  binary true risk 0.05 n= 500 delta=0.05: MAPIE default bound 0.049   two-halves replica 0.049   paper's bound 0.013  ok
+  binary true risk 0.05 n=1000 delta= 0.1: MAPIE default bound 0.053   two-halves replica 0.053   paper's bound 0.022  ok
+  binary true risk 0.05 n=1000 delta=0.05: MAPIE default bound 0.031   two-halves replica 0.031   paper's bound 0.011  ok
+  binary true risk  0.1 n= 100 delta= 0.1: MAPIE default bound 0.187   two-halves replica 0.187   paper's bound 0.065  ABOVE delta
+  binary true risk  0.1 n= 100 delta=0.05: MAPIE default bound 0.106   two-halves replica 0.106   paper's bound 0.032  ABOVE delta
+  binary true risk  0.1 n= 500 delta= 0.1: MAPIE default bound 0.095   two-halves replica 0.095   paper's bound 0.034  ok
+  binary true risk  0.1 n= 500 delta=0.05: MAPIE default bound 0.059   two-halves replica 0.059   paper's bound 0.016  ok

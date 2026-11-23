@@ -1,0 +1,2 @@
+conditional regressor, exact=True, randomize=False (defaults): group 0 0.9037 (se 0.0013) ok; group 1 0.9063 (se 0.0019) ok; overall 0.9045 (se 0.0011) ok; share infinite 0.000  (49s)
+conditional regressor, exact=True, randomize=True: group 0 0.9018 (se 0.0013) ok; group 1 0.9006 (se 0.0020) ok; overall 0.9015 (se 0.0011) ok; share infinite 0.000  (35s)

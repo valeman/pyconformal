@@ -1,0 +1,24 @@
+NOTE: the first result line (_compute_regression_quantile) comes from a wrong call in the script and must be ignored; see t8b.txt for the correct check.
+
+_compute_regression_quantile: 37581 cases with a finite exact rank: exact 1500, one rank too high 0, too low 36081, refused or other 0
+   examples (n, level, got, exact rank): [(2, 0.5, 1.0, 2), (2, 0.6, 1.0, 2), (3, 0.6, 1.0, 3), (3, 0.7, 1.0, 3), (3, 0.75, 1.0, 3), (4, 0.5, 2.0, 3), (4, 0.6, 2.0, 3), (4, 0.7, 1.0, 4)]
+_compute_classification_quantile: 37581 cases with a finite exact rank: exact 37581, one rank too high 0, too low 0, refused or other 0
+   examples (n, level, got, exact rank): []
+
+Width minimisation (beta chosen on the calibration scores): coverage at a 90% target, skewed errors
+  split regression, absolute score, sym=False  n_cal=  30 minimise=False coverage 0.9355 (se 0.0011) width 3.931  over
+  split regression, absolute score, sym=False  n_cal=  30 minimise=True  REFUSES (ValueError: The number of calibration samples (30) is too low to reach t)
+  split regression, absolute score, sym=False  n_cal=  50 minimise=False coverage 0.9208 (se 0.0011) width 3.438  ok
+  split regression, absolute score, sym=False  n_cal=  50 minimise=True  coverage 0.9003 (se 0.0012) width 2.660  ok
+  split regression, absolute score, sym=False  n_cal= 100 minimise=False coverage 0.8999 (se 0.0009) width 3.048  ok
+  split regression, absolute score, sym=False  n_cal= 100 minimise=True  coverage 0.9012 (se 0.0009) width 2.472  ok
+  split regression, absolute score, sym=False  n_cal= 300 minimise=False coverage 0.9001 (se 0.0006) width 2.984  ok
+  split regression, absolute score, sym=False  n_cal= 300 minimise=True  coverage 0.9033 (se 0.0006) width 2.393  ok
+  split regression, gamma score                n_cal=  30 minimise=False coverage 0.9355 (se 0.0011) width 3.931  over
+  split regression, gamma score                n_cal=  30 minimise=True  REFUSES (ValueError: The number of calibration samples (30) is too low to reach t)
+  split regression, gamma score                n_cal=  50 minimise=False coverage 0.9208 (se 0.0011) width 3.438  ok
+  split regression, gamma score                n_cal=  50 minimise=True  coverage 0.9003 (se 0.0012) width 2.660  ok
+  split regression, gamma score                n_cal= 100 minimise=False coverage 0.8999 (se 0.0009) width 3.048  ok
+  split regression, gamma score                n_cal= 100 minimise=True  coverage 0.9012 (se 0.0009) width 2.472  ok
+  split regression, gamma score                n_cal= 300 minimise=False coverage 0.9001 (se 0.0006) width 2.984  ok
+  split regression, gamma score                n_cal= 300 minimise=True  coverage 0.9033 (se 0.0006) width 2.393  ok

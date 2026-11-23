@@ -170,7 +170,7 @@ the coverage of their intervals.)
 84 coverage configurations we ran, 78 met their target (for jackknife+ and
 CV+ the target is their proven bound of 80% at a 90% setting) and 6 refused
 to run because the calibration set was too small, which is safe behaviour.
-Two faults lie outside those 84, both reproduced on MAPIE 1.6.0: APS sets with `include_last_label=False` cover 81% at a 90% target (their issue #1021; the default covers 95%), and ACI clips its working level to [0, 1], which breaks its long-run guarantee on drifting data (miss rates of 14% to 33% at a 10% target, where an unclipped ACI gives 10.1%). Its problems are speed,
+Four faults lie outside those 84, all reproduced on MAPIE 1.6.0 ([full audit](project/benchmarks/mapie_audit/README.md)). ACI clips its working level to [0, 1], so it is not the algorithm of Gibbs and Candès and loses their guarantee on drifting data (miss rates of 14% to 33% at a 10% target, where an unclipped ACI gives 10.1%). APS sets with `include_last_label=False` cover 81% at a 90% target (their issue #1021; the default covers 95%). The default RCPS confidence bound is computed on two halves of the data and falls below the true risk in up to 20% of runs where 10% is allowed (their pull request #998, closed unmerged). The default Holm procedure in learn-then-test returns no threshold when one p-value is undefined. Its other problems are speed,
 memory, and sets that are larger than they need to be:
 
 | | MAPIE 1.6.0 | pyconformal | Times faster | Output |

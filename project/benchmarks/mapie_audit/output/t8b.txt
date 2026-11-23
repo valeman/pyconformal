@@ -1,0 +1,7 @@
+regression quantile as MAPIE calls it: exact 37581, too high 0, too low 0; examples (n, level, got, exact): []
+  5 calibration points, 90% level, sym=True, allow_infinite_bounds=False: ValueError: Number of samples of the score is too low,
+1/confidence_level and 1/(1 - confidence_level)
+  5 calibration points, 90% level, sym=True, allow_infinite_bounds=True: ValueError: The number of calibration samples (5) is too low to reach the requested level. The correct
+  5 calibration points, 90% level, sym=False, allow_infinite_bounds=False: ValueError: Number of samples of the score is too low,
+1/confidence_level and 1/(1 - confidence_level)
+  5 calibration points, 90% level, sym=False, allow_infinite_bounds=True: interval [-inf  inf]

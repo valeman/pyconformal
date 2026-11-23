@@ -1,0 +1,12 @@
+ACI, gamma=0.05, T=3000: theorem allows |miss rate - 0.1| <= 0.0063
+  i.i.d. noise                             miss rate 0.1003  deviation 0.0003  within bound  infinite intervals 0.77%  final alpha_t {0.1: 0.13000000000000042}
+  noise scale x10 halfway                  miss rate 0.1010  deviation 0.0010  within bound  infinite intervals 1.00%  final alpha_t {0.1: 0.09500000000000206}
+  errors growing 1% per step               miss rate 0.1367  deviation 0.0367  VIOLATES THE BOUND  infinite intervals 21.97%  final alpha_t {0.1: 0.025000000000000015}
+  errors growing 5% per step               miss rate 0.1983  deviation 0.0983  VIOLATES THE BOUND  infinite intervals 39.33%  final alpha_t {0.1: 0.0}
+  every outcome larger than all before     miss rate 0.3340  deviation 0.2340  VIOLATES THE BOUND  infinite intervals 66.60%  final alpha_t {0.1: 0.0}
+EnbPI, i.i.d. linear data, 90% target, documented predict/update loop
+  seed 0: coverage 0.907
+  seed 1: coverage 0.910
+  seed 2: coverage 0.887
+  seed 3: coverage 0.897
+  seed 4: coverage 0.907

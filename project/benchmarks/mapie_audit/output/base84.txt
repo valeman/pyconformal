@@ -1,0 +1,86 @@
+mapie 1.6.0
+ok   Split regression, score=absolute, n_cal=20, minimize_width=False target>=0.900  coverage 0.9119 (se 0.0042) 
+ok   Split regression, score=gamma, n_cal=20, minimize_width=False  target>=0.900  coverage 0.9045 (se 0.0043) 
+ERR  Split regression, score=gamma, n_cal=20, minimize_width=True: ValueError: The number of calibration samples (20) is too low to reach the request
+ok   Split regression, score=residual_normalized, n_cal=20, minimize_width=False target>=0.900  coverage 0.9319 (se 0.0051) 
+ok   Split regression, score=absolute, n_cal=50, minimize_width=False target>=0.900  coverage 0.9064 (se 0.0029) 
+ok   Split regression, score=gamma, n_cal=50, minimize_width=False  target>=0.900  coverage 0.9243 (se 0.0027) 
+ERR  Split regression, score=gamma, n_cal=50, minimize_width=True: ValueError: The number of calibration samples (50) is too low to reach the request
+ok   Split regression, score=residual_normalized, n_cal=50, minimize_width=False target>=0.900  coverage 0.9223 (se 0.0029) 
+ok   Split regression, score=absolute, n_cal=200, minimize_width=False target>=0.900  coverage 0.9009 (se 0.0018) 
+ok   Split regression, score=gamma, n_cal=200, minimize_width=False target>=0.900  coverage 0.9018 (se 0.0018) 
+ok   Split regression, score=gamma, n_cal=200, minimize_width=True  target>=0.900  coverage 0.9038 (se 0.0018) 
+ok   Split regression, score=residual_normalized, n_cal=200, minimize_width=False target>=0.900  coverage 0.9035 (se 0.0018) 
+ok   CQR, n_cal=50, symmetric=False, minimize_width=False           target>=0.900  coverage 0.9243 (se 0.0048) 
+ok   CQR, n_cal=50, symmetric=False, minimize_width=True            target>=0.900  coverage 0.9243 (se 0.0048) 
+ok   CQR, n_cal=50, symmetric=True, minimize_width=False            target>=0.900  coverage 0.8998 (se 0.0053) 
+ok   CQR, n_cal=50, symmetric=True, minimize_width=True             target>=0.900  coverage 0.8998 (se 0.0053) 
+ok   CQR, n_cal=200, symmetric=False, minimize_width=False          target>=0.900  coverage 0.8989 (se 0.0030) 
+ok   CQR, n_cal=200, symmetric=False, minimize_width=True           target>=0.900  coverage 0.8989 (se 0.0030) 
+ok   CQR, n_cal=200, symmetric=True, minimize_width=False           target>=0.900  coverage 0.8986 (se 0.0029) 
+ok   CQR, n_cal=200, symmetric=True, minimize_width=True            target>=0.900  coverage 0.8986 (se 0.0029) 
+ok   Cross regression, method=plus, cv=5, n=60                      target>=0.800  coverage 0.9102 (se 0.0050) 
+ok   Cross regression, method=plus, cv=LOO, n=60                    target>=0.800  coverage 0.9073 (se 0.0052) 
+ok   Cross regression, method=minmax, cv=5, n=60                    target>=0.900  coverage 0.9315 (se 0.0044) 
+ok   Cross regression, method=minmax, cv=LOO, n=60                  target>=0.900  coverage 0.9272 (se 0.0046) 
+ok   Cross regression, method=base, cv=5, n=60                      target>=0.900  coverage 0.9083 (se 0.0048) (base has no guarantee)
+ok   Cross regression, method=base, cv=LOO, n=60                    target>=0.900  coverage 0.9080 (se 0.0052) (base has no guarantee)
+ok   Jackknife+-after-bootstrap, method=plus, n=60                  target>=0.800  coverage 0.8987 (se 0.0052) 
+ok   Jackknife+-after-bootstrap, method=minmax, n=60                target>=0.900  coverage 0.9221 (se 0.0043) 
+ok   Split classification, score=lac, n_cal=20                      target>=0.900  coverage 0.9064 (se 0.0048) mean set size 2.66
+ok   Split classification, score=lac, n_cal=50                      target>=0.900  coverage 0.8981 (se 0.0033) mean set size 2.54
+ok   Split classification, score=lac, n_cal=200                     target>=0.900  coverage 0.9016 (se 0.0017) mean set size 2.53
+ok   Split classification, score=aps, n_cal=20                      target>=0.900  coverage 0.9560 (se 0.0031) mean set size 3.16
+ok   Split classification, score=aps, n_cal=50                      target>=0.900  coverage 0.9551 (se 0.0021) mean set size 3.08
+ok   Split classification, score=aps, n_cal=200                     target>=0.900  coverage 0.9552 (se 0.0012) mean set size 3.06
+ERR  Split classification, score=raps, n_cal=20: ValueError: The test_size = 2 should be greater or equal to the number of classes 
+ERR  Split classification, score=raps, n_cal=50: ValueError: Number of samples of the score is too low,
+1/confidence_level and 1/(1
+ok   Split classification, score=raps, n_cal=200                    target>=0.900  coverage 0.9627 (se 0.0013) mean set size 3.17
+ok   Split classification, score=top_k, n_cal=20                    target>=0.900  coverage 0.9504 (se 0.0038) mean set size 3.33
+ok   Split classification, score=top_k, n_cal=50                    target>=0.900  coverage 0.9503 (se 0.0026) mean set size 3.25
+ok   Split classification, score=top_k, n_cal=200                   target>=0.900  coverage 0.9349 (se 0.0011) mean set size 3.02
+ok   Cross classification, score=lac, cv=5, n=150                   target>=0.900  coverage 0.9096 (se 0.0038) (guarantee depends on method)
+ok   Cross classification, score=aps, cv=5, n=150                   target>=0.800  coverage 0.9643 (se 0.0022) (guarantee depends on method)
+ok   Split regression, score=absolute, n_cal=20, minimize_width=False target>=0.800  coverage 0.8193 (se 0.0058) 
+ok   Split regression, score=gamma, n_cal=20, minimize_width=False  target>=0.800  coverage 0.8147 (se 0.0060) 
+ERR  Split regression, score=gamma, n_cal=20, minimize_width=True: ValueError: The number of calibration samples (20) is too low to reach the request
+ok   Split regression, score=residual_normalized, n_cal=20, minimize_width=False target>=0.800  coverage 0.8135 (se 0.0070) 
+ok   Split regression, score=absolute, n_cal=50, minimize_width=False target>=0.800  coverage 0.8074 (se 0.0037) 
+ok   Split regression, score=gamma, n_cal=50, minimize_width=False  target>=0.800  coverage 0.8073 (se 0.0038) 
+ok   Split regression, score=gamma, n_cal=50, minimize_width=True   target>=0.800  coverage 0.8162 (se 0.0039) 
+ok   Split regression, score=residual_normalized, n_cal=50, minimize_width=False target>=0.800  coverage 0.8196 (se 0.0044) 
+ok   Split regression, score=absolute, n_cal=200, minimize_width=False target>=0.800  coverage 0.8013 (se 0.0022) 
+ok   Split regression, score=gamma, n_cal=200, minimize_width=False target>=0.800  coverage 0.8010 (se 0.0022) 
+ok   Split regression, score=gamma, n_cal=200, minimize_width=True  target>=0.800  coverage 0.7977 (se 0.0023) 
+ok   Split regression, score=residual_normalized, n_cal=200, minimize_width=False target>=0.800  coverage 0.7983 (se 0.0026) 
+ok   CQR, n_cal=50, symmetric=False, minimize_width=False           target>=0.800  coverage 0.8016 (se 0.0073) 
+ok   CQR, n_cal=50, symmetric=False, minimize_width=True            target>=0.800  coverage 0.8016 (se 0.0073) 
+ok   CQR, n_cal=50, symmetric=True, minimize_width=False            target>=0.800  coverage 0.8055 (se 0.0069) 
+ok   CQR, n_cal=50, symmetric=True, minimize_width=True             target>=0.800  coverage 0.8055 (se 0.0069) 
+ok   CQR, n_cal=200, symmetric=False, minimize_width=False          target>=0.800  coverage 0.7927 (se 0.0042) 
+ok   CQR, n_cal=200, symmetric=False, minimize_width=True           target>=0.800  coverage 0.7927 (se 0.0042) 
+ok   CQR, n_cal=200, symmetric=True, minimize_width=False           target>=0.800  coverage 0.7916 (se 0.0043) 
+ok   CQR, n_cal=200, symmetric=True, minimize_width=True            target>=0.800  coverage 0.7916 (se 0.0043) 
+ok   Cross regression, method=plus, cv=5, n=60                      target>=0.600  coverage 0.8168 (se 0.0066) 
+ok   Cross regression, method=plus, cv=LOO, n=60                    target>=0.600  coverage 0.8005 (se 0.0070) 
+ok   Cross regression, method=minmax, cv=5, n=60                    target>=0.800  coverage 0.8582 (se 0.0059) 
+ok   Cross regression, method=minmax, cv=LOO, n=60                  target>=0.800  coverage 0.8433 (se 0.0064) 
+ok   Cross regression, method=base, cv=5, n=60                      target>=0.800  coverage 0.8142 (se 0.0071) (base has no guarantee)
+ok   Cross regression, method=base, cv=LOO, n=60                    target>=0.800  coverage 0.8017 (se 0.0070) (base has no guarantee)
+ok   Jackknife+-after-bootstrap, method=plus, n=60                  target>=0.600  coverage 0.7997 (se 0.0073) 
+ok   Jackknife+-after-bootstrap, method=minmax, n=60                target>=0.800  coverage 0.8479 (se 0.0060) 
+ok   Split classification, score=lac, n_cal=20                      target>=0.800  coverage 0.8067 (se 0.0059) mean set size 2.01
+ok   Split classification, score=lac, n_cal=50                      target>=0.800  coverage 0.8012 (se 0.0045) mean set size 1.94
+ok   Split classification, score=lac, n_cal=200                     target>=0.800  coverage 0.8010 (se 0.0022) mean set size 1.93
+ok   Split classification, score=aps, n_cal=20                      target>=0.800  coverage 0.8905 (se 0.0045) mean set size 2.56
+ok   Split classification, score=aps, n_cal=50                      target>=0.800  coverage 0.8882 (se 0.0032) mean set size 2.49
+ok   Split classification, score=aps, n_cal=200                     target>=0.800  coverage 0.8875 (se 0.0015) mean set size 2.46
+ERR  Split classification, score=raps, n_cal=20: ValueError: The test_size = 2 should be greater or equal to the number of classes 
+ok   Split classification, score=raps, n_cal=50                     target>=0.800  coverage 0.8998 (se 0.0033) mean set size 2.61
+ok   Split classification, score=raps, n_cal=200                    target>=0.800  coverage 0.8983 (se 0.0020) mean set size 2.58
+ok   Split classification, score=top_k, n_cal=20                    target>=0.800  coverage 0.8827 (se 0.0052) mean set size 2.66
+ok   Split classification, score=top_k, n_cal=50                    target>=0.800  coverage 0.8756 (se 0.0052) mean set size 2.59
+ok   Split classification, score=top_k, n_cal=200                   target>=0.800  coverage 0.8886 (se 0.0047) mean set size 2.68
+ok   Cross classification, score=lac, cv=5, n=150                   target>=0.800  coverage 0.8068 (se 0.0049) (guarantee depends on method)
+ok   Cross classification, score=aps, cv=5, n=150                   target>=0.600  coverage 0.8924 (se 0.0037) (guarantee depends on method)

@@ -1,0 +1,6 @@
+bound on |miss rate - 0.1|: 0.0063
+  i.i.d. noise                             pyconformal 0.1000   paper loop 0.1000   paper loop with alpha clipped to [0, 1] 0.1013
+  noise scale x10 halfway                  pyconformal 0.1007   paper loop 0.1007   paper loop with alpha clipped to [0, 1] 0.1187
+  errors growing 1% per step               pyconformal 0.1007   paper loop 0.1007   paper loop with alpha clipped to [0, 1] 0.2633
+  errors growing 5% per step               pyconformal 0.1007   paper loop 0.1007   paper loop with alpha clipped to [0, 1] 0.3760
+  every outcome larger than all before     pyconformal 0.1007   paper loop 0.1007   paper loop with alpha clipped to [0, 1] 0.5003

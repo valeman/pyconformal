@@ -1,0 +1,14 @@
+MAPIE 1.6.0
+#1018 split sizes for 0.8/0.1/0.1 of 1,000 rows: [800, 99, 101]
+      split sizes for 0.6/0.2/0.2 of 1,000 rows: [600, 200, 200]
+#710 CrossConformalRegressor.fit_conformalize called twice: works
+#542 CrossConformalRegressor with cv=LeaveOneGroupOut(): (5, 2, 1)
+#484 TimeSeriesRegressor, two confidence levels, optimize_beta=True: (5, 2, 2)
+Refit the model after conformalizing (prefit object reused): no error or warning; interval width unchanged at 3.31; coverage of the refitted model's intervals 0.010 at a 0.9 target
+ACI: update(gamma=...) on its own: alpha_t after a miss with update(gamma=0.5): {0.1: 0.1}; warnings raised: 1
+NaN probability at prediction: ERROR AssertionError: 
+Not equal to tolerance rtol=1e-05, atol=0
+The sum of the scores is not equal to one.
+x and y nan location mismatch:
+ x: array([nan])
+ y: array(1)

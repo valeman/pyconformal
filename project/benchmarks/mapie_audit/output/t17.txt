@@ -1,0 +1,26 @@
+regression: pandas DataFrame and Series                                    same intervals as NumPy
+regression: pandas with a shuffled, non-default index                      same intervals as NumPy
+regression: SciPy sparse X                                                 same intervals as NumPy
+regression: Python lists                                                   same intervals as NumPy
+regression: y as a column vector (n, 1)                                    ERROR ValueError: could not broadcast input array from shape (400,1) into shape (400,)
+regression: float32 inputs                                                 ERROR ValueError: The two functions get_conformity_scores and get_estimation_distribution of the BaseRegressionScore class are not consistent. The following equation mu
+regression: one test row                                                   same intervals as NumPy
+regression: NaN in calibration y                                           ERROR ValueError: Input y contains NaN.
+regression: NaN in test X                                                  ERROR ValueError: Input X contains NaN.
+LinearRegression does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider skl
+regression: three levels at once                                           shape (300, 2, 3); widths nested: True; each level equals its single-level run: True
+regression: levels given unsorted [0.95, 0.8, 0.9]                         column order follows input: True
+cross-conformal: sample_weight through fit_params                          sample_weight changes the intervals: True (mean width 3.310 against 3.314 unweighted)
+cross-conformal: GroupKFold with groups                                    runs; coverage on test 0.883
+jackknife+-after-bootstrap: pandas input                                   runs; coverage 0.880
+classification (lac): string labels                                        same sets as integer labels
+classification (lac): labels 10, 20, 30, 40                                same sets
+classification (lac): labels in reverse numeric meaning (3 - y)            same sets (columns reversed)
+classification (lac): pandas input                                         same sets
+classification (lac): a class missing from the calibration set             runs
+classification (aps): string labels                                        DIFFERENT sets from integer labels
+classification (aps): labels 10, 20, 30, 40                                DIFFERENT sets
+classification (aps): labels in reverse numeric meaning (3 - y)            DIFFERENT sets
+classification (aps): pandas input                                         DIFFERENT sets
+classification (aps): a class missing from the calibration set             runs
+classification (lac): boolean labels, two classes                          runs; set shape (400, 2, 1)

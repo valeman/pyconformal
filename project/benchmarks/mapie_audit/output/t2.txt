@@ -1,0 +1,4 @@
+Split regression, absolute score: {'exact': 907, 'one_too_high': 0, 'too_low': 0, 'refused_but_finite_exists': 9, 'refused_correctly': 290, 'finite_where_none_valid': 0, 'infinite_correctly': 0, 'other': 0}
+  examples: [('refused', False, 1, 0.5), ('refused', False, 2, 0.6), ('refused', False, 3, 0.7), ('refused', False, 4, 0.8), ('refused', False, 6, 0.85), ('refused', False, 9, 0.9), ('refused', False, 19, 0.95), ('refused', False, 49, 0.98), ('refused', False, 99, 0.99)]
+LAC classification: {'exact': 431, 'one_too_high': 0, 'too_low': 0, 'refused': 154, 'full_set_correctly': 0, 'finite_where_none_valid': 0, 'other': 0}
+  examples: []

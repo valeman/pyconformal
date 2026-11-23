@@ -1,0 +1,21 @@
+
+AR(1), phi=0.8, stationary  (90% target, 6 series of 600 steps)
+  EnbPI with update          coverage mean 0.899, lowest 0.885, highest 0.907  mean width 3.33
+  EnbPI without update       coverage mean 0.903, lowest 0.885, highest 0.922  mean width 3.36
+  EnbPI median aggregation   coverage mean 0.897, lowest 0.880, highest 0.907  mean width 3.35
+  EnbPI optimize_beta        coverage mean 0.899, lowest 0.877, highest 0.908  mean width 3.35
+  ACI                        coverage mean 0.900, lowest 0.898, highest 0.902  bound allows a miss rate up to 0.132: met in all series
+
+AR(1) with volatility clusters (GARCH-like)  (90% target, 6 series of 600 steps)
+  EnbPI with update          coverage mean 0.906, lowest 0.872, highest 0.920  mean width 2.15
+  EnbPI without update       coverage mean 0.907, lowest 0.867, highest 0.932  mean width 2.21
+  EnbPI median aggregation   coverage mean 0.907, lowest 0.877, highest 0.922  mean width 2.16
+  EnbPI optimize_beta        coverage mean 0.906, lowest 0.878, highest 0.917  mean width 2.16
+  ACI                        coverage mean 0.897, lowest 0.892, highest 0.900  bound allows a miss rate up to 0.132: met in all series
+
+trend plus noise that doubles halfway  (90% target, 6 series of 600 steps)
+  EnbPI with update          coverage mean 0.811, lowest 0.800, highest 0.835  mean width 5.11
+  EnbPI without update       coverage mean 0.625, lowest 0.593, highest 0.667  mean width 3.82
+  EnbPI median aggregation   coverage mean 0.810, lowest 0.798, highest 0.833  mean width 5.11
+  EnbPI optimize_beta        coverage mean 0.809, lowest 0.793, highest 0.820  mean width 5.13
+  ACI                        coverage mean 0.892, lowest 0.888, highest 0.895  bound allows a miss rate up to 0.132: met in all series

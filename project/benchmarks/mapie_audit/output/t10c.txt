@@ -1,0 +1,58 @@
+Share of runs in which the upper bound falls BELOW the true risk (must be at most delta)
+  binary true risk  0.1 n=  50 delta= 0.1: MAPIE default bound 0.158   two-halves replica 0.158   paper's bound 0.060  ABOVE delta
+  binary true risk  0.1 n=  50 delta=0.05: MAPIE default bound 0.062   two-halves replica 0.062   paper's bound 0.025  ok
+  binary true risk  0.1 n= 100 delta= 0.1: MAPIE default bound 0.183   two-halves replica 0.183   paper's bound 0.063  ABOVE delta
+  binary true risk  0.1 n= 100 delta=0.05: MAPIE default bound 0.102   two-halves replica 0.102   paper's bound 0.028  ABOVE delta
+  binary true risk  0.1 n= 200 delta= 0.1: MAPIE default bound 0.142   two-halves replica 0.142   paper's bound 0.058  ABOVE delta
+  binary true risk  0.1 n= 200 delta=0.05: MAPIE default bound 0.083   two-halves replica 0.083   paper's bound 0.030  ABOVE delta
+  binary true risk  0.1 n= 300 delta= 0.1: MAPIE default bound 0.147   two-halves replica 0.147   paper's bound 0.055  ABOVE delta
+  binary true risk  0.1 n= 300 delta=0.05: MAPIE default bound 0.085   two-halves replica 0.085   paper's bound 0.035  ABOVE delta
+  binary true risk  0.2 n=  50 delta= 0.1: MAPIE default bound 0.197   two-halves replica 0.197   paper's bound 0.085  ABOVE delta
+  binary true risk  0.2 n=  50 delta=0.05: MAPIE default bound 0.110   two-halves replica 0.110   paper's bound 0.043  ABOVE delta
+  binary true risk  0.2 n= 100 delta= 0.1: MAPIE default bound 0.168   two-halves replica 0.168   paper's bound 0.052  ABOVE delta
+  binary true risk  0.2 n= 100 delta=0.05: MAPIE default bound 0.090   two-halves replica 0.090   paper's bound 0.027  ABOVE delta
+  binary true risk  0.2 n= 200 delta= 0.1: MAPIE default bound 0.132   two-halves replica 0.132   paper's bound 0.042  ok
+  binary true risk  0.2 n= 200 delta=0.05: MAPIE default bound 0.073   two-halves replica 0.073   paper's bound 0.030  ok
+  binary true risk  0.2 n= 300 delta= 0.1: MAPIE default bound 0.133   two-halves replica 0.133   paper's bound 0.040  ok
+  binary true risk  0.2 n= 300 delta=0.05: MAPIE default bound 0.078   two-halves replica 0.078   paper's bound 0.022  ABOVE delta
+  binary true risk  0.3 n=  50 delta= 0.1: MAPIE default bound 0.147   two-halves replica 0.147   paper's bound 0.072  ABOVE delta
+  binary true risk  0.3 n=  50 delta=0.05: MAPIE default bound 0.078   two-halves replica 0.078   paper's bound 0.032  ABOVE delta
+  binary true risk  0.3 n= 100 delta= 0.1: MAPIE default bound 0.127   two-halves replica 0.127   paper's bound 0.040  ok
+  binary true risk  0.3 n= 100 delta=0.05: MAPIE default bound 0.082   two-halves replica 0.082   paper's bound 0.023  ABOVE delta
+  binary true risk  0.3 n= 200 delta= 0.1: MAPIE default bound 0.122   two-halves replica 0.122   paper's bound 0.040  ok
+  binary true risk  0.3 n= 200 delta=0.05: MAPIE default bound 0.053   two-halves replica 0.053   paper's bound 0.022  ok
+  binary true risk  0.3 n= 300 delta= 0.1: MAPIE default bound 0.113   two-halves replica 0.113   paper's bound 0.048  ok
+  binary true risk  0.3 n= 300 delta=0.05: MAPIE default bound 0.065   two-halves replica 0.065   paper's bound 0.018  ok
+  beta   true risk  0.1 n=  50 delta= 0.1: MAPIE default bound 0.007   two-halves replica 0.007   paper's bound 0.002  ok
+  beta   true risk  0.1 n=  50 delta=0.05: MAPIE default bound 0.000   two-halves replica 0.000   paper's bound 0.000  ok
+  beta   true risk  0.1 n= 100 delta= 0.1: MAPIE default bound 0.045   two-halves replica 0.045   paper's bound 0.008  ok
+  beta   true risk  0.1 n= 100 delta=0.05: MAPIE default bound 0.003   two-halves replica 0.003   paper's bound 0.000  ok
+  beta   true risk  0.1 n= 200 delta= 0.1: MAPIE default bound 0.062   two-halves replica 0.062   paper's bound 0.017  ok
+  beta   true risk  0.1 n= 200 delta=0.05: MAPIE default bound 0.025   two-halves replica 0.025   paper's bound 0.007  ok
+  beta   true risk  0.1 n= 300 delta= 0.1: MAPIE default bound 0.052   two-halves replica 0.052   paper's bound 0.018  ok
+  beta   true risk  0.1 n= 300 delta=0.05: MAPIE default bound 0.028   two-halves replica 0.028   paper's bound 0.005  ok
+  beta   true risk  0.2 n=  50 delta= 0.1: MAPIE default bound 0.040   two-halves replica 0.040   paper's bound 0.013  ok
+  beta   true risk  0.2 n=  50 delta=0.05: MAPIE default bound 0.005   two-halves replica 0.005   paper's bound 0.000  ok
+  beta   true risk  0.2 n= 100 delta= 0.1: MAPIE default bound 0.097   two-halves replica 0.097   paper's bound 0.030  ok
+  beta   true risk  0.2 n= 100 delta=0.05: MAPIE default bound 0.030   two-halves replica 0.030   paper's bound 0.012  ok
+  beta   true risk  0.2 n= 200 delta= 0.1: MAPIE default bound 0.082   two-halves replica 0.082   paper's bound 0.023  ok
+  beta   true risk  0.2 n= 200 delta=0.05: MAPIE default bound 0.040   two-halves replica 0.040   paper's bound 0.010  ok
+  beta   true risk  0.2 n= 300 delta= 0.1: MAPIE default bound 0.055   two-halves replica 0.055   paper's bound 0.020  ok
+  beta   true risk  0.2 n= 300 delta=0.05: MAPIE default bound 0.028   two-halves replica 0.028   paper's bound 0.010  ok
+  beta   true risk  0.3 n=  50 delta= 0.1: MAPIE default bound 0.058   two-halves replica 0.058   paper's bound 0.020  ok
+  beta   true risk  0.3 n=  50 delta=0.05: MAPIE default bound 0.008   two-halves replica 0.008   paper's bound 0.005  ok
+  beta   true risk  0.3 n= 100 delta= 0.1: MAPIE default bound 0.097   two-halves replica 0.097   paper's bound 0.033  ok
+  beta   true risk  0.3 n= 100 delta=0.05: MAPIE default bound 0.038   two-halves replica 0.038   paper's bound 0.012  ok
+  beta   true risk  0.3 n= 200 delta= 0.1: MAPIE default bound 0.068   two-halves replica 0.068   paper's bound 0.015  ok
+  beta   true risk  0.3 n= 200 delta=0.05: MAPIE default bound 0.028   two-halves replica 0.028   paper's bound 0.005  ok
+  beta   true risk  0.3 n= 300 delta= 0.1: MAPIE default bound 0.075   two-halves replica 0.075   paper's bound 0.022  ok
+  beta   true risk  0.3 n= 300 delta=0.05: MAPIE default bound 0.030   two-halves replica 0.030   paper's bound 0.012  ok
+MAPIE's bound equals the two-halves replica in 28800 of 28800 runs
+
+End to end, MultiLabelClassificationController(risk='recall', method='rcps'): share of runs whose TRUE risk exceeds the target (must be at most 1 - confidence_level)
+  recall >= 0.8, confidence 0.9, about 100 calibration rows, rcps_bound=None     : 0.128 (allowed 0.10)  ok
+  recall >= 0.8, confidence 0.9, about 100 calibration rows, rcps_bound=hoeffding: 0.000 (allowed 0.10)  ok
+  recall >= 0.7, confidence 0.9, about 100 calibration rows, rcps_bound=None     : 0.117 (allowed 0.10)  ok
+  recall >= 0.7, confidence 0.9, about 100 calibration rows, rcps_bound=hoeffding: 0.000 (allowed 0.10)  ok
+  recall >= 0.8, confidence 0.9, about 300 calibration rows, rcps_bound=None     : 0.090 (allowed 0.10)  ok
+  recall >= 0.8, confidence 0.9, about 300 calibration rows, rcps_bound=hoeffding: 0.000 (allowed 0.10)  ok

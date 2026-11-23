@@ -1,0 +1,20 @@
+
+2 classes. Raw model: top-label ECE 0.0782, log loss 0.5250, accuracy 0.8500
+TopLabelCalibrator, sigmoid, prefit                                top-label ECE 0.0187; predicted class unchanged 1.000; rows containing NaN 1.00; row sums 0.198 to 0.910; predict() accuracy 0.8500
+TopLabelCalibrator, sigmoid, split                                 top-label ECE 0.0130
+TopLabelCalibrator, isotonic, prefit                               top-label ECE 0.0247; predicted class unchanged 1.000; rows containing NaN 1.00; row sums 0.250 to 1.000; predict() accuracy 0.8500
+TopLabelCalibrator, isotonic, split                                top-label ECE 0.0205
+VennAbersCalibrator, prefit                                        top-label ECE 0.0178; log loss 0.3742; row sums 1.0000 to 1.0000; values in [0,1] True; accuracy 0.8547
+VennAbersCalibrator, inductive (default)                           top-label ECE 0.0154; log loss 0.3752; row sums 1.0000 to 1.0000; values in [0,1] True; accuracy 0.8550
+VennAbersCalibrator, cross, 5 splits                               top-label ECE 0.0151; log loss 0.3726; row sums 1.0000 to 1.0000; values in [0,1] True; accuracy 0.8547
+VennAbersCalibrator, prefit, against venn-abers package            max difference from the venn-abers package 0.00e+00
+
+4 classes. Raw model: top-label ECE 0.1340, log loss 1.0815, accuracy 0.5830
+TopLabelCalibrator, sigmoid, prefit                                top-label ECE 0.0227; predicted class unchanged 1.000; rows containing NaN 1.00; row sums 0.139 to 0.929; predict() accuracy 0.5830
+TopLabelCalibrator, sigmoid, split                                 top-label ECE 0.0273
+TopLabelCalibrator, isotonic, prefit                               top-label ECE 0.0225; predicted class unchanged 1.000; rows containing NaN 1.00; row sums 0.000 to 1.000; predict() accuracy 0.5830
+TopLabelCalibrator, isotonic, split                                top-label ECE 0.0303
+VennAbersCalibrator, prefit                                        top-label ECE 0.0239; log loss 0.9275; row sums 1.0000 to 1.0000; values in [0,1] True; accuracy 0.5927
+VennAbersCalibrator, inductive (default)                           top-label ECE 0.0300; log loss 0.9186; row sums 1.0000 to 1.0000; values in [0,1] True; accuracy 0.6170
+VennAbersCalibrator, cross, 5 splits                               top-label ECE 0.0305; log loss 0.9148; row sums 1.0000 to 1.0000; values in [0,1] True; accuracy 0.6170
+VennAbersCalibrator, prefit, against venn-abers package            max difference from the venn-abers package 0.00e+00

@@ -1,0 +1,7 @@
+p-values [1.e-09 1.e-09 1.e-09    nan]  delta 0.1
+  bonferroni       rejects indices [0, 1, 2]
+  bonferroni_holm  rejects indices []
+
+precision >= 0.6, n = 2000, 300 runs  (any NaN p-value, Holm returns nothing, Bonferroni returns nothing): count
+   (False, False, False) 139
+   (True, True, False) 161

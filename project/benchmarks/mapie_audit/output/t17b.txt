@@ -1,0 +1,16 @@
+split, LinearRegression, X float64, y float64                          runs
+split, LinearRegression, X float32, y float64                          runs
+split, LinearRegression, X float64, y float32                          runs
+split, LinearRegression, X float32, y float32                          runs
+split, RandomForest, X float64, y float64                              runs
+split, RandomForest, X float32, y float64                              runs
+split, RandomForest, X float64, y float32                              runs
+split, RandomForest, X float32, y float32                              runs
+split, HistGradientBoosting, X float64, y float64                      runs
+split, HistGradientBoosting, X float32, y float64                      runs
+split, HistGradientBoosting, X float64, y float32                      runs
+split, HistGradientBoosting, X float32, y float32                      runs
+split, gamma score, float32                                            runs
+cross-conformal, float32                                               runs
+split, float32, AbsoluteConformityScore(consistency_check=False)       ERROR TypeError: AbsoluteConformityScore.__init__() got an unexpected keyword argument 'consistency_check'
+split, pandas float32 frame (as read from many parquet files)          runs

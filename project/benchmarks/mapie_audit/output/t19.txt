@@ -1,0 +1,12 @@
+precision >= 0.6 for all 3 classes, n= 300, bonferroni_holm : some class below target in 0.000 of runs (allowed 0.10) ok; no threshold in 200 of 200; median threshold nan
+precision >= 0.6 for all 3 classes, n= 300, bonferroni      : some class below target in 0.000 of runs (allowed 0.10) ok; no threshold in 188 of 200; median threshold 0.71
+precision >= 0.6 for all 3 classes, n=1000, bonferroni_holm : some class below target in 0.000 of runs (allowed 0.10) ok; no threshold in 188 of 200; median threshold 0.85
+precision >= 0.6 for all 3 classes, n=1000, bonferroni      : some class below target in 0.000 of runs (allowed 0.10) ok; no threshold in 4 of 200; median threshold 0.84
+precision >= 0.7 for all 3 classes, n= 300, bonferroni_holm : some class below target in 0.000 of runs (allowed 0.10) ok; no threshold in 200 of 200; median threshold nan
+precision >= 0.7 for all 3 classes, n= 300, bonferroni      : some class below target in 0.000 of runs (allowed 0.10) ok; no threshold in 200 of 200; median threshold nan
+precision >= 0.7 for all 3 classes, n=1000, bonferroni_holm : some class below target in 0.000 of runs (allowed 0.10) ok; no threshold in 198 of 200; median threshold 0.86
+precision >= 0.7 for all 3 classes, n=1000, bonferroni      : some class below target in 0.000 of runs (allowed 0.10) ok; no threshold in 165 of 200; median threshold 0.81
+recall    >= 0.3 for all 3 classes, n= 300, bonferroni_holm : some class below target in 0.000 of runs (allowed 0.10) ok; no threshold in 0 of 200; median threshold 0.00
+recall    >= 0.3 for all 3 classes, n= 300, bonferroni      : some class below target in 0.000 of runs (allowed 0.10) ok; no threshold in 0 of 200; median threshold 0.00
+recall    >= 0.3 for all 3 classes, n=1000, bonferroni_holm : some class below target in 0.000 of runs (allowed 0.10) ok; no threshold in 0 of 200; median threshold 0.00
+recall    >= 0.3 for all 3 classes, n=1000, bonferroni      : some class below target in 0.000 of runs (allowed 0.10) ok; no threshold in 0 of 200; median threshold 0.00

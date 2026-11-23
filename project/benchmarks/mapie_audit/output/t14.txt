@@ -1,0 +1,17 @@
+regression coverage ok
+regression mean width ok
+mean Winkler interval score ok
+regression SSC (3 width bins) ok ; SSC score ok
+classification coverage ok
+classification mean set size ok
+ECE, 10 bins, split_strategy=None ok
+ECE, 10 bins, split_strategy=uniform ok
+ECE, 50 bins, split_strategy=None DIFFERS (MAPIE 0.109193, by hand 0.108129)
+ECE, 50 bins, split_strategy=uniform DIFFERS (MAPIE 0.109193, by hand 0.108129)
+Spiegelhalter statistic ok
+Kolmogorov-Smirnov n= 200: rejects at 5% on calibrated scores in 0.037 of runs ok; on miscalibrated scores 0.611; p-value range [0.000, 1.000], mean 0.528
+Kolmogorov-Smirnov n=2000: rejects at 5% on calibrated scores in 0.047 of runs ok; on miscalibrated scores 1.000; p-value range [0.000, 1.000], mean 0.500
+Kuiper             n= 200: rejects at 5% on calibrated scores in 0.036 of runs ok; on miscalibrated scores 0.528; p-value range [0.000, 1.000], mean 0.556
+Kuiper             n=2000: rejects at 5% on calibrated scores in 0.050 of runs ok; on miscalibrated scores 1.000; p-value range [0.000, 1.000], mean 0.513
+Spiegelhalter      n= 200: rejects at 5% on calibrated scores in 0.058 of runs ok; on miscalibrated scores 0.023; p-value range [0.000, 0.998], mean 0.503
+Spiegelhalter      n=2000: rejects at 5% on calibrated scores in 0.046 of runs ok; on miscalibrated scores 0.000; p-value range [0.001, 1.000], mean 0.501

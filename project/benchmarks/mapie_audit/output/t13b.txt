@@ -1,0 +1,4 @@
+conditional regressor, exact=False: group 0 0.9018 (se 0.0039) ok; group 1 0.9096 (se 0.0053) ok; overall 0.9038 (se 0.0033) ok; share infinite 0.000  (465s)
+ordinary split regressor: group 0 1.0000; group 1 0.6662
+conditional classifier, lac: group 0 0.9017 (se 0.0022) ok; group 1 0.9064 (se 0.0036) ok; overall 0.9032 (se 0.0019) ok  (25s)
+conditional classifier, aps: group 0 0.9814 (se 0.0007) over; group 1 0.9714 (se 0.0020) over; overall 0.9783 (se 0.0008) over  (39s)

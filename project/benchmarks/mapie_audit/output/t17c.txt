@@ -1,0 +1,17 @@
+Share of 200 random datasets on which SplitConformalRegressor(LinearRegression) raises, by input type and by the size of y
+  y centred at      0, X float64, y float64: raises on 0.00 of datasets  
+  y centred at      0, X float32, y float64: raises on 0.00 of datasets  
+  y centred at      0, X float64, y float32: raises on 0.00 of datasets  
+  y centred at      0, X float32, y float32: raises on 1.00 of datasets  ValueError: The two functions get_conformity_scores and get_estimation_distribution of the BaseRegressionScore class are not consistent. The following equation mu
+  y centred at      1, X float64, y float64: raises on 0.00 of datasets  
+  y centred at      1, X float32, y float64: raises on 0.00 of datasets  
+  y centred at      1, X float64, y float32: raises on 0.00 of datasets  
+  y centred at      1, X float32, y float32: raises on 1.00 of datasets  ValueError: The two functions get_conformity_scores and get_estimation_distribution of the BaseRegressionScore class are not consistent. The following equation mu
+  y centred at     50, X float64, y float64: raises on 0.00 of datasets  
+  y centred at     50, X float32, y float64: raises on 0.00 of datasets  
+  y centred at     50, X float64, y float32: raises on 0.00 of datasets  
+  y centred at     50, X float32, y float32: raises on 0.00 of datasets  
+  y centred at   1000, X float64, y float64: raises on 0.00 of datasets  
+  y centred at   1000, X float32, y float64: raises on 0.00 of datasets  
+  y centred at   1000, X float64, y float32: raises on 0.00 of datasets  
+  y centred at   1000, X float32, y float32: raises on 0.00 of datasets  

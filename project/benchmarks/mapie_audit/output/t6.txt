@@ -1,0 +1,4 @@
+Learn-then-test, precision >= 0.6 at confidence 0.9: runs with true precision below 0.6: 0/400 = 0.000 (allowed 0.10); no valid threshold found in 348 runs
+CRC multi-label recall, target 0.9: mean recall 0.9076 (se 0.0008) ok
+Venn-Abers binary, prefit: 658 RuntimeWarnings during fit and predict ({'invalid value encountered in divide'})
+  max difference from the venn-abers package: 0.00e+00; NaN in output: 0

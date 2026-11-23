@@ -1,0 +1,4 @@
+MultiLabelClassificationController(risk='recall', method='rcps', rcps_bound=None): share of runs whose TRUE recall is below the target
+  recall >= 0.8, confidence 0.9, 100 calibration rows: 0.115 of 1500 runs (allowed 0.10)  within noise of the limit   median threshold 0.14
+  recall >= 0.9, confidence 0.9, 100 calibration rows: 0.123 of 1500 runs (allowed 0.10)  VIOLATED   median threshold 0.06
+  recall >= 0.8, confidence 0.95, 100 calibration rows: 0.071 of 1500 runs (allowed 0.05)  VIOLATED   median threshold 0.12
