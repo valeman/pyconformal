@@ -1,0 +1,6 @@
+SGSC: 30 random splits, 139 s. Mean over splits.
+  distribution                         | pooled worst-level cal. error | per-unit cal. error: mean | worst 10% of units | pinball: mean | worst 10% of units | central 90% coverage | worst 10% of units | 90% width | infinite quantiles
+  equal weights, fixed levels          | 0.023 | 0.109 | 0.244 | 0.0411 | 0.0910 | 0.901 | 0.606 | 0.519 | 0.0000
+  equal weights, adaptive levels       | 0.029 | 0.061 | 0.127 | 0.0383 | 0.0803 | 0.932 | 0.844 | 0.517 | 0.0018
+  similarity weights, fixed levels     | 0.027 | 0.103 | 0.244 | 0.0416 | 0.0936 | 0.930 | 0.721 | 0.595 | 0.0167
+  similarity weights, adaptive levels  | 0.032 | 0.058 | 0.129 | 0.0387 | 0.0824 | 0.941 | 0.867 | 0.560 | 0.0130

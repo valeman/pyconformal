@@ -1,0 +1,6 @@
+M5: 30 random splits, 261 s. Mean over splits.
+  distribution                         | pooled worst-level cal. error | per-unit cal. error: mean | worst 10% of units | pinball: mean | worst 10% of units | central 90% coverage | worst 10% of units | 90% width | infinite quantiles
+  equal weights, fixed levels          | 0.024 | 0.123 | 0.253 | 0.2156 | 0.4125 | 0.897 | 0.571 | 2.365 | 0.0000
+  equal weights, adaptive levels       | 0.041 | 0.068 | 0.138 | 0.1964 | 0.3594 | 0.944 | 0.865 | 2.274 | 0.0018
+  similarity weights, fixed levels     | 0.031 | 0.116 | 0.239 | 0.2071 | 0.3766 | 0.928 | 0.732 | 2.313 | 0.0084
+  similarity weights, adaptive levels  | 0.045 | 0.066 | 0.134 | 0.1916 | 0.3373 | 0.947 | 0.886 | 2.221 | 0.0068

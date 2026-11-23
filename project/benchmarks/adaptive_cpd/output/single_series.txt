@@ -1,0 +1,63 @@
+19 levels 0.05..0.95, window 200. Columns: worst calibration error over levels | mean calibration error | pinball loss | coverage of the central 90% interval | lowest coverage in any 250-step stretch | share of infinite quantiles
+Bound on the calibration error of any level for any sequence, T = 3000: gamma 0.005: 0.067, gamma 0.02: 0.017, gamma 0.05: 0.007
+
+i.i.d. errors
+  base (rolling CPS)                 0.005 | 0.002 | 0.2977 | 0.900 | 0.860 | 0.0000
+  adaptive, gamma 0.005              0.002 | 0.001 | 0.2987 | 0.900 | 0.866 | 0.0000
+  adaptive, gamma 0.02               0.001 | 0.001 | 0.3010 | 0.900 | 0.878 | 0.0006 | steps with crossed thresholds before sorting 0.058
+  adaptive, gamma 0.05               0.002 | 0.001 | 0.3062 | 0.901 | 0.884 | 0.0104 | steps with crossed thresholds before sorting 0.557
+  adaptive, gamma 0.02, not sorted   0.001 | 0.001 | 0.3010 | 0.900 | 0.878 | 0.0006 | steps with crossed thresholds before sorting 0.058
+
+noise x5 from the middle
+  base (rolling CPS)                 0.012 | 0.006 | 0.8985 | 0.886 | 0.726 | 0.0000
+  adaptive, gamma 0.005              0.002 | 0.001 | 0.8997 | 0.900 | 0.829 | 0.0000
+  adaptive, gamma 0.02               0.001 | 0.001 | 0.9050 | 0.900 | 0.874 | 0.0020 | steps with crossed thresholds before sorting 0.073
+  adaptive, gamma 0.05               0.002 | 0.001 | 0.9243 | 0.902 | 0.884 | 0.0139 | steps with crossed thresholds before sorting 0.560
+  adaptive, gamma 0.02, not sorted   0.001 | 0.001 | 0.9050 | 0.900 | 0.872 | 0.0020 | steps with crossed thresholds before sorting 0.073
+
+noise grows 0.1% a step
+  base (rolling CPS)                 0.027 | 0.016 | 2.3168 | 0.866 | 0.822 | 0.0000
+  adaptive, gamma 0.005              0.003 | 0.001 | 2.3208 | 0.898 | 0.866 | 0.0000
+  adaptive, gamma 0.02               0.001 | 0.001 | 2.3443 | 0.900 | 0.878 | 0.0030 | steps with crossed thresholds before sorting 0.055
+  adaptive, gamma 0.05               0.002 | 0.001 | 2.4215 | 0.902 | 0.887 | 0.0202 | steps with crossed thresholds before sorting 0.540
+  adaptive, gamma 0.02, not sorted   0.001 | 0.001 | 2.3444 | 0.900 | 0.878 | 0.0030 | steps with crossed thresholds before sorting 0.055
+
+forecast bias drifts (error mean +0.002 a step)
+  base (rolling CPS)                 0.083 | 0.059 | 0.3036 | 0.895 | 0.850 | 0.0000
+  adaptive, gamma 0.005              0.006 | 0.004 | 0.2989 | 0.900 | 0.865 | 0.0000
+  adaptive, gamma 0.02               0.002 | 0.001 | 0.3015 | 0.900 | 0.878 | 0.0022 | steps with crossed thresholds before sorting 0.083
+  adaptive, gamma 0.05               0.003 | 0.001 | 0.3083 | 0.902 | 0.883 | 0.0133 | steps with crossed thresholds before sorting 0.575
+  adaptive, gamma 0.02, not sorted   0.002 | 0.001 | 0.3015 | 0.900 | 0.878 | 0.0022 | steps with crossed thresholds before sorting 0.083
+
+random-walk error
+  base (rolling CPS)                 0.182 | 0.105 | 0.2455 | 0.704 | 0.408 | 0.0000
+  adaptive, gamma 0.005              0.009 | 0.006 | 0.1835 | 0.902 | 0.760 | 0.0197 | steps with crossed thresholds before sorting 0.117
+  adaptive, gamma 0.02               0.013 | 0.006 | 0.1207 | 0.911 | 0.823 | 0.0472 | steps with crossed thresholds before sorting 0.559
+  adaptive, gamma 0.05               0.035 | 0.022 | 0.1231 | 0.923 | 0.869 | 0.0865 | steps with crossed thresholds before sorting 0.841
+  adaptive, gamma 0.02, not sorted   0.006 | 0.004 | 0.1262 | 0.902 | 0.816 | 0.0472 | steps with crossed thresholds before sorting 0.559
+
+regime switches every 250 steps (scale 1 / 4)
+  base (rolling CPS)                 0.022 | 0.010 | 0.8034 | 0.866 | 0.730 | 0.0000
+  adaptive, gamma 0.005              0.004 | 0.002 | 0.7971 | 0.903 | 0.809 | 0.0001
+  adaptive, gamma 0.02               0.002 | 0.001 | 0.7765 | 0.902 | 0.839 | 0.0074 | steps with crossed thresholds before sorting 0.207
+  adaptive, gamma 0.05               0.003 | 0.001 | 0.7860 | 0.905 | 0.866 | 0.0251 | steps with crossed thresholds before sorting 0.643
+  adaptive, gamma 0.02, not sorted   0.002 | 0.001 | 0.7768 | 0.902 | 0.838 | 0.0074 | steps with crossed thresholds before sorting 0.207
+
+skew flips at the middle
+  base (rolling CPS)                 0.011 | 0.005 | 0.2614 | 0.900 | 0.860 | 0.0000
+  adaptive, gamma 0.005              0.002 | 0.001 | 0.2619 | 0.900 | 0.866 | 0.0000
+  adaptive, gamma 0.02               0.002 | 0.001 | 0.2636 | 0.900 | 0.876 | 0.0010 | steps with crossed thresholds before sorting 0.076
+  adaptive, gamma 0.05               0.002 | 0.001 | 0.2700 | 0.902 | 0.885 | 0.0106 | steps with crossed thresholds before sorting 0.556
+  adaptive, gamma 0.02, not sorted   0.002 | 0.001 | 0.2636 | 0.900 | 0.876 | 0.0010 | steps with crossed thresholds before sorting 0.076
+
+M5 CA_1 FOODS_3 daily total, seasonal-naive forecast (lag 7) (1734 steps)
+  base (rolling CPS)                 0.016 | 0.004 | 100.9971 | 0.897 | 0.848 | 0.0000
+  adaptive, gamma 0.005              0.004 | 0.002 | 101.3054 | 0.901 | 0.868 | 0.0000
+  adaptive, gamma 0.02               0.003 | 0.001 | 102.0895 | 0.903 | 0.872 | 0.0015
+  adaptive, gamma 0.05               0.004 | 0.002 | 103.5807 | 0.905 | 0.884 | 0.0113
+
+SGSC mean household load, half-hourly, forecast = same slot yesterday (4744 steps)
+  base (rolling CPS)                 0.020 | 0.012 | 0.0223 | 0.877 | 0.716 | 0.0000
+  adaptive, gamma 0.005              0.001 | 0.000 | 0.0219 | 0.901 | 0.764 | 0.0015
+  adaptive, gamma 0.02               0.001 | 0.001 | 0.0184 | 0.902 | 0.844 | 0.0085
+  adaptive, gamma 0.05               0.008 | 0.005 | 0.0134 | 0.911 | 0.872 | 0.0226
