@@ -1,0 +1,11 @@
+ACIPredictor.train + .evaluate (lookback 200, retrain every 25 steps, 30 epochs), linear model, 400 training steps, 1,000 test steps, 90% target
+  AR(1), stable                    gamma 0.005: miss rate 0.1005 (worst run 0.1050); Gibbs-Candes bound 0.2810
+  AR(1), stable                    gamma 0.05: miss rate 0.1003 (worst run 0.1020); Gibbs-Candes bound 0.1190
+  AR(1), noise x4 from the middle  gamma 0.005: miss rate 0.1020 (worst run 0.1080); Gibbs-Candes bound 0.2810
+  AR(1), noise x4 from the middle  gamma 0.05: miss rate 0.1027 (worst run 0.1040); Gibbs-Candes bound 0.1190
+  AR(1), noise grows 0.5% a step   gamma 0.005: miss rate 0.1110 (worst run 0.1130); Gibbs-Candes bound 0.2810
+  AR(1), noise grows 0.5% a step   gamma 0.05: miss rate 0.1050 (worst run 0.1100); Gibbs-Candes bound 0.1190
+EnsemblePredictor.train + .evaluate (EnbPI, 10 models, updates after each batch of 1), same series
+  AR(1), stable                    coverage 0.8953 (lowest run 0.8780)   [EnbPI has no finite-sample guarantee under drift]
+  AR(1), noise x4 from the middle  coverage 0.8233 (lowest run 0.8130)   [EnbPI has no finite-sample guarantee under drift]
+  AR(1), noise grows 0.5% a step   coverage 0.5825 (lowest run 0.5740)   [EnbPI has no finite-sample guarantee under drift]

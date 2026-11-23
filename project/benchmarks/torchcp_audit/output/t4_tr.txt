@@ -1,0 +1,8 @@
+Trainers, then split conformal on fresh data (APS, 90%). 6 classes, 3,000 training rows. Coverage must stay on target whatever the trainer does; set size is the trainer's claim.
+  cross-entropy only       coverage 0.9011, set size 3.58, accuracy 0.489
+  TSTrainer                coverage 0.8979, set size 3.54, accuracy 0.489
+  ConfTSTrainer            coverage 0.8983, set size 3.57, accuracy 0.489
+  ConfTrTrainer            coverage 0.8959, set size 3.53, accuracy 0.488
+  SCPOTrainer              ERROR AttributeError: 'Sequential' object has no attribute 'fc'
+  UncertaintyAwareTrainer  coverage 0.8984, set size 3.55, accuracy 0.486
+  OrdinalTrainer           coverage 0.8917, set size 4.57, accuracy 0.331

@@ -1,0 +1,9 @@
+probs = [0.6, 0.3, 0.1], true label = top class: score used in calibration vs score used to build the set
+  SAPS(randomized=False): calibration 0.000, prediction 0.600
+  APS(randomized=False): calibration 0.600, prediction 0.600
+  RAPS(randomized=False): calibration 0.600, prediction 0.600
+  TOPK(randomized=False): calibration 1.000, prediction 1.000
+  top-1 accuracy 0.47: SAPS rand 0.903; SAPS not rand 0.903; APS rand 0.906; APS not rand 0.906; RAPS rand 0.906; RAPS not rand 0.907; TOPK rand 0.905; TOPK not rand 0.914
+  top-1 accuracy 0.88: SAPS rand 0.903; SAPS not rand 0.904; APS rand 0.901; APS not rand 0.900; RAPS rand 0.901; RAPS not rand 0.901; TOPK rand 0.904; TOPK not rand 0.942
+  top-1 accuracy 0.93: SAPS rand 0.900; SAPS not rand 0.000; APS rand 0.900; APS not rand 0.898; RAPS rand 0.899; RAPS not rand 0.898; TOPK rand 0.900; TOPK not rand 0.938
+  top-1 accuracy 0.98: SAPS rand 0.898; SAPS not rand 0.000; APS rand 0.902; APS not rand 0.900; RAPS rand 0.902; RAPS not rand 0.899; TOPK rand 0.902; TOPK not rand 0.983

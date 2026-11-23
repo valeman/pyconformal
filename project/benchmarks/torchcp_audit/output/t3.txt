@@ -1,0 +1,27 @@
+(a) WeightedPredictor under covariate shift. Source x ~ N(0,1), target x ~ N(1,1), true weight w(x) = exp(x - 0.5) given to it through the domain classifier. 3 classes, LAC, 90% target.
+  alpha passed to the constructor is 0.1; predictor.alpha after construction: None
+  model more accurate where the target has more mass: TorchCP coverage 0.9818, set size 2.013 | reference weighted method 0.8999, size 1.243 | no weighting 0.9099
+  model less accurate where the target has more mass: TorchCP coverage 0.9916, set size 2.660 | reference weighted method 0.9042, size 1.882 | no weighting 0.9046
+(c) classification metrics against an independent calculation
+  coverage_rate        TorchCP 0.459250  independent 0.459250  same
+  average_size         TorchCP 3.128250  independent 3.128250  same
+  CovGap               TorchCP 44.033451  independent 44.033455  same
+  VioClasses           TorchCP 7.000000  independent 7.000000  same
+  SSCV                 TorchCP 0.765385  independent 0.765385  same
+  singleton_hit_ratio  TorchCP 0.014000  independent 0.014000  same
+  coverage_rate(macro) TorchCP 0.459665  independent 0.459665
+  regression coverage_rate TorchCP 0.327000 independent 0.327000; average_size TorchCP 1.135662 independent 1.135662
+(c2) LLM metric SSCL (size-stratified loss): 300 examples, 8 generations
+  SSCL returns 101.0000; it sums set membership over examples (dim 0), giving (8,) 'sizes' for 300 examples
+(b) CDLoss (C-Adapter): which way does minimising it move the scores? Linear layer on a cross-entropy-trained start, 300 Adam steps, epsilon 0.5; split conformal set size on fresh data at 90%
+  LAC: start: set size 3.38, wrong-label score minus true-label score +0.244; minimise CDLoss: set size 5.83, wrong-label score minus true-label score -0.157; minimise -CDLoss: set size 3.53, wrong-label score minus true-label score +0.388
+  APS: start: set size 3.55, wrong-label score minus true-label score +0.174; minimise CDLoss: set size 4.54, wrong-label score minus true-label score +0.023; minimise -CDLoss: set size 5.80, wrong-label score minus true-label score -0.013
+(d) ConformalPredictiveDistribution: P(y <= its tau-quantile) for tau = 0.1, 0.5, 0.9 (should be about tau)
+  tau 0.1: 0.0994; tau 0.5: 0.4871; tau 0.9: 0.8924; output shape for 1,000 rows and 199 calibration rows: (1000, 199), values returned unsorted
+(e) R2CCP with SplitPredictor, trained (bimodal data, 40 bins, 60 epochs), 90% target
+  coverage 0.8975 (se 0.0028), mean total length 9.880
+(f) ConformalLM risk control (no language model: synthetic scores). Risk = no correct answer in the set. Share of calibration draws whose chosen setting has true risk above epsilon; should be at most alpha = 0.05.
+  scaling none, rejection False: epsilon 0.3: above epsilon in 0.000 of draws (setting found in 1.00, mean true risk 0.234); epsilon 0.4: above epsilon in 0.010 of draws (setting found in 1.00, mean true risk 0.328); candidate settings 16
+  scaling none, rejection True: epsilon 0.3: above epsilon in 0.050 of draws (setting found in 1.00, mean true risk 0.257); epsilon 0.4: above epsilon in 0.030 of draws (setting found in 1.00, mean true risk 0.350); candidate settings 74
+  scaling platt, rejection False: epsilon 0.3: above epsilon in 0.255 of draws (setting found in 1.00, mean true risk 0.285); epsilon 0.4: above epsilon in 0.005 of draws (setting found in 1.00, mean true risk 0.383); candidate settings 8
+  scaling platt, rejection True: epsilon 0.3: above epsilon in 1.000 of draws (setting found in 1.00, mean true risk 0.367); epsilon 0.4: above epsilon in 0.960 of draws (setting found in 1.00, mean true risk 0.504); candidate settings 30
