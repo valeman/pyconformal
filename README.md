@@ -41,6 +41,8 @@ No model object? Pass its outputs: `cp.calibrate(y_pred=pred_cal, y=y_cal)`.
 
 **[Install](#install) · [What you get](#what-you-get) · [Quick tour](#one-interface) · [Why it exists](#why-it-exists) · [On real data](#on-real-data) · [Speed](#speed-method-by-method) · [User guide](https://github.com/valeman/pyconformal/blob/main/project/docs/guide.md)**
 
+**Documentation: [every method with a minimal example](https://valeman.github.io/pyconformal/whats-inside/) · [FAQ](https://valeman.github.io/pyconformal/faq/)**
+
 ## Install
 
 ```bash
@@ -70,7 +72,7 @@ pip install "pyconformal[fast] @ git+https://github.com/valeman/pyconformal"
 | | Methods |
 |---|---|
 | **Regression** | Split conformal (normalized, Mondrian, weighted) · jackknife+ and CV+ · CQR · CTI · CIR and CIR+ · a parallel quantile forest with out-of-bag calibration |
-| **Classification** | LAC · APS · RAPS · SAPS, randomised or not, marginal or per class |
+| **Classification** | LAC · APS · RAPS · SAPS, randomised or not, marginal, per class or per category (Mondrian) |
 | **Probability calibration** | Venn-Abers and cross Venn-Abers, binary and multiclass |
 | **Distribution-valued outcomes** | Conformal sets for distribution-to-distribution regression, with a band for the distribution function |
 | **Predictive distributions** | Conformal predictive systems: quantiles, distribution function, intervals, exact CRPS |

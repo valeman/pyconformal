@@ -48,6 +48,13 @@ class SplitConformalClassifier(_Conformal):
         calibration samples of that class. Coverage then holds within every
         class, not only on average. A class with too few calibration
         samples for ``alpha`` is always included.
+
+        For a threshold per category of your own choosing (Mondrian conformal
+        prediction: a region, a device, an age band), pass ``groups`` to
+        ``calibrate`` and again to ``predict_set``. Coverage then holds within
+        every category. A category that is new at prediction, or has too few
+        calibration samples for ``alpha``, gets every class. ``groups`` and
+        ``class_conditional`` cannot be combined.
     random_state : int, numpy.random.Generator or None
         Seed for randomised scores.
     classes : array-like or None
@@ -109,11 +116,21 @@ class SplitConformalClassifier(_Conformal):
                 raise ValueError("Each row of probabilities must sum to 1 (within 1e-4).")
         return P
 
-    def calibrate(self, X=None, y=None, *, proba=None):
-        """Compute scores on data not used for training."""
+    def calibrate(self, X=None, y=None, *, proba=None, groups=None):
+        """Compute scores on data not used for training.
+
+        ``groups``: a category per calibration sample, for one threshold per
+        category (Mondrian conformal prediction).
+        """
         if y is None:
             raise TypeError("calibrate() needs the labels y.")
         y = np.asarray(y).ravel()
+        if groups is not None:
+            if self.class_conditional:
+                raise ValueError("groups and class_conditional cannot be combined.")
+            groups = np.asarray(groups).ravel()
+            if groups.shape[0] != y.shape[0]:
+                raise ValueError("groups has the wrong length.")
         self._n_classes = None  # a new calibration may change the number of columns
         P = self._proba(X, proba)
         if P.shape[0] != y.shape[0]:
@@ -135,13 +152,35 @@ class SplitConformalClassifier(_Conformal):
             ) from None
         self.calibration_scores_ = self.score.label_scores(P, cols, self._draw_u(len(cols)))
         self._calibration_labels = cols
+        self._calibration_groups = groups
         self._cache = {}
         return self
+
+    def group_thresholds(self, alpha: float | None = None):
+        """Score threshold of each calibration category, as a dict."""
+        g = self.__dict__.get("_calibration_groups")
+        if self.calibration_scores_ is None or g is None:
+            raise RuntimeError("Call calibrate() with groups first.")
+        alpha = self.alpha if alpha is None else _check_alpha(alpha)
+        cache = self.__dict__.setdefault("_cache", {})
+        key = ("groups", alpha)
+        if key not in cache:
+            values, inverse = np.unique(g, return_inverse=True)
+            order = np.argsort(inverse, kind="stable")
+            starts = np.concatenate([[0], np.cumsum(np.bincount(inverse, minlength=values.size))])
+            s = self.calibration_scores_
+            cache[key] = {
+                v: conformal_quantile(s[order[starts[i] : starts[i + 1]]], alpha)
+                for i, v in enumerate(values.tolist())
+            }
+        return dict(cache[key])
 
     def thresholds(self, alpha: float | None = None):
         """Score threshold, or one per class when ``class_conditional``."""
         if self.calibration_scores_ is None:
             raise RuntimeError("Call calibrate() first.")
+        if self.__dict__.get("_calibration_groups") is not None:
+            raise RuntimeError("With groups the threshold differs between samples; use group_thresholds().")
         alpha = self.alpha if alpha is None else _check_alpha(alpha)
         cache = self.__dict__.setdefault("_cache", {})
         key = (alpha, self.class_conditional)
@@ -162,19 +201,42 @@ class SplitConformalClassifier(_Conformal):
         cache[key] = q
         return q.copy() if isinstance(q, np.ndarray) else q
 
+    def _predict_set_groups(self, X, proba, groups, alphas, single):
+        P = self._proba(X, proba)
+        if groups.shape[0] != P.shape[0]:
+            raise ValueError("groups has the wrong length.")
+        u = self._draw_u(P.shape[0])
+        values, inverse = np.unique(groups, return_inverse=True)
+        out = np.ones((P.shape[0], P.shape[1], len(alphas)), dtype=bool)  # unseen category: every class
+        for j, a in enumerate(alphas):
+            table = self.group_thresholds(a)
+            for i, v in enumerate(values.tolist()):
+                q = table.get(v, np.inf)
+                if np.isfinite(q):
+                    rows = np.flatnonzero(inverse == i)
+                    out[rows, :, j] = self.score.sets(P[rows], q, None if u is None else u[rows])
+        return out[:, :, 0] if single else out
+
     def predict(self, X=None, *, proba=None):
         """Most likely class."""
         return self.classes_[np.argmax(self._proba(X, proba), axis=1)]
 
-    def predict_set(self, X=None, alpha=None, *, proba=None):
+    def predict_set(self, X=None, alpha=None, *, proba=None, groups=None):
         """Prediction sets as a boolean array (n_samples, n_classes).
 
         Entry ``[i, j]`` is True when ``classes_[j]`` is in the set for
         sample ``i``. ``alpha`` overrides the default level without
         recalibrating; a list of levels gives shape
         (n_samples, n_classes, n_levels), with the sets nested.
+
+        ``groups``: the category of each sample; required if and only if
+        ``calibrate`` was given groups.
         """
         alphas, single = self._alphas(alpha)
+        if (groups is None) != (self.__dict__.get("_calibration_groups") is None):
+            raise ValueError("Pass groups at prediction if and only if they were given at calibration.")
+        if groups is not None:
+            return self._predict_set_groups(X, proba, np.asarray(groups).ravel(), alphas, single)
         qs = [self.thresholds(a) for a in alphas]
         P = self._proba(X, proba)
         u = self._draw_u(P.shape[0])  # one draw, so the sets for several levels are nested

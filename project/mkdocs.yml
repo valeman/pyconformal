@@ -1,0 +1,70 @@
+site_name: pyconformal
+site_description: Conformal prediction for regression, classification, probability calibration and time series.
+site_url: https://valeman.github.io/pyconformal/
+repo_url: https://github.com/valeman/pyconformal
+repo_name: valeman/pyconformal
+edit_uri: edit/main/project/docs/
+docs_dir: docs
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.top
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  palette:
+    - scheme: default
+      toggle: {icon: material/brightness-7, name: Dark mode}
+    - scheme: slate
+      toggle: {icon: material/brightness-4, name: Light mode}
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+markdown_extensions:
+  - admonition
+  - tables
+  - toc: {permalink: true}
+  - pymdownx.highlight
+  - pymdownx.superfences
+nav:
+  - Home: index.md
+  - "What's inside": whats-inside.md
+  - Methods:
+    - Regression:
+      - "Split conformal regression": methods/split-regression.md
+      - "Mondrian (group-conditional) conformal prediction": methods/mondrian.md
+      - "Normalized (locally adaptive) intervals": methods/normalized.md
+      - "Weighted conformal prediction (covariate shift)": methods/weighted.md
+      - "Jackknife+ and CV+": methods/jackknife-plus.md
+    - Regression on quantiles:
+      - "Conformalized quantile regression (CQR)": methods/cqr.md
+      - "Conformal interquantile regression (CIR, CIR+)": methods/cir.md
+      - "Conformal thresholded intervals (CTI)": methods/cti.md
+      - "Quantile forest": methods/quantile-forest.md
+      - "Quantile models from CatBoost, XGBoost and LightGBM": methods/quantile-booster.md
+    - Classification:
+      - "Mondrian classification: by category or by class": methods/mondrian-classification.md
+      - "Split conformal classification (LAC, APS, RAPS, SAPS)": methods/classification.md
+    - Probability calibration:
+      - "Venn-Abers calibration": methods/venn-abers.md
+    - Predictive distributions:
+      - "Conformal predictive systems": methods/predictive-systems.md
+      - "When the outcome is a whole distribution": methods/distributions.md
+    - Time series:
+      - "Adaptive conformal inference (ACI)": methods/aci.md
+      - "DtACI, AgACI, Conformal PID and NexCP": methods/dtaci-agaci-pid-nexcp.md
+      - "Multi-step forecasts: MSCP and AcMCP": methods/multi-step.md
+      - "EnbPI and SPCI": methods/enbpi-spci.md
+      - "Conformal Seasonal Pools": methods/csp.md
+      - "STL and MSTL decomposition": methods/stl-mstl.md
+    - Building blocks:
+      - "The conformal quantile, on its own": methods/conformal-quantile.md
+  - FAQ: faq.md
+  - User guide: guide.md
+  - Case studies: case_studies.md
+  - API reference: api.md

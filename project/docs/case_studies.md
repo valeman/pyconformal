@@ -92,4 +92,4 @@ The same comparison with statsforecast's AutoETS and AutoTheta. These refit at e
 
 ## Reproduce
 
-Scripts and instructions are in [`project/benchmarks/case_studies/`](../benchmarks/case_studies/).
+Scripts and instructions are in [`project/benchmarks/case_studies/`](https://github.com/valeman/pyconformal/tree/main/project/benchmarks/case_studies).
