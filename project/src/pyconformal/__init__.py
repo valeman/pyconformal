@@ -35,7 +35,11 @@ from pyconformal.venn_abers import CrossVennAbers, VennAbers
 
 __version__ = "0.1.4"
 
+from .panel import PanelResult, WeightedTQA
+
 __all__ = [
+    "WeightedTQA",
+    "PanelResult",
     "APS",
     "AcMCP",
     "AgACI",

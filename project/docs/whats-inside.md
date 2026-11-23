@@ -50,6 +50,7 @@ Every method in pyconformal. Click a name for a minimal example you can run.
 | [DtACI, AgACI, Conformal PID and NexCP](methods/dtaci-agaci-pid-nexcp.md) | Four more online methods with the same interface as ACI. | `DtACI`, `AgACI`, `ConformalPID`, `NonexchangeableConformal` |
 | [Multi-step forecasts: MSCP and AcMCP](methods/multi-step.md) | Intervals for forecasts several steps ahead, one calibration per horizon. | `MultiStepSplitConformal`, `AcMCP` |
 | [EnbPI and SPCI](methods/enbpi-spci.md) | Bootstrap ensembles that give intervals without a calibration set, with residuals sliding forward. | `EnbPI`, `SPCI` |
+| [Panel data: W-TQA and TQA](methods/panel-wtqa.md) | Prediction sets for one unit of a panel, calibrated on the other units in the same round. | `WeightedTQA` |
 | [Conformal Seasonal Pools](methods/csp.md) | A training-free probabilistic forecaster for seasonal series. | `ConformalSeasonalPool` |
 | [STL and MSTL decomposition](methods/stl-mstl.md) | Fast trend and seasonal decomposition, for one or several seasonal periods. | `stl`, `mstl` |
 
@@ -74,6 +75,7 @@ Every method in pyconformal. Click a name for a minimal example you can run.
 | Probability calibration, Platt or isotonic replacement | [Venn-Abers](methods/venn-abers.md) |
 | Predictive distribution, CDF, CRPS | [Conformal predictive systems](methods/predictive-systems.md) |
 | Online, distribution shift, drift | [ACI](methods/aci.md), [DtACI, AgACI, PID, NexCP](methods/dtaci-agaci-pid-nexcp.md) |
+| Panel data, cross-section, many series, hierarchical retail | [Panel data: W-TQA and TQA](methods/panel-wtqa.md) |
 | Forecast horizons | [Multi-step forecasts](methods/multi-step.md) |
 | APS, RAPS, SAPS, LAC, THR | [Classification scores](methods/classification.md) |
 

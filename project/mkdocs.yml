@@ -60,6 +60,7 @@ nav:
       - "DtACI, AgACI, Conformal PID and NexCP": methods/dtaci-agaci-pid-nexcp.md
       - "Multi-step forecasts: MSCP and AcMCP": methods/multi-step.md
       - "EnbPI and SPCI": methods/enbpi-spci.md
+      - "Panel data: W-TQA and TQA": methods/panel-wtqa.md
       - "Conformal Seasonal Pools": methods/csp.md
       - "STL and MSTL decomposition": methods/stl-mstl.md
     - Building blocks:
