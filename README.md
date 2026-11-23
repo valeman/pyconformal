@@ -2,6 +2,9 @@
 
 **Conformal prediction that is exact, fast, and covers both tabular data and time series.**
 
+**Documentation: https://valeman.github.io/pyconformal/** (every method with a minimal example you can run)
+
+[![docs](https://img.shields.io/badge/docs-valeman.github.io%2Fpyconformal-blue)](https://valeman.github.io/pyconformal/)
 [![tests](https://github.com/valeman/pyconformal/actions/workflows/tests.yml/badge.svg)](https://github.com/valeman/pyconformal/actions/workflows/tests.yml)
 [![Version](https://img.shields.io/pypi/v/pyconformal)](https://github.com/valeman/pyconformal/blob/main/project/CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.12%20%7C%203.14-blue)](pyproject.toml)

@@ -46,6 +46,7 @@ test = ["pytest>=7", "scikit-learn>=1.0", "venn-abers>=1.5", "crepes>=0.9", "sta
 
 [project.urls]
 Homepage = "https://github.com/valeman/pyconformal"
+Documentation = "https://valeman.github.io/pyconformal/"
 Source = "https://github.com/valeman/pyconformal"
 Issues = "https://github.com/valeman/pyconformal/issues"
 
