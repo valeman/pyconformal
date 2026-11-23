@@ -1,0 +1,40 @@
+(a) fixed predictions (IdPredictor), i.i.d. noise
+  SplitCP n=9, alpha=0.1                                         coverage 0.8978 (se 0.0055) ok; infinite 0.00
+  SplitCP n=9, alpha=0.05                                        ERROR ValueError: Alpha is too small: (alpha=0.05, n=9) 0.05 < 0.1 for at least one of its coordinates. Increase alpha or the size of the calibration set.
+  SplitCP n=19, alpha=0.1                                        coverage 0.9011 (se 0.0038) ok; infinite 0.00
+  SplitCP n=19, alpha=0.05                                       coverage 0.9537 (se 0.0024) ok; infinite 0.00
+  SplitCP n=49, alpha=0.1                                        coverage 0.9003 (se 0.0025) ok; infinite 0.00
+  SplitCP n=49, alpha=0.05                                       coverage 0.9581 (se 0.0017) ok; infinite 0.00
+  SplitCP n=199, alpha=0.1                                       coverage 0.9012 (se 0.0014) ok; infinite 0.00
+  SplitCP n=199, alpha=0.05                                      coverage 0.9511 (se 0.0010) ok; infinite 0.00
+  SplitCP n=1000, alpha=0.1                                      coverage 0.9000 (se 0.0010) ok; infinite 0.00
+  SplitCP n=1000, alpha=0.05                                     coverage 0.9497 (se 0.0007) ok; infinite 0.00
+  LocallyAdaptiveCP, n=300 (predictions: mean and spread)        coverage 0.8992 (se 0.0012) ok; infinite 0.00
+  CQR, n=300 (predictions: two quantiles)                        coverage 0.9011 (se 0.0013) ok; infinite 0.00
+(b) with models, fresh test data, 90%
+  SplitCP + LinearRegression, fit_ratio 0.8                      coverage 0.8929 (se 0.0058) ok; infinite 0.00
+  SplitCP + RandomForest, explicit split                         coverage 0.9005 (se 0.0041) ok; infinite 0.00
+  LocallyAdaptiveCP + two forests                                coverage 0.8987 (se 0.0050) ok; infinite 0.00
+  CQR + two gradient-boosting quantile models                    coverage 0.8889 (se 0.0050) ok; infinite 0.00
+  CVPlus, K=5, LinearRegression (guarantee: at least 80%)        coverage 0.9020 (se 0.0027) ok; infinite 0.00
+  CVPlus, K=5, RandomForest                                      coverage 0.9122 (se 0.0026) ok; infinite 0.00
+  CVPlus, K=20, 60 training rows, LinearRegression               coverage 0.9046 (se 0.0041) ok; infinite 0.00
+  LeverageWeightedCP + LinearRegression                          coverage 0.9112 (se 0.0040) ok; infinite 0.00
+(c) exact rank: residuals 1..n, upper end of the interval against ceil((n+1)(1-alpha))
+  alpha 0.2: exact 1997, too high 0, TOO LOW 0, refused although a finite rank exists 0; examples []
+  alpha 0.1: exact 1992, too high 0, TOO LOW 0, refused although a finite rank exists 0; examples []
+  alpha 0.05: exact 1982, too high 0, TOO LOW 0, refused although a finite rank exists 0; examples []
+  alpha 0.025: exact 1962, too high 0, TOO LOW 0, refused although a finite rank exists 0; examples []
+  alpha 0.01: exact 1902, too high 0, TOO LOW 0, refused although a finite rank exists 0; examples []
+(d) small calibration sets, alpha = 0.1
+  n= 1: TypeError: object of type 'numpy.float64' has no len()
+  n= 2: ValueError: Alpha is too small: (alpha=0.1, n=2) 0.1 < 0.3333333333333333 for at least one of its coordinates. Increase alpha or the size of the calibration set.
+  n= 5: ValueError: Alpha is too small: (alpha=0.1, n=5) 0.1 < 0.16666666666666666 for at least one of its coordinates. Increase alpha or the size of the calibration set.
+  n= 8: ValueError: Alpha is too small: (alpha=0.1, n=8) 0.1 < 0.1111111111111111 for at least one of its coordinates. Increase alpha or the size of the calibration set.
+  n= 9: interval -9.0, 9.0
+  n=10: interval -10.0, 10.0
+(e) weights (weight_func): exponential-decay weights on i.i.d. data must still cover; all-equal weights must equal no weights
+  SplitCP with weight_func: equal weights                        coverage 0.9019 (se 0.0012) ok; infinite 0.00
+  SplitCP with weight_func: decay 0.99 per step                  coverage 0.9106 (se 0.0014) ok; infinite 0.00
+  SplitCP with weight_func: random positive weights              coverage 0.9063 (se 0.0013) ok; infinite 0.00
+  equal weights give the same interval as no weights: True [1.58347288] [1.58347288]

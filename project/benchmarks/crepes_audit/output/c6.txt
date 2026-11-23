@@ -1,0 +1,18 @@
+online classification, 90%: coverage of the true label
+  standard      : 0.8986 (se 0.0012)
+  Mondrian      : 0.8986 (se 0.0012)
+  no warm start : 0.9000 (se 0.0012)
+online p-values (regression), true outcomes: uniform?
+  P(p<0.1) = 0.1002, P(p<0.05) = 0.0507, mean 0.5004
+percentiles of the predictive system: share of outcomes below the stated percentile
+  lower  5: 0.0491 (at most 0.05); higher 95: 0.9494 (at least 0.95)  ok
+  lower 10: 0.0979 (at most 0.1); higher 90: 0.8991 (at least 0.9)  ok
+  lower 25: 0.2447 (at most 0.25); higher 75: 0.7477 (at least 0.75)  ok
+  lower 50: 0.4948 (at most 0.5); higher 50: 0.4997 (at least 0.5)  ok
+pandas inputs and chaining
+  WrapRegressor.fit returns                                          NoneType
+  pandas frame with shuffled index: same intervals as NumPy          True
+  DifficultyEstimator on a DataFrame (k-NN)                          (100,)
+  MondrianCategorizer(learner=fitted model) then apply               ERROR NameError: name 'learner' is not defined
+  calibrate with y as a list                                         (100, 2)
+  WrapClassifier with string labels in a Series                      [['neg', 'pos'], ['neg'], ['neg'], ['neg', 'pos'], ['neg', 'pos']]

@@ -1,0 +1,6 @@
+k-NN residuals k=25: through WrapRegressor.calibrate(X, y, de=de, oob=True): 0.8810 (se 0.0021); with the stored leave-one-out estimates de.apply(): 0.8994 (se 0.0021); de.apply() equals de.apply(X_train): False
+k-NN residuals k= 5: through WrapRegressor.calibrate(X, y, de=de, oob=True): 0.8363 (se 0.0024); with the stored leave-one-out estimates de.apply(): 0.9044 (se 0.0016); de.apply() equals de.apply(X_train): False
+k-NN distance  k=25: through WrapRegressor.calibrate(X, y, de=de, oob=True): 0.9571 (se 0.0013); with the stored leave-one-out estimates de.apply(): 0.9007 (se 0.0020); de.apply() equals de.apply(X_train): False
+k-NN distance  k= 5: through WrapRegressor.calibrate(X, y, de=de, oob=True): 0.9974 (se 0.0004); with the stored leave-one-out estimates de.apply(): 0.8991 (se 0.0024); de.apply() equals de.apply(X_train): False
+k-NN labels    k=25: through WrapRegressor.calibrate(X, y, de=de, oob=True): 0.8981 (se 0.0022); with the stored leave-one-out estimates de.apply(): 0.9035 (se 0.0022); de.apply() equals de.apply(X_train): False
+k-NN labels    k= 5: through WrapRegressor.calibrate(X, y, de=de, oob=True): 0.8753 (se 0.0021); with the stored leave-one-out estimates de.apply(): 0.9019 (se 0.0021); de.apply() equals de.apply(X_train): False

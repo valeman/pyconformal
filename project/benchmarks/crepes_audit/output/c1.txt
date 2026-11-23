@@ -1,0 +1,138 @@
+(a) coverage, mean over 300 repetitions
+  ConformalRegressor         standard               n=  19 level 0.9: 0.9452 (se 0.0029) over; infinite 0.00
+  ConformalRegressor         standard               n=  19 level 0.95: 0.9452 (se 0.0029) ok; infinite 0.00
+  ConformalRegressor         standard               n=  19 level 0.99: 1.0000 (se 0.0000) ok; infinite 1.00
+  ConformalRegressor         standard               n=  49 level 0.9: 0.9190 (se 0.0024) over; infinite 0.00
+  ConformalRegressor         standard               n=  49 level 0.95: 0.9618 (se 0.0017) ok; infinite 0.00
+  ConformalRegressor         standard               n=  49 level 0.99: 1.0000 (se 0.0000) ok; infinite 1.00
+  ConformalRegressor         standard               n= 199 level 0.9: 0.9056 (se 0.0016) ok; infinite 0.00
+  ConformalRegressor         standard               n= 199 level 0.95: 0.9511 (se 0.0012) ok; infinite 0.00
+  ConformalRegressor         standard               n= 199 level 0.99: 0.9903 (se 0.0006) ok; infinite 0.00
+  ConformalRegressor         standard               n=1000 level 0.9: 0.8999 (se 0.0013) ok; infinite 0.00
+  ConformalRegressor         standard               n=1000 level 0.95: 0.9492 (se 0.0009) ok; infinite 0.00
+  ConformalRegressor         standard               n=1000 level 0.99: 0.9897 (se 0.0004) ok; infinite 0.00
+  ConformalRegressor         normalized             n=  19 level 0.9: 0.9469 (se 0.0031) over; infinite 0.00
+  ConformalRegressor         normalized             n=  19 level 0.95: 0.9469 (se 0.0031) ok; infinite 0.00
+  ConformalRegressor         normalized             n=  19 level 0.99: 1.0000 (se 0.0000) ok; infinite 1.00
+  ConformalRegressor         normalized             n=  49 level 0.9: 0.9225 (se 0.0025) over; infinite 0.00
+  ConformalRegressor         normalized             n=  49 level 0.95: 0.9616 (se 0.0019) ok; infinite 0.00
+  ConformalRegressor         normalized             n=  49 level 0.99: 1.0000 (se 0.0000) ok; infinite 1.00
+  ConformalRegressor         normalized             n= 199 level 0.9: 0.9053 (se 0.0017) ok; infinite 0.00
+  ConformalRegressor         normalized             n= 199 level 0.95: 0.9507 (se 0.0013) ok; infinite 0.00
+  ConformalRegressor         normalized             n= 199 level 0.99: 0.9905 (se 0.0006) ok; infinite 0.00
+  ConformalRegressor         normalized             n=1000 level 0.9: 0.9007 (se 0.0014) ok; infinite 0.00
+  ConformalRegressor         normalized             n=1000 level 0.95: 0.9497 (se 0.0011) ok; infinite 0.00
+  ConformalRegressor         normalized             n=1000 level 0.99: 0.9887 (se 0.0005) ok; infinite 0.00
+  ConformalRegressor         Mondrian               n=  19 level 0.9: 0.9930 (se 0.0016) over; infinite 0.93
+  ConformalRegressor         Mondrian               n=  19 level 0.95: 0.9987 (se 0.0013) over; infinite 1.00
+  ConformalRegressor         Mondrian               n=  19 level 0.99: 0.9987 (se 0.0013) ok; infinite 1.00
+  ConformalRegressor         Mondrian               n=  49 level 0.9: 0.9365 (se 0.0023) over; infinite 0.02
+  ConformalRegressor         Mondrian               n=  49 level 0.95: 0.9862 (se 0.0011) over; infinite 0.74
+  ConformalRegressor         Mondrian               n=  49 level 0.99: 1.0000 (se 0.0000) ok; infinite 1.00
+  ConformalRegressor         Mondrian               n= 199 level 0.9: 0.9071 (se 0.0016) ok; infinite 0.00
+  ConformalRegressor         Mondrian               n= 199 level 0.95: 0.9577 (se 0.0011) ok; infinite 0.00
+  ConformalRegressor         Mondrian               n= 199 level 0.99: 1.0000 (se 0.0000) ok; infinite 1.00
+  ConformalRegressor         Mondrian               n=1000 level 0.9: 0.9057 (se 0.0013) ok; infinite 0.00
+  ConformalRegressor         Mondrian               n=1000 level 0.95: 0.9528 (se 0.0010) ok; infinite 0.00
+  ConformalRegressor         Mondrian               n=1000 level 0.99: 0.9923 (se 0.0004) ok; infinite 0.00
+  ConformalRegressor         normalized + Mondrian  n=  19 level 0.9: 0.9956 (se 0.0008) over; infinite 0.94
+  ConformalRegressor         normalized + Mondrian  n=  19 level 0.95: 1.0000 (se 0.0000) over; infinite 1.00
+  ConformalRegressor         normalized + Mondrian  n=  19 level 0.99: 1.0000 (se 0.0000) ok; infinite 1.00
+  ConformalRegressor         normalized + Mondrian  n=  49 level 0.9: 0.9365 (se 0.0022) over; infinite 0.02
+  ConformalRegressor         normalized + Mondrian  n=  49 level 0.95: 0.9892 (se 0.0010) over; infinite 0.75
+  ConformalRegressor         normalized + Mondrian  n=  49 level 0.99: 1.0000 (se 0.0000) ok; infinite 1.00
+  ConformalRegressor         normalized + Mondrian  n= 199 level 0.9: 0.9056 (se 0.0018) ok; infinite 0.00
+  ConformalRegressor         normalized + Mondrian  n= 199 level 0.95: 0.9564 (se 0.0011) ok; infinite 0.00
+  ConformalRegressor         normalized + Mondrian  n= 199 level 0.99: 1.0000 (se 0.0000) ok; infinite 1.00
+  ConformalRegressor         normalized + Mondrian  n=1000 level 0.9: 0.8984 (se 0.0014) ok; infinite 0.00
+  ConformalRegressor         normalized + Mondrian  n=1000 level 0.95: 0.9491 (se 0.0010) ok; infinite 0.00
+  ConformalRegressor         normalized + Mondrian  n=1000 level 0.99: 0.9904 (se 0.0004) ok; infinite 0.00
+  ConformalPredictiveSystem  standard               n=  19 level 0.9: 0.9463 (se 0.0029) over; infinite 1.00
+  ConformalPredictiveSystem  standard               n=  19 level 0.95: 1.0000 (se 0.0000) over; infinite 1.00
+  ConformalPredictiveSystem  standard               n=  19 level 0.99: 1.0000 (se 0.0000) ok; infinite 1.00
+  ConformalPredictiveSystem  standard               n=  49 level 0.9: 0.9187 (se 0.0024) over; infinite 0.00
+  ConformalPredictiveSystem  standard               n=  49 level 0.95: 0.9627 (se 0.0017) ok; infinite 0.00
+  ConformalPredictiveSystem  standard               n=  49 level 0.99: 1.0000 (se 0.0000) ok; infinite 1.00
+  ConformalPredictiveSystem  standard               n= 199 level 0.9: 0.9057 (se 0.0017) ok; infinite 0.00
+  ConformalPredictiveSystem  standard               n= 199 level 0.95: 0.9518 (se 0.0013) ok; infinite 0.00
+  ConformalPredictiveSystem  standard               n= 199 level 0.99: 0.9905 (se 0.0005) ok; infinite 0.00
+  ConformalPredictiveSystem  standard               n=1000 level 0.9: 0.9002 (se 0.0013) ok; infinite 0.00
+  ConformalPredictiveSystem  standard               n=1000 level 0.95: 0.9492 (se 0.0010) ok; infinite 0.00
+  ConformalPredictiveSystem  standard               n=1000 level 0.99: 0.9898 (se 0.0005) ok; infinite 0.00
+  ConformalPredictiveSystem  normalized             n=  19 level 0.9: 0.9467 (se 0.0030) over; infinite 1.00
+  ConformalPredictiveSystem  normalized             n=  19 level 0.95: 1.0000 (se 0.0000) over; infinite 1.00
+  ConformalPredictiveSystem  normalized             n=  19 level 0.99: 1.0000 (se 0.0000) ok; infinite 1.00
+  ConformalPredictiveSystem  normalized             n=  49 level 0.9: 0.9229 (se 0.0025) over; infinite 0.00
+  ConformalPredictiveSystem  normalized             n=  49 level 0.95: 0.9629 (se 0.0017) ok; infinite 0.00
+  ConformalPredictiveSystem  normalized             n=  49 level 0.99: 1.0000 (se 0.0000) ok; infinite 1.00
+  ConformalPredictiveSystem  normalized             n= 199 level 0.9: 0.9058 (se 0.0017) ok; infinite 0.00
+  ConformalPredictiveSystem  normalized             n= 199 level 0.95: 0.9511 (se 0.0012) ok; infinite 0.00
+  ConformalPredictiveSystem  normalized             n= 199 level 0.99: 0.9902 (se 0.0006) ok; infinite 0.00
+  ConformalPredictiveSystem  normalized             n=1000 level 0.9: 0.9010 (se 0.0014) ok; infinite 0.00
+  ConformalPredictiveSystem  normalized             n=1000 level 0.95: 0.9490 (se 0.0011) ok; infinite 0.00
+  ConformalPredictiveSystem  normalized             n=1000 level 0.99: 0.9889 (se 0.0005) ok; infinite 0.00
+  ConformalPredictiveSystem  Mondrian               n=  19 level 0.9: 0.9987 (se 0.0013) over; infinite 1.00
+  ConformalPredictiveSystem  Mondrian               n=  19 level 0.95: 0.9987 (se 0.0013) over; infinite 1.00
+  ConformalPredictiveSystem  Mondrian               n=  19 level 0.99: 0.9987 (se 0.0013) ok; infinite 1.00
+  ConformalPredictiveSystem  Mondrian               n=  49 level 0.9: 0.9812 (se 0.0014) over; infinite 0.84
+  ConformalPredictiveSystem  Mondrian               n=  49 level 0.95: 1.0000 (se 0.0000) over; infinite 1.00
+  ConformalPredictiveSystem  Mondrian               n=  49 level 0.99: 1.0000 (se 0.0000) ok; infinite 1.00
+  ConformalPredictiveSystem  Mondrian               n= 199 level 0.9: 0.9134 (se 0.0016) ok; infinite 0.00
+  ConformalPredictiveSystem  Mondrian               n= 199 level 0.95: 0.9695 (se 0.0010) over; infinite 0.00
+  ConformalPredictiveSystem  Mondrian               n= 199 level 0.99: 1.0000 (se 0.0000) ok; infinite 1.00
+  ConformalPredictiveSystem  Mondrian               n=1000 level 0.9: 0.9070 (se 0.0013) ok; infinite 0.00
+  ConformalPredictiveSystem  Mondrian               n=1000 level 0.95: 0.9544 (se 0.0010) ok; infinite 0.00
+  ConformalPredictiveSystem  Mondrian               n=1000 level 0.99: 0.9948 (se 0.0003) ok; infinite 0.00
+  ConformalPredictiveSystem  normalized + Mondrian  n=  19 level 0.9: 1.0000 (se 0.0000) over; infinite 1.00
+  ConformalPredictiveSystem  normalized + Mondrian  n=  19 level 0.95: 1.0000 (se 0.0000) over; infinite 1.00
+  ConformalPredictiveSystem  normalized + Mondrian  n=  19 level 0.99: 1.0000 (se 0.0000) ok; infinite 1.00
+  ConformalPredictiveSystem  normalized + Mondrian  n=  49 level 0.9: 0.9815 (se 0.0014) over; infinite 0.83
+  ConformalPredictiveSystem  normalized + Mondrian  n=  49 level 0.95: 1.0000 (se 0.0000) over; infinite 1.00
+  ConformalPredictiveSystem  normalized + Mondrian  n=  49 level 0.99: 1.0000 (se 0.0000) ok; infinite 1.00
+  ConformalPredictiveSystem  normalized + Mondrian  n= 199 level 0.9: 0.9138 (se 0.0017) ok; infinite 0.00
+  ConformalPredictiveSystem  normalized + Mondrian  n= 199 level 0.95: 0.9684 (se 0.0010) over; infinite 0.00
+  ConformalPredictiveSystem  normalized + Mondrian  n= 199 level 0.99: 1.0000 (se 0.0000) ok; infinite 1.00
+  ConformalPredictiveSystem  normalized + Mondrian  n=1000 level 0.9: 0.8997 (se 0.0014) ok; infinite 0.00
+  ConformalPredictiveSystem  normalized + Mondrian  n=1000 level 0.95: 0.9505 (se 0.0010) ok; infinite 0.00
+  ConformalPredictiveSystem  normalized + Mondrian  n=1000 level 0.99: 0.9937 (se 0.0003) ok; infinite 0.00
+  ConformalClassifier        standard           smoothing=True  n=  49 level 0.9: 0.8992 (se 0.0026) ok; mean set size 2.54
+  ConformalClassifier        standard           smoothing=True  n= 199 level 0.9: 0.9008 (se 0.0017) ok; mean set size 2.52
+  ConformalClassifier        standard           smoothing=True  n=1000 level 0.9: 0.8988 (se 0.0013) ok; mean set size 2.52
+  ConformalClassifier        standard           smoothing=False n=  49 level 0.9: 0.9185 (se 0.0024) over; mean set size 2.69
+  ConformalClassifier        standard           smoothing=False n= 199 level 0.9: 0.9060 (se 0.0017) ok; mean set size 2.56
+  ConformalClassifier        standard           smoothing=False n=1000 level 0.9: 0.8989 (se 0.0013) ok; mean set size 2.52
+  ConformalClassifier        Mondrian           smoothing=True  n=  49 level 0.9: 0.8993 (se 0.0026) ok; mean set size 2.62
+  ConformalClassifier        Mondrian           smoothing=True  n= 199 level 0.9: 0.9006 (se 0.0018) ok; mean set size 2.54
+  ConformalClassifier        Mondrian           smoothing=True  n=1000 level 0.9: 0.8983 (se 0.0014) ok; mean set size 2.52
+  ConformalClassifier        Mondrian           smoothing=False n=  49 level 0.9: 0.9325 (se 0.0023) over; mean set size 2.90
+  ConformalClassifier        Mondrian           smoothing=False n= 199 level 0.9: 0.9091 (se 0.0017) ok; mean set size 2.60
+  ConformalClassifier        Mondrian           smoothing=False n=1000 level 0.9: 0.9000 (se 0.0014) ok; mean set size 2.53
+  ConformalClassifier        class-conditional  smoothing=True  n=  49 level 0.9: 0.8986 (se 0.0026) ok; mean set size 2.66
+  ConformalClassifier        class-conditional  smoothing=True  n= 199 level 0.9: 0.9003 (se 0.0018) ok; mean set size 2.55
+  ConformalClassifier        class-conditional  smoothing=True  n=1000 level 0.9: 0.8997 (se 0.0013) ok; mean set size 2.53
+  ConformalClassifier        class-conditional  smoothing=False n=  49 level 0.9: 0.9405 (se 0.0021) over; mean set size 3.07
+  ConformalClassifier        class-conditional  smoothing=False n= 199 level 0.9: 0.9120 (se 0.0017) ok; mean set size 2.64
+  ConformalClassifier        class-conditional  smoothing=False n=1000 level 0.9: 0.9017 (se 0.0013) ok; mean set size 2.54
+
+(b) rank used against the exact rank ceil((n+1) * level), residuals 1..n
+  ConformalRegressor level 0.8: exact 1597, one rank too high 399, infinite although a finite rank exists 1, other 0; examples (n, used, exact) [(4, inf, 4), (9, 9.0, 8), (14, 13.0, 12), (19, 17.0, 16), (24, 21.0, 20), (29, 25.0, 24)]
+  ConformalRegressor level 0.9: exact 1792, one rank too high 199, infinite although a finite rank exists 1, other 0; examples (n, used, exact) [(9, inf, 9), (19, 19.0, 18), (29, 28.0, 27), (39, 37.0, 36), (49, 46.0, 45), (59, 55.0, 54)]
+  ConformalRegressor level 0.95: exact 1982, one rank too high 0, infinite although a finite rank exists 0, other 0; examples (n, used, exact) []
+  ConformalRegressor level 0.975: exact 1962, one rank too high 0, infinite although a finite rank exists 0, other 0; examples (n, used, exact) []
+  ConformalRegressor level 0.99: exact 1902, one rank too high 0, infinite although a finite rank exists 0, other 0; examples (n, used, exact) []
+  ConformalPredictiveSystem level 0.8: exact 1792, wider than exact 200, NARROWER than exact 0; examples (n, used, exact) [(9, (-inf, 9.0), (1, 9)), (19, (1.0, 18.0), (2, 18)), (29, (2.0, 27.0), (3, 27)), (39, (3.0, 36.0), (4, 36)), (49, (4.0, 45.0), (5, 45)), (59, (5.0, 54.0), (6, 54))]
+  ConformalPredictiveSystem level 0.9: exact 1882, wider than exact 100, NARROWER than exact 0; examples (n, used, exact) [(19, (-inf, 19.0), (1, 19)), (39, (1.0, 38.0), (2, 38)), (59, (2.0, 57.0), (3, 57)), (79, (3.0, 76.0), (4, 76)), (99, (4.0, 95.0), (5, 95)), (119, (5.0, 114.0), (6, 114))]
+  ConformalPredictiveSystem level 0.95: exact 1962, wider than exact 0, NARROWER than exact 0; examples (n, used, exact) []
+  ConformalPredictiveSystem level 0.99: exact 1802, wider than exact 0, NARROWER than exact 0; examples (n, used, exact) []
+
+(c) a test object whose Mondrian category is absent from the calibration set
+  ConformalRegressor: prediction 10, category seen: [ 8.526 11.474] | category unseen: [0. 0.] | warnings raised: 0
+  ConformalPredictiveSystem: category seen: [ 8.098 11.802] | category unseen: [0. 0.]
+
+(d) does a call with seed= leave NumPy's global random state changed?
+  ConformalPredictiveSystem.predict(y=..., seed=0)              : next global draw RESET to the seeded stream
+  ConformalPredictiveSystem.predict(lower_percentiles=5, seed=0): next global draw changed (it consumed draws, as expected without a seed)
+  ConformalPredictiveSystem.fit(seed=0) then predict(y=...)     : next global draw RESET to the seeded stream
+  ConformalRegressor.predict_p(seed=0)                          : next global draw unchanged
+  ConformalClassifier.predict_set(seed=0)                       : next global draw unchanged
+  ConformalPredictiveSystem.predict(y=...) without seed         : next global draw changed (it consumed draws, as expected without a seed)

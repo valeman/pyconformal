@@ -1,0 +1,27 @@
+(a) EnbPI on i.i.d. data, linear model, 90%
+  EnbPI, no feedback                                   coverage 0.8959 (se 0.0055) ok
+  EnbPI, residuals updated every 1 step(s)             ERROR TypeError: 'numpy.float64' object is not iterable
+  EnbPI, residuals updated every 2 step(s)             coverage 0.8968 (se 0.0021) ok
+  EnbPI, residuals updated every 10 step(s)            coverage 0.8961 (se 0.0020) ok
+  EnbPI, residuals updated every 50 step(s)            coverage 0.8962 (se 0.0026) ok
+  AdaptiveEnbPI, no feedback                           coverage 0.8982 (se 0.0059) ok
+  AdaptiveEnbPI, residuals updated every 1 step(s)     ERROR IndexError: too many indices for array: array is 2-dimensional, but 3 were indexed
+  AdaptiveEnbPI, residuals updated every 2 step(s)     coverage 0.8992 (se 0.0020) ok
+  AdaptiveEnbPI, residuals updated every 10 step(s)    coverage 0.8994 (se 0.0023) ok
+  AdaptiveEnbPI, residuals updated every 50 step(s)    coverage 0.8991 (se 0.0027) ok
+(b) class-wise LAC: coverage inside each class, 4 classes of very different difficulty, 90%
+  LAC          : overall 0.9005; per class [0.998, 0.888, 0.622, 0.463]
+  ClasswiseLAC : overall 0.9007; per class [0.899, 0.902, 0.904, 0.904]
+(c) anomaly detection (SplitCAD): share of NORMAL points flagged must be at most alpha
+  alpha 0.1: normal points flagged 0.0000 (se 0.0000) ok; true anomalies flagged 0.000
+  alpha 0.05: normal points flagged 0.0000 (se 0.0000) ok; true anomalies flagged 0.000
+  alpha 0.01: normal points flagged 0.0000 (se 0.0000) ok; true anomalies flagged 0.000
+(d) object detection (SplitBoxWise): the outer box must contain the true box (all four sides) in at least 90% of cases
+  additive      : 0.9171 (se 0.0019) over
+  multiplicative: 0.8547 (se 0.0030) UNDER
+(e) metrics against hand calculations
+  regression_mean_coverage ok | regression_sharpness ok | regression_ace ok
+  classification_mean_coverage ok | classification_mean_size ok
+(f) APS when the threshold reaches 1 (the model always ranks the true class last in calibration)
+  rand=True: set sizes [3, 4]; true class covered in 0.850
+  rand=False: set sizes [4]; true class covered in 1.000

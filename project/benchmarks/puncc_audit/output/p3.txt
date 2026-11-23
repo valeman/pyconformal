@@ -1,0 +1,9 @@
+Share of test boxes whose true box lies inside the outer box (target at least 0.90). 300 calibration boxes, 1,000 test boxes.
+  symmetric errors                         additive      : PUNCC 0.9089 (its own metric: 0.9089); per side x_min 0.977, y_min 0.977, x_max 0.976, y_max 0.976; by definition (additive) 0.9115
+  symmetric errors                         multiplicative: PUNCC 0.8584 (its own metric: 0.8584); per side x_min 0.977, y_min 0.977, x_max 0.942, y_max 0.944
+  predicted boxes too small                additive      : PUNCC 0.0000 (its own metric: 0.0000); per side x_min 0.976, y_min 0.976, x_max 0.000, y_max 0.000; by definition (additive) 0.9050
+  predicted boxes too small                multiplicative: PUNCC 0.0000 (its own metric: 0.0000); per side x_min 0.978, y_min 0.975, x_max 0.000, y_max 0.000
+  predicted boxes too large                additive      : PUNCC 0.9570 (its own metric: 0.9570); per side x_min 0.978, y_min 0.979, x_max 1.000, y_max 1.000; by definition (additive) 0.9134
+  predicted boxes too large                multiplicative: PUNCC 0.9567 (its own metric: 0.9567); per side x_min 0.978, y_min 0.979, x_max 1.000, y_max 1.000
+  predicted boxes shifted right and down   additive      : PUNCC 0.9520 (its own metric: 0.9520); per side x_min 0.976, y_min 0.976, x_max 1.000, y_max 1.000; by definition (additive) 0.9085
+  predicted boxes shifted right and down   multiplicative: PUNCC 0.9523 (its own metric: 0.9523); per side x_min 0.977, y_min 0.975, x_max 1.000, y_max 1.000

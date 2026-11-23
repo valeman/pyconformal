@@ -1,0 +1,53 @@
+(e) p-values of true outcomes must be uniform: share below 0.1 and below 0.05 (smoothed)
+  continuous scores    ConformalRegressor.predict_p            : P(p<0.1) = 0.0976, P(p<0.05) = 0.0475, mean 0.5012  ok
+  continuous scores    ConformalPredictiveSystem.predict(y=)   : P(p<0.1) = 0.0977, P(p<0.05) = 0.0485, mean 0.5006  ok
+  continuous scores    ConformalClassifier.predict_p           : P(p<0.1) = 0.0979, P(p<0.05) = 0.0475, mean 0.5012  ok
+  heavily tied scores  ConformalRegressor.predict_p            : P(p<0.1) = 0.0986, P(p<0.05) = 0.0473, mean 0.5011  ok
+  heavily tied scores  ConformalPredictiveSystem.predict(y=)   : P(p<0.1) = 0.0993, P(p<0.05) = 0.0496, mean 0.4996  ok
+  heavily tied scores  ConformalClassifier.predict_p           : P(p<0.1) = 0.0989, P(p<0.05) = 0.0491, mean 0.5001  ok
+
+(f) online mode: intervals must equal a batch fit on calibration plus all earlier test points; and cover
+  ConformalRegressor         standard   : largest difference from batch 0.00e+00; coverage 0.9008 (se 0.0068) ok
+  ConformalRegressor         normalized : largest difference from batch 0.00e+00; coverage 0.9008 (se 0.0068) ok
+  ConformalRegressor         Mondrian   : largest difference from batch 0.00e+00; coverage 0.9108 (se 0.0068) ok
+  ConformalPredictiveSystem  standard   : largest difference from batch 0.00e+00; coverage 0.9075 (se 0.0063) ok
+  ConformalPredictiveSystem  normalized : largest difference from batch 0.00e+00; coverage 0.9075 (se 0.0063) ok
+  ConformalPredictiveSystem  Mondrian   : largest difference from batch 1.03e+00; coverage 0.9213 (se 0.0060) ok
+
+(g) wrappers end to end with a random forest, fresh test data, 90% level
+  split, standard                                            ERROR AttributeError: 'NoneType' object has no attribute 'calibrate'
+  split, predictive system                                   ERROR AttributeError: 'NoneType' object has no attribute 'calibrate'
+  split, difficulty: k-NN distance                           ERROR AttributeError: 'NoneType' object has no attribute 'calibrate'
+  split, difficulty: k-NN label spread                       ERROR AttributeError: 'NoneType' object has no attribute 'calibrate'
+  split, difficulty: k-NN out-of-bag residuals               ERROR AttributeError: 'NoneType' object has no attribute 'learner'
+  split, difficulty: k-NN in-sample residuals                ERROR AttributeError: 'NoneType' object has no attribute 'predict'
+  split, difficulty: forest variance                         ERROR AttributeError: 'NoneType' object has no attribute 'learner'
+  split, Mondrian categorizer (5 bins)                       ERROR AttributeError: 'NoneType' object has no attribute 'learner'
+  out-of-bag calibration, standard                           ERROR AttributeError: 'NoneType' object has no attribute 'calibrate'
+  out-of-bag calibration + forest-variance difficulty (oob)  ERROR AttributeError: 'NoneType' object has no attribute 'learner'
+  out-of-bag calibration + k-NN residual difficulty (oob)    ERROR AttributeError: 'NoneType' object has no attribute 'learner'
+  warn(
+  out-of-bag calibration, 200 rows, 20 trees                 ERROR AttributeError: 'NoneType' object has no attribute 'calibrate'
+  WrapClassifier, hinge                                      ERROR AttributeError: 'NoneType' object has no attribute 'calibrate'
+  WrapClassifier, margin                                     ERROR AttributeError: 'NoneType' object has no attribute 'calibrate'
+  WrapClassifier, class-conditional                          ERROR AttributeError: 'NoneType' object has no attribute 'calibrate'
+  WrapClassifier, out-of-bag                                 ERROR AttributeError: 'NoneType' object has no attribute 'calibrate'
+  WrapClassifier, hinge, no smoothing                        ERROR AttributeError: 'NoneType' object has no attribute 'calibrate'
+
+(h) evaluate() against hand calculations
+  ConformalRegressor: {'error': 'ok', 'eff_mean': 'ok', 'eff_med': 'ok'} | keys ['eff_mean', 'eff_med', 'error', 'ks_test', 'time_evaluate', 'time_fit']
+  ConformalPredictiveSystem, standard  : CRPS crepes 0.63679; by definition on crepes' own distributions 0.63679 (closed form 0.63679)  ok
+  ConformalPredictiveSystem, normalized: CRPS crepes 0.60511; by definition on crepes' own distributions 0.60085 (closed form 0.60085)  DIFFERS by +0.7%
+  ConformalClassifier: {'error': 'ok', 'avg_c': 'ok', 'one_c': 'ok', 'empty': 'ok'} | keys ['avg_c', 'empty', 'error', 'ks_test', 'one_c', 'time_evaluate', 'time_fit']
+
+(i) martingales on uniform p-values: share of runs in which the martingale ever reaches 20 (must be at most 0.05)
+  SimpleJumper                               uniform: 0.0417 ok; after a change at step 500: 1.000
+  SleeperStayer                              uniform: 0.0183 ok; after a change at step 500: 1.000
+  SleeperDrifter                             uniform: 0.0167 ok; after a change at step 500: 1.000
+  Composite(SimpleJumper, SleeperStayer)     uniform: 0.0283 ok; after a change at step 500: 1.000
+  a second SimpleJumper built after another one was used gives the same path as a fresh one: True
+  semi_online_p_values on i.i.d. scores: P(p<0.1) = 0.1000, mean 0.5004
+
+(j) binning()
+  10 bins of 1,000 values: sizes [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+  10 bins of heavily tied values: sizes [100, 100, 100, 100, 100, 100, 100, 100, 100, 100] | equal values always in the same bin: False

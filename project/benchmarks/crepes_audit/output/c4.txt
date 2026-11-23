@@ -1,0 +1,23 @@
+Regression
+  out-of-bag, no difficulty estimate                                 n= 900 level 0.9: coverage 0.9020 (se 0.0019) ok; median width 4.83
+  out-of-bag + forest variance (oob=True)                            n= 900 level 0.9: coverage 0.9011 (se 0.0019) ok; median width 5.19
+  out-of-bag + k-NN distance (oob=True)                              n= 900 level 0.9: coverage 0.9569 (se 0.0013) over; median width 7.80
+  out-of-bag + k-NN label spread (oob=True)                          n= 900 level 0.9: coverage 0.8983 (se 0.0018) ok; median width 4.81
+  out-of-bag + k-NN residuals (oob=True), k=25                       n= 900 level 0.9: coverage 0.8807 (se 0.0017) UNDER; median width 4.47
+  out-of-bag + k-NN residuals (oob=True), k=5                        n= 900 level 0.9: coverage 0.8361 (se 0.0020) UNDER; median width 3.91
+  split (2/3 train, 1/3 calibration) + k-NN residuals                n= 900 level 0.9: coverage 0.8984 (se 0.0033) ok; median width 4.99
+  out-of-bag, no difficulty estimate                                 n= 300 level 0.9: coverage 0.8998 (se 0.0029) ok; median width 4.93
+  out-of-bag + forest variance (oob=True)                            n= 300 level 0.9: coverage 0.9071 (se 0.0031) ok; median width 6.12
+  out-of-bag + k-NN distance (oob=True)                              n= 300 level 0.9: coverage 0.9616 (se 0.0018) over; median width 10.07
+  out-of-bag + k-NN label spread (oob=True)                          n= 300 level 0.9: coverage 0.8988 (se 0.0028) ok; median width 5.35
+  out-of-bag + k-NN residuals (oob=True), k=25                       n= 300 level 0.9: coverage 0.8854 (se 0.0031) UNDER; median width 4.99
+  out-of-bag + k-NN residuals (oob=True), k=5                        n= 300 level 0.9: coverage 0.8304 (se 0.0031) UNDER; median width 4.22
+  split (2/3 train, 1/3 calibration) + k-NN residuals                n= 300 level 0.9: coverage 0.9067 (se 0.0047) ok; median width 6.55
+  out-of-bag + k-NN residuals (oob=True), k=25                       n= 900 level 0.95: coverage 0.9325 (se 0.0015) UNDER; median width 5.54
+  out-of-bag + k-NN residuals (oob=True), k=25                       n= 900 level 0.8: coverage 0.7897 (se 0.0022) UNDER; median width 3.41
+Classification
+  WrapClassifier, hinge                 : coverage 0.9011 (se 0.0031) ok; mean set size 1.51; per class [0.879, 0.887, 0.931]
+  WrapClassifier, margin                : coverage 0.9033 (se 0.0036) ok; mean set size 1.57; per class [0.887, 0.891, 0.927]
+  WrapClassifier, class-conditional     : coverage 0.9017 (se 0.0031) ok; mean set size 1.54; per class [0.909, 0.904, 0.894]
+  WrapClassifier, out-of-bag            : coverage 0.9067 (se 0.0023) ok; mean set size 1.51; per class [0.886, 0.894, 0.934]
+  WrapClassifier, hinge, no smoothing   : coverage 0.9044 (se 0.0031) ok; mean set size 1.53; per class [0.883, 0.89, 0.934]

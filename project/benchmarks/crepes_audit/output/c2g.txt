@@ -1,0 +1,19 @@
+
+(g) wrappers end to end with a random forest, fresh test data, 90% level
+  split, standard                                            coverage 0.8964 (se 0.0041) ok; median width 4.83
+  split, predictive system                                   coverage 0.8942 (se 0.0041) ok; median width 4.83
+  split, difficulty: k-NN distance                           coverage 0.9032 (se 0.0032) ok; median width 5.60
+  split, difficulty: k-NN label spread                       coverage 0.9004 (se 0.0040) ok; median width 5.05
+  split, difficulty: k-NN out-of-bag residuals               coverage 0.8968 (se 0.0037) ok; median width 4.95
+  split, difficulty: k-NN in-sample residuals                coverage 0.8961 (se 0.0035) ok; median width 4.99
+  split, difficulty: forest variance                         coverage 0.8971 (se 0.0047) ok; median width 4.89
+  split, Mondrian categorizer (5 bins)                       ERROR NameError: name 'learner' is not defined
+  out-of-bag calibration, standard                           coverage 0.8998 (se 0.0027) ok; median width 4.82
+  out-of-bag calibration + forest-variance difficulty (oob)  coverage 0.9027 (se 0.0023) ok; median width 5.22
+  out-of-bag calibration + k-NN residual difficulty (oob)    coverage 0.8803 (se 0.0027) UNDER; median width 4.44
+  out-of-bag calibration, 200 rows, 20 trees                 coverage 0.9094 (se 0.0033) ok; median width 5.29
+  WrapClassifier, hinge                                      ERROR ValueError: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (1000,) + inhomoge
+  WrapClassifier, margin                                     ERROR ValueError: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (1000,) + inhomoge
+  WrapClassifier, class-conditional                          ERROR ValueError: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (1000,) + inhomoge
+  WrapClassifier, out-of-bag                                 ERROR ValueError: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (1000,) + inhomoge
+  WrapClassifier, hinge, no smoothing                        ERROR ValueError: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (1000,) + inhomoge

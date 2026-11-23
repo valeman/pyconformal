@@ -1,0 +1,20 @@
+APS, rand=True             predicting    1 row(s) per call: coverage 0.4543 (target 0.90), mean set size 1.00, largest set 1.0
+APS, rand=True             predicting    2 row(s) per call: coverage 0.6813 (target 0.90), mean set size 1.99, largest set 2.0
+APS, rand=True             predicting    5 row(s) per call: coverage 0.8883 (target 0.90), mean set size 3.74, largest set 4.0
+APS, rand=True             predicting   20 row(s) per call: coverage 0.8975 (target 0.90), mean set size 3.80, largest set 4.1
+APS, rand=True             predicting 1000 row(s) per call: coverage 0.8977 (target 0.90), mean set size 3.80, largest set 4.2
+APS, rand=False            predicting    1 row(s) per call: coverage 0.4546 (target 0.90), mean set size 1.00, largest set 1.0
+APS, rand=False            predicting    2 row(s) per call: coverage 0.6832 (target 0.90), mean set size 2.00, largest set 2.0
+APS, rand=False            predicting    5 row(s) per call: coverage 0.9380 (target 0.90), mean set size 4.54, largest set 4.7
+APS, rand=False            predicting   20 row(s) per call: coverage 0.9614 (target 0.90), mean set size 4.94, largest set 5.2
+APS, rand=False            predicting 1000 row(s) per call: coverage 0.9614 (target 0.90), mean set size 4.94, largest set 5.2
+RAPS, lambd=0.01, k_reg=2  predicting    1 row(s) per call: coverage 0.4545 (target 0.90), mean set size 1.00, largest set 1.0
+RAPS, lambd=0.01, k_reg=2  predicting    2 row(s) per call: coverage 0.6828 (target 0.90), mean set size 1.99, largest set 2.0
+RAPS, lambd=0.01, k_reg=2  predicting    5 row(s) per call: coverage 0.8945 (target 0.90), mean set size 3.79, largest set 4.0
+RAPS, lambd=0.01, k_reg=2  predicting   20 row(s) per call: coverage 0.9035 (target 0.90), mean set size 3.86, largest set 4.2
+RAPS, lambd=0.01, k_reg=2  predicting 1000 row(s) per call: coverage 0.9028 (target 0.90), mean set size 3.86, largest set 4.3
+LAC                        predicting    1 row(s) per call: coverage 0.8917 (target 0.90), mean set size 3.64, largest set 3.9
+LAC                        predicting    2 row(s) per call: coverage 0.8917 (target 0.90), mean set size 3.64, largest set 3.9
+LAC                        predicting    5 row(s) per call: coverage 0.8917 (target 0.90), mean set size 3.64, largest set 3.9
+LAC                        predicting   20 row(s) per call: coverage 0.8976 (target 0.90), mean set size 3.64, largest set 4.0
+LAC                        predicting 1000 row(s) per call: coverage 0.8976 (target 0.90), mean set size 3.64, largest set 4.0

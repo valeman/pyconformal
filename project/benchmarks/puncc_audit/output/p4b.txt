@@ -1,0 +1,10 @@
+   19 calibration points, alpha 0.1: normal points flagged 0.1006 (se 0.0015); exact conformal rule gives 0.1000  ok
+   19 calibration points, alpha 0.05: ValueError: All coordinates of [q] must be in the open interval (0, 1).
+   20 calibration points, alpha 0.1: normal points flagged 0.0951 (se 0.0014); exact conformal rule gives 0.0952  ok
+   20 calibration points, alpha 0.05: normal points flagged 0.0486 (se 0.0010); exact conformal rule gives 0.0476  ok
+   99 calibration points, alpha 0.1: normal points flagged 0.0994 (se 0.0007); exact conformal rule gives 0.1000  ok
+   99 calibration points, alpha 0.05: normal points flagged 0.0504 (se 0.0005); exact conformal rule gives 0.0500  ok
+  100 calibration points, alpha 0.1: normal points flagged 0.0984 (se 0.0007); exact conformal rule gives 0.0990  ok
+  100 calibration points, alpha 0.05: normal points flagged 0.0499 (se 0.0005); exact conformal rule gives 0.0495  ok
+  500 calibration points, alpha 0.1: normal points flagged 0.1002 (se 0.0005); exact conformal rule gives 0.0998  ok
+  500 calibration points, alpha 0.05: normal points flagged 0.0501 (se 0.0003); exact conformal rule gives 0.0499  ok

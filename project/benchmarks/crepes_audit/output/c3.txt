@@ -1,0 +1,4 @@
+Mondrian predictive system, online against batch refit: 4 of 80 steps differ; first: step, online, batch, calibration size in that category = (7, array([-1.42677385,  2.00239258]), array([-1.42677385,  1.68910745]), 39)
+  by hand: category has 39 residuals; lower rank 2, upper rank 38: [-1.4015, 1.6891]
+  online Mondrian predictive system, two categories with different noise: coverage 0.9213 (se 0.0015) at 90%
+  per category: low-noise 0.9216, high-noise 0.9219
