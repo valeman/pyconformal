@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.4 (23 November 2026)
 
 - `SplitConformalClassifier`: `groups=` at `calibrate` and `predict_set` for Mondrian conformal prediction by any category, with `group_thresholds()`.
 - Documentation site: one page per method with a runnable minimal example, a "What's inside" index and an FAQ. Every example is run by the tests.

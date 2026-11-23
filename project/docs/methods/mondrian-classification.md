@@ -12,7 +12,7 @@ Prediction sets with one threshold per category (`groups=`) or per class (`class
 | **Example needs** | pyconformal, scikit-learn |
 
 !!! note
-    `groups=` on the classifier is new after version 0.1.3. Until the next release, install the development version: `pip install "pyconformal @ git+https://github.com/valeman/pyconformal"`. `class_conditional=True` works in 0.1.3.
+    `groups=` on the classifier needs pyconformal 0.1.4 or later. `class_conditional=True` works in earlier versions too.
 
 ## Minimal example
 
