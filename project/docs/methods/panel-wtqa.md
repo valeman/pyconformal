@@ -59,7 +59,7 @@ print("split, worst 10% of units:", round(split.tail_coverage(0.1), 3))
 
 ## Checked against the paper
 
-On the M5 panel the package reproduces the paper's table: W-TQA average coverage 0.925 (paper 0.925), coverage of the worst 10% of units 0.843 (paper 0.847), against 0.566 (paper 0.579) for split conformal. Details: [benchmarks/wtqa](https://github.com/valeman/pyconformal/tree/main/project/benchmarks/wtqa).
+On the M5 panel the package reproduces the paper's table: W-TQA average coverage 0.925 (paper 0.925), coverage of the worst 10% of units 0.843 (paper 0.847), against 0.566 (paper 0.579) for split conformal. On the SGSC household electricity panel it does the same (0.857 against 0.858). Details: [benchmarks/wtqa](https://github.com/valeman/pyconformal/tree/main/project/benchmarks/wtqa).
 
 ## More
 

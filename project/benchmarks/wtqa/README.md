@@ -30,7 +30,22 @@ Where our pipeline differs from the paper, because the paper does not give the d
 | Standard deviation divisor in the profile metric | not stated | n |
 | Data source | Kaggle | `m5-benchmarks` public mirror (sales, SNAP, prices) |
 
-Not checked: the synthetic panels (their parameters are not published), HF, SGSC and the cross-market panel, and the baselines TQA-B and LPCI.
+## 2b. The paper's SGSC table
+
+Smart-Grid Smart-City (Australian Government, data.gov.au, CC BY 3.0 AU): half-hourly electricity use of households with plain load (no solar generation, no controlled load). Burn-in 3,984 half-hours to 17 March 2013, then 600 rounds; 280 calibration and 120 test households per split; 30 splits; feedback on 20% of rounds; same settings as M5.
+
+| Method | Average coverage | Tail coverage (worst 10% of units) | Relative width | Width CoV |
+|---|---|---|---|---|
+| Split CP | 0.901 ± 0.011 (0.902 ± 0.014) | 0.638 ± 0.044 (0.646 ± 0.048) | 1.000 (1.000) | 0.351 (0.346) |
+| TQA-only | 0.923 ± 0.005 (0.924 ± 0.006) | 0.833 ± 0.011 (0.836 ± 0.010) | 1.011 (1.024) | 0.487 (0.489) |
+| W-only | 0.930 ± 0.008 (0.933 ± 0.010) | 0.763 ± 0.035 (0.763 ± 0.038) | 1.213 (1.297) | 0.553 (0.566) |
+| W-TQA | 0.933 ± 0.004 (0.935 ± 0.005) | 0.857 ± 0.009 (0.858 ± 0.009) | 1.130 (1.172) | 0.627 (0.621) |
+
+Every coverage figure is within one standard deviation of the paper's. Run in `sgsc/`: `extract.py 2012-12-20 2013-04-02` (streams the 1.7 GB archive, 345 million rows, 4 minutes), `build.py`, `sgsc_wtqa.py 30` (83 s).
+
+Differences from the paper: 1,760 households pass our eligibility rule (complete readings and survey flags) against the paper's 400, so 400 are drawn at random per split; 30 attribute columns against 31; the ridge is fit on 600 sampled burn-in rounds; penalty 1.0.
+
+Not checked: the synthetic panels (their parameters are not published), the HF hourly and cross-market panels, and the baselines TQA-B and LPCI.
 
 ## 3. `finite=False`, the package default
 
