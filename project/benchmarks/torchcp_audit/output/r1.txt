@@ -1,0 +1,9 @@
+90% target, 1,000 calibration rows, 2,000 test rows
+  ABS    coverage 0.9024 (se 0.0011) ok; mean width 4.631; raw band coverage before the conformal step nan; mean q_hat 2.3154
+  CQR    coverage 0.9023 (se 0.0010) ok; mean width 4.173; raw band coverage before the conformal step 0.5759; mean q_hat 1.0483
+  CQRR   coverage 0.5759 (se 0.0010) UNDER; mean width 2.076; raw band coverage before the conformal step 0.5759; mean q_hat 0.5325
+  CQRM   coverage 0.9014 (se 0.0011) ok; mean width 4.287; raw band coverage before the conformal step 0.5759; mean q_hat 1.0649
+  CQRFM  coverage 0.9014 (se 0.0011) ok; mean width 4.287; raw band coverage before the conformal step 0.5759; mean q_hat 2.0649
+p-values of the true y (SplitPredictor.predict_p), ABS
+  smooth=True: n=20000, P(p <= 0.1) = 0.1031, P(p <= 0.05) = 0.0496
+  smooth=False: n=20000, P(p <= 0.1) = 0.1026, P(p <= 0.05) = 0.0493

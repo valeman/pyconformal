@@ -1,0 +1,4 @@
+  APS            coverage 0.9019 (se 0.0037), mean set size 2.05
+  DAPS           coverage 0.9030 (se 0.0040), mean set size 1.43
+  SNAPS          coverage 0.9006 (se 0.0040), mean set size 1.42
+  NAPSPredictor  coverage 0.9072 (se 0.0013), mean set size 2.15

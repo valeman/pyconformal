@@ -1,0 +1,18 @@
+ACIPredictor, gamma 0.005, target miss rate 0.10, 3000 steps; Gibbs-Candes bound on the miss rate: 0.1603
+  i.i.d.                                                 TorchCP miss 0.0998 (max 0.1010), infinite steps 0.000, lowest alpha_t 1.0000 | reference miss 0.0999 (max 0.1007), infinite steps 0.000
+  series trends, model fixed (error grows 0.02 a step)   TorchCP miss 0.1047 (max 0.1053), infinite steps 0.000, lowest alpha_t 0.0050 | reference miss 0.1057 (max 0.1060), infinite steps 0.021
+  random-walk error                                      TorchCP miss 0.1227 (max 0.1353), infinite steps 0.000, lowest alpha_t 0.0050 | reference miss 0.1003 (max 0.1040), infinite steps 0.059
+  noise scale grows 1% a step                            TorchCP miss 0.1047 (max 0.1057), infinite steps 0.000, lowest alpha_t 0.0050 | reference miss 0.1058 (max 0.1060), infinite steps 0.024
+  noise scale x5 at step 1500                            TorchCP miss 0.0998 (max 0.1010), infinite steps 0.000, lowest alpha_t 1.0000 | reference miss 0.0999 (max 0.1007), infinite steps 0.000
+ACIPredictor, gamma 0.05, target miss rate 0.10, 3000 steps; Gibbs-Candes bound on the miss rate: 0.1063
+  i.i.d.                                                 TorchCP miss 0.1000 (max 0.1010), infinite steps 0.000, lowest alpha_t 0.0050 | reference miss 0.0999 (max 0.1003), infinite steps 0.013
+  series trends, model fixed (error grows 0.02 a step)   TorchCP miss 0.1102 (max 0.1120), infinite steps 0.000, lowest alpha_t 0.0050 | reference miss 0.1007 (max 0.1007), infinite steps 0.389
+  random-walk error                                      TorchCP miss 0.1398 (max 0.1510), infinite steps 0.000, lowest alpha_t 0.0050 | reference miss 0.0991 (max 0.1007), infinite steps 0.140
+  noise scale grows 1% a step                            TorchCP miss 0.1099 (max 0.1113), infinite steps 0.000, lowest alpha_t 0.0050 | reference miss 0.1007 (max 0.1007), infinite steps 0.393
+  noise scale x5 at step 1500                            TorchCP miss 0.1009 (max 0.1020), infinite steps 0.000, lowest alpha_t 0.0050 | reference miss 0.0999 (max 0.1003), infinite steps 0.022
+AgACIPredictor, gamma_list [0.001, 0.01, 0.05, 0.1], default settings
+  i.i.d.                                                 miss 0.0997 (max 0.1020); the four experts got identical weights at every step: True
+  series trends, model fixed (error grows 0.02 a step)   miss 0.4454 (max 0.4517); the four experts got identical weights at every step: True
+  random-walk error                                      miss 0.2747 (max 0.3167); the four experts got identical weights at every step: True
+  noise scale grows 1% a step                            miss 0.3818 (max 0.3873); the four experts got identical weights at every step: True
+  noise scale x5 at step 1500                            miss 0.1111 (max 0.1150); the four experts got identical weights at every step: True

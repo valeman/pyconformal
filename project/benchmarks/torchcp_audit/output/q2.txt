@@ -1,0 +1,25 @@
+(a) ClusteredPredictor(LAC), 90% target: share of classes whose threshold is infinite (always in every set)
+  4 balanced classes, 2,000 calibration rows: classes with infinite threshold 1.00; coverage 1.0000, mean set size 4.00 of 4 | plain SplitPredictor: coverage 0.8979, size 0.93
+  10 balanced classes, 5,000 rows: classes with infinite threshold 1.00; coverage 1.0000, mean set size 10.00 of 10 | plain SplitPredictor: coverage 0.8964, size 1.13
+  100 balanced classes, 10,000 rows: classes with infinite threshold 0.00; coverage 0.9022, mean set size 6.22 of 100 | plain SplitPredictor: coverage 0.8996, size 6.00
+  100 classes, 30 of them rare (about 8 rows each), 10,000 rows: classes with infinite threshold 0.30; coverage 0.9032, mean set size 34.30 of 100 | plain SplitPredictor: coverage 0.9008, size 5.98
+(b) RC3PPredictor.calculate_threshold called directly (as SplitPredictor allows)
+  TypeError: full(): argument 'size' must be tuple of ints, not tuple
+(c0) NorABS + SplitPredictor.predict on batches of different size (model returns mean and spread, shape (n, 2), as documented)
+  variance, batch of 1: ok, output shape (1, 1, 2)
+  variance, batch of 2: RuntimeError: The expanded size of the tensor (1) must match the existing size (2) at non-singleton dimension 1. Target sizes: [2, 1]. Tensor sizes: [2, 2]
+  variance, batch of 64: RuntimeError: The expanded size of the tensor (1) must match the existing size (64) at non-singleton dimension 1. Target sizes: [64, 1]. Tensor sizes: [64, 64]
+  knn_distance, batch of 1: ok, output shape (1, 1, 2)
+  knn_distance, batch of 2: RuntimeError: The expanded size of the tensor (1) must match the existing size (2) at non-singleton dimension 1. Target sizes: [2, 1]. Tensor sizes: [2, 2]
+  knn_distance, batch of 64: RuntimeError: The expanded size of the tensor (1) must match the existing size (64) at non-singleton dimension 1. Target sizes: [64, 1]. Tensor sizes: [64, 64]
+(c) NorABS(knn_*), 90% target (coverage computed from the scores, because predict fails, see c0): neighbours taken from a separate set (as the example does) or from the calibration set (as the docstring says: 'Calibration dataset')
+  knn_residual  k= 5: separate set 0.9036 (se 0.0028); calibration set 0.8361 (se 0.0034) UNDER
+  knn_residual  k=20: separate set 0.9035 (se 0.0025); calibration set 0.8866 (se 0.0032) UNDER
+  knn_label     k= 5: separate set 0.9023 (se 0.0030); calibration set 0.8463 (se 0.0031) UNDER
+  knn_label     k=20: separate set 0.9033 (se 0.0027); calibration set 0.8887 (se 0.0028) UNDER
+  knn_distance  k= 5: separate set 0.9043 (se 0.0027); calibration set 0.9707 (se 0.0014)
+  knn_distance  k=20: separate set 0.9058 (se 0.0028); calibration set 0.9370 (se 0.0021)
+(d) KNN score with SplitPredictor, 90% target, train features separate from calibration
+  coverage 0.9065 (se 0.0022)
+(e) EnsemblePredictor (EnbPI), i.i.d. data, linear model, 300 training rows, 5 models, 90% target
+  coverage 0.9011 (se 0.0045); out-of-bag scores kept 292 of 300

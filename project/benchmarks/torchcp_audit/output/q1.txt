@@ -1,0 +1,55 @@
+(a) SplitPredictor, 90% target, 1,000 calibration rows; coverage with all test rows in one call and with one row per call
+  LAC                          one call 0.8977 (se 0.0019) ok; one row per call 0.8971; mean set size 3.64
+  APS                          one call 0.8968 (se 0.0021) ok; one row per call 0.8931; mean set size 3.79
+  APS, not randomized          one call 0.8981 (se 0.0022) ok; one row per call 0.8963; mean set size 3.94
+  RAPS(penalty=0.01, kreg=2)   one call 0.8976 (se 0.0020) ok; one row per call 0.8944; mean set size 3.78
+  SAPS(weight=0.2)             one call 0.8979 (se 0.0020) ok; one row per call 0.8962; mean set size 3.81
+  Margin                       one call 0.8967 (se 0.0020) ok; one row per call 0.8957; mean set size 5.71
+  TOPK                         one call 0.8993 (se 0.0021) ok; one row per call 0.8976; mean set size 3.97
+  TOPK, not randomized         one call 0.9198 (se 0.0033) ok; one row per call 0.9186; mean set size 4.37
+  EntmaxScore                  one call 0.8979 (se 0.0020) ok; one row per call 0.8975; mean set size 3.66
+(b) small calibration sets, LAC and APS, 90% and 95%
+  LAC n=  9 alpha=0.1: 0.8968 (se 0.0065) ok; threshold infinite in 0.00 of runs
+  LAC n=  9 alpha=0.05: 1.0000 (se 0.0000) over; threshold infinite in 1.00 of runs
+  LAC n= 19 alpha=0.1: 0.9020 (se 0.0043) ok; threshold infinite in 0.00 of runs
+  LAC n= 19 alpha=0.05: 0.9551 (se 0.0029) ok; threshold infinite in 0.00 of runs
+  LAC n= 20 alpha=0.1: 0.9043 (se 0.0043) ok; threshold infinite in 0.00 of runs
+  LAC n= 20 alpha=0.05: 0.9524 (se 0.0029) ok; threshold infinite in 0.00 of runs
+  LAC n= 49 alpha=0.1: 0.8982 (se 0.0031) ok; threshold infinite in 0.00 of runs
+  LAC n= 49 alpha=0.05: 0.9594 (se 0.0021) ok; threshold infinite in 0.00 of runs
+  LAC n= 99 alpha=0.1: 0.8999 (se 0.0022) ok; threshold infinite in 0.00 of runs
+  LAC n= 99 alpha=0.05: 0.9483 (se 0.0015) ok; threshold infinite in 0.00 of runs
+  APS n=  9 alpha=0.1: 0.8989 (se 0.0062) ok; threshold infinite in 0.00 of runs
+  APS n=  9 alpha=0.05: 1.0000 (se 0.0000) over; threshold infinite in 1.00 of runs
+  APS n= 19 alpha=0.1: 0.8979 (se 0.0043) ok; threshold infinite in 0.00 of runs
+  APS n= 19 alpha=0.05: 0.9518 (se 0.0028) ok; threshold infinite in 0.00 of runs
+  APS n= 20 alpha=0.1: 0.9055 (se 0.0044) ok; threshold infinite in 0.00 of runs
+  APS n= 20 alpha=0.05: 0.9521 (se 0.0030) ok; threshold infinite in 0.00 of runs
+  APS n= 49 alpha=0.1: 0.8969 (se 0.0031) ok; threshold infinite in 0.00 of runs
+  APS n= 49 alpha=0.05: 0.9594 (se 0.0022) ok; threshold infinite in 0.00 of runs
+  APS n= 99 alpha=0.1: 0.8994 (se 0.0021) ok; threshold infinite in 0.00 of runs
+  APS n= 99 alpha=0.05: 0.9483 (se 0.0016) ok; threshold infinite in 0.00 of runs
+(c) exact rank of calculate_conformal_value, scores 1..n
+  alpha 0.2: exact 1997, one rank too high 0, TOO LOW 0, infinite although a finite rank exists 0; examples (n, used, exact) []
+  alpha 0.1: exact 1992, one rank too high 0, TOO LOW 0, infinite although a finite rank exists 0; examples (n, used, exact) []
+  alpha 0.05: exact 1982, one rank too high 0, TOO LOW 0, infinite although a finite rank exists 0; examples (n, used, exact) []
+  alpha 0.025: exact 1962, one rank too high 0, TOO LOW 0, infinite although a finite rank exists 0; examples (n, used, exact) []
+  alpha 0.01: exact 1902, one rank too high 0, TOO LOW 0, infinite although a finite rank exists 0; examples (n, used, exact) []
+(d) class-conditional, clustered and RC3P predictors: coverage inside each class; 4 classes of very different difficulty
+  SplitPredictor             LAC: overall 0.9015; per class [0.999, 0.923, 0.685, 0.531]; mean set size 1.17
+  SplitPredictor             APS: overall 0.8998; per class [0.944, 0.937, 0.783, 0.658]; mean set size 1.42
+  ClassConditionalPredictor  LAC: overall 0.9011; per class [0.9, 0.902, 0.898, 0.909]; mean set size 1.59
+  ClassConditionalPredictor  APS: overall 0.8985; per class [0.898, 0.898, 0.896, 0.908]; mean set size 1.91
+  ClusteredPredictor         LAC: overall 0.9950; per class [0.995, 0.998, 0.987, 0.996]; mean set size 3.88
+  ClusteredPredictor         APS: overall 0.9900; per class [0.992, 0.99, 0.983, 0.991]; mean set size 3.78
+  RC3PPredictor              LAC: overall 0.9163; per class [0.906, 0.932, 0.926, 0.909]; mean set size 1.76
+  RC3PPredictor              APS: overall 0.9136; per class [0.903, 0.926, 0.928, 0.911]; mean set size 2.03
+(e) p-values of the true label (SplitPredictor.predict_p needs a model; computed here through an identity model)
+  smooth=True: P(p <= 0.1) = 0.1011, P(p <= 0.05) = 0.0488, mean 0.5039
+  smooth=False: P(p <= 0.1) = 0.1004, P(p <= 0.05) = 0.0487, mean 0.5064
+(f) does a score change the caller's tensor?
+  Margin(score_type='identity')   : input unchanged after scoring with labels: False; after scoring all labels: True   e.g. row 0 now [0.29899999499320984, 0.4490000009536743, 0.008999999612569809, 0.0010000000474974513, -1.0]
+  LAC(score_type='identity')      : input unchanged after scoring with labels: True; after scoring all labels: True
+  APS(score_type='identity')      : input unchanged after scoring with labels: True; after scoring all labels: True
+  SAPS(score_type='identity')     : input unchanged after scoring with labels: True; after scoring all labels: True
+  Margin() with softmax           : input unchanged after scoring with labels: True; after scoring all labels: True
