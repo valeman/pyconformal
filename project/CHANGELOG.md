@@ -3,6 +3,8 @@
 ## Unreleased
 
 - New: `WeightedTQA`, online conformal prediction for panel data (W-TQA, Tu and Giesecke, arXiv:2605.17705; TQA as the equal-weight case). Identical to a line-by-line reference of the paper's Algorithm 1, reproduces the paper's M5 and SGSC tables, 250x to 370x faster than the reference loop. Infinite sets are kept by default (`finite=False`); `finite=True` gives the paper's finitization.
+- New: `MultiQT` (Ding, Gibbs and Tibshirani, arXiv:2512.23671): calibrated quantile forecasts at many levels at once, online, never crossing. Same forecasts as the authors' code to 1e-15, 15 times faster; many series in one call; missing outcomes.
+- New: `PanelPredictiveSystem`: a predictive distribution for each unit of a panel (W-TQA's weighted cross-section as the base, MultiQT as the online correction under partial feedback).
 
 ## 0.1.4 (23 November 2026)
 

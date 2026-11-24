@@ -61,6 +61,8 @@ nav:
       - "Multi-step forecasts: MSCP and AcMCP": methods/multi-step.md
       - "EnbPI and SPCI": methods/enbpi-spci.md
       - "Panel data: W-TQA and TQA": methods/panel-wtqa.md
+      - "Predictive distributions for panels": methods/panel-distribution.md
+      - "MultiQT: calibrated quantiles online": methods/multiqt.md
       - "Conformal Seasonal Pools": methods/csp.md
       - "STL and MSTL decomposition": methods/stl-mstl.md
     - Building blocks:

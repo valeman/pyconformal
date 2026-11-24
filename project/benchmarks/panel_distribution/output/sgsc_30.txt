@@ -1,0 +1,7 @@
+SGSC: 30 splits, feedback on 20% of rounds; 600 rounds, 280 calibration units, 120 targets, 19 levels; 0.92 s per run of the method
+  variant | per-unit calibration error | worst 10% of units | pinball | worst 10% | central 90% coverage | worst 10% | 90% width | pooled worst-level error
+  equal weights: base only (no adjustment)                       | 0.109 | 0.244 | 0.0411 | 0.0910 | 0.901 | 0.606 | 0.519 | 0.023
+  equal weights: PanelPredictiveSystem                           | 0.027 | 0.051 | 0.0392 | 0.0770 | 0.902 | 0.851 | 0.494 | 0.008
+  similarity weights: base only (no adjustment)                  | 0.103 | 0.244 | 0.0416 | 0.0936 | 0.929 | 0.720 | 0.595 | 0.027
+  similarity weights: PanelPredictiveSystem                      | 0.026 | 0.051 | 0.0393 | 0.0769 | 0.908 | 0.860 | 0.524 | 0.008
+  similarity weights, step floor 0.02: PanelPredictiveSystem     | 0.029 | 0.055 | 0.0377 | 0.0764 | 0.931 | 0.865 | 0.562 | 0.017

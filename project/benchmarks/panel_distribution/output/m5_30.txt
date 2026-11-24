@@ -1,0 +1,7 @@
+M5: 30 splits, feedback on 20% of rounds; 600 rounds, 454 calibration units, 194 targets, 19 levels; 1.55 s per run of the method
+  variant | per-unit calibration error | worst 10% of units | pinball | worst 10% | central 90% coverage | worst 10% | 90% width | pooled worst-level error
+  equal weights: base only (no adjustment)                       | 0.123 | 0.253 | 0.2156 | 0.4125 | 0.897 | 0.571 | 2.365 | 0.024
+  equal weights: PanelPredictiveSystem                           | 0.031 | 0.061 | 0.1828 | 0.3166 | 0.936 | 0.869 | 2.167 | 0.027
+  similarity weights: base only (no adjustment)                  | 0.116 | 0.239 | 0.2071 | 0.3766 | 0.925 | 0.724 | 2.313 | 0.030
+  similarity weights: PanelPredictiveSystem                      | 0.030 | 0.059 | 0.1804 | 0.3035 | 0.929 | 0.881 | 2.093 | 0.020
+  similarity weights, step floor 0.02: PanelPredictiveSystem     | 0.030 | 0.059 | 0.1804 | 0.3035 | 0.929 | 0.881 | 2.094 | 0.020

@@ -35,10 +35,14 @@ from pyconformal.venn_abers import CrossVennAbers, VennAbers
 
 __version__ = "0.1.4"
 
-from .panel import PanelResult, WeightedTQA
+from .multiqt import MultiQT, QuantileResult
+from .panel import PanelPredictiveSystem, PanelResult, WeightedTQA
 
 __all__ = [
     "WeightedTQA",
+    "MultiQT",
+    "QuantileResult",
+    "PanelPredictiveSystem",
     "PanelResult",
     "APS",
     "AcMCP",

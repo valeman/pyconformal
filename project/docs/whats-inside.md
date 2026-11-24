@@ -51,6 +51,8 @@ Every method in pyconformal. Click a name for a minimal example you can run.
 | [Multi-step forecasts: MSCP and AcMCP](methods/multi-step.md) | Intervals for forecasts several steps ahead, one calibration per horizon. | `MultiStepSplitConformal`, `AcMCP` |
 | [EnbPI and SPCI](methods/enbpi-spci.md) | Bootstrap ensembles that give intervals without a calibration set, with residuals sliding forward. | `EnbPI`, `SPCI` |
 | [Panel data: W-TQA and TQA](methods/panel-wtqa.md) | Prediction sets for one unit of a panel, calibrated on the other units in the same round. | `WeightedTQA` |
+| [Predictive distributions for panels](methods/panel-distribution.md) | A full predictive distribution for each unit of a panel, corrected online with the unit's own outcomes. | `PanelPredictiveSystem` |
+| [MultiQT](methods/multiqt.md) | Quantile forecasts at many levels kept calibrated under drift, never crossing. | `MultiQT` |
 | [Conformal Seasonal Pools](methods/csp.md) | A training-free probabilistic forecaster for seasonal series. | `ConformalSeasonalPool` |
 | [STL and MSTL decomposition](methods/stl-mstl.md) | Fast trend and seasonal decomposition, for one or several seasonal periods. | `stl`, `mstl` |
 
@@ -76,6 +78,7 @@ Every method in pyconformal. Click a name for a minimal example you can run.
 | Predictive distribution, CDF, CRPS | [Conformal predictive systems](methods/predictive-systems.md) |
 | Online, distribution shift, drift | [ACI](methods/aci.md), [DtACI, AgACI, PID, NexCP](methods/dtaci-agaci-pid-nexcp.md) |
 | Panel data, cross-section, many series, hierarchical retail | [Panel data: W-TQA and TQA](methods/panel-wtqa.md) |
+| Quantile forecasts under drift, calibrated quantiles, quantile crossing, probabilistic forecast recalibration | [MultiQT](methods/multiqt.md) |
 | Forecast horizons | [Multi-step forecasts](methods/multi-step.md) |
 | APS, RAPS, SAPS, LAC, THR | [Classification scores](methods/classification.md) |
 

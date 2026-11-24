@@ -36,8 +36,9 @@ import numpy as np
 
 from ._panel_kernel import HAVE_NUMBA, round_thresholds
 from ._quantile import _check_alpha
+from .multiqt import MultiQT, QuantileResult
 
-__all__ = ["WeightedTQA", "PanelResult"]
+__all__ = ["WeightedTQA", "PanelResult", "PanelPredictiveSystem"]
 
 _TOL = 1e-12
 
@@ -322,4 +323,121 @@ class WeightedTQA:
         res = PanelResult(q, (St <= q) & valid, al, fb,
                           None if P_t is None else np.stack([P_t - q, P_t + q], axis=-1))
         res._valid = valid
+        return res
+
+
+class PanelPredictiveSystem:
+    """A predictive distribution for each target unit of a panel.
+
+    Each round, the base distribution of a target is the weighted
+    distribution of its peers' signed forecast errors in that round, with
+    W-TQA's similarity weights (Tu and Giesecke, 2026). The quantiles of
+    that base at ``levels`` are then adjusted online, per target, by MultiQT
+    (Ding, Gibbs and Tibshirani, 2025), using the target's own outcome on
+    the rounds where it is revealed. The quantiles never cross.
+
+    Parameters
+    ----------
+    levels : sequence of float, optional
+        Probability levels; default 0.05, 0.10, ..., 0.95.
+    bandwidth : float, default=0.6
+        Kernel bandwidth of the similarity weights; ``np.inf`` for equal weights.
+    lr, lr_window, lr_floor
+        Step-size settings of :class:`MultiQT`. ``lr_floor`` is in outcome
+        units: lower it when forecast errors are much smaller than 1.
+
+    Notes
+    -----
+    The base quantiles are confined to the range of the peers' errors in the
+    round; the adjustment can move outside that range.
+
+    Guarantee: MultiQT's offsets move only on revealed rounds, so its
+    calibration result applies to the sequence of revealed rounds of each
+    target: with bounded errors, the share of revealed rounds with the
+    outcome at or below the level-q quantile tends to q, for every level and
+    any data. If which rounds are revealed does not depend on the outcomes,
+    the same holds on average over all rounds. Nothing is promised for a
+    target that is never revealed, beyond what its peers provide.
+
+    Examples
+    --------
+    >>> pps = PanelPredictiveSystem()
+    >>> res = pps.run(y_pred_cal=P_cal, y_cal=Y_cal, X_cal=X_cal,
+    ...               y_pred_target=P_tgt, y_target=Y_tgt, X_target=X_tgt, revealed=seen)
+    >>> res.quantiles.shape          # (n_rounds, n_targets, n_levels)
+    >>> res.interval(0.1)            # central 90% intervals
+    """
+
+    def __init__(self, levels=None, bandwidth: float = 0.6, lr="adaptive", lr_window: int = 50, lr_floor: float = 0.1):
+        self.levels = np.round(np.arange(0.05, 0.96, 0.05), 2) if levels is None else np.asarray(levels, dtype=float).ravel()
+        self._weights = WeightedTQA(bandwidth=bandwidth)
+        self._tracker = MultiQT(self.levels, lr=lr, lr_window=lr_window, lr_floor=lr_floor)
+        self.bandwidth = self._weights.bandwidth
+
+    def start(self, n_cal: int, n_targets: int = 1, n_features: int = 0):
+        """Reset the state."""
+        self._weights.start(n_cal, n_targets, n_features)
+        self._tracker.start(n_targets)
+        return self
+
+    def base_quantiles(self, resid_cal):
+        """Quantiles, at ``levels``, of the weighted distribution of this round's peer errors: (n_targets, n_levels)."""
+        r = np.asarray(resid_cal, dtype=float).ravel()
+        M, K = self._weights.n_targets_, self.levels.size
+        ok = ~np.isnan(r)
+        if not ok.any():
+            return np.zeros((M, K))
+        order = np.argsort(r[ok], kind="stable")
+        rs = r[ok][order]
+        W = self._weights.weights()
+        kap = W[:, :-1][:, ok][:, order]
+        tot = kap.sum(axis=1) + W[:, -1]
+        cum = np.cumsum(kap, axis=1) / tot[:, None]
+        w_tgt = W[:, -1] / tot
+        need = self.levels[None, :] - 0.5 * w_tgt[:, None] - _TOL        # half of the target's own mass at each end
+        n = rs.size
+        cum[:, -1] = np.maximum(cum[:, -1], 1.0 - w_tgt)                 # guard the last cumulative value against rounding
+        flat = (cum + 2.0 * np.arange(M)[:, None]).ravel()
+        idx = np.searchsorted(flat, (need + 2.0 * np.arange(M)[:, None]).ravel(), side="left").reshape(M, K) - n * np.arange(M)[:, None]
+        return rs[np.clip(idx, 0, n - 1)]
+
+    def predict(self, resid_cal):
+        """Ordered quantiles of each target's error for this round, and the base they were built from."""
+        base = self.base_quantiles(resid_cal)
+        return self._tracker.predict(base), base
+
+    def update(self, played, base, resid_target=None, observed=None, X_cal=None, X_target=None):
+        """Close the round: feed the targets' own errors where revealed, and the features for the weights."""
+        self._tracker.begin_round()
+        if resid_target is not None:
+            self._tracker.update(resid_target, played, base, observed)
+        self._tracker.end_round()
+        self._weights.update(X_cal, X_target)
+        return self
+
+    def run(self, *, y_pred_cal, y_cal, y_pred_target, y_target, X_cal=None, X_target=None, revealed=None):
+        """Replay a panel. Shapes as in :meth:`WeightedTQA.run`. Returns a :class:`QuantileResult` whose
+        quantiles are on the outcome scale (target forecast plus error quantile)."""
+        Rc = np.asarray(y_cal, dtype=float) - np.asarray(y_pred_cal, dtype=float)
+        Pt = np.asarray(y_pred_target, dtype=float)
+        Pt = Pt[:, None] if Pt.ndim == 1 else Pt
+        Yt = np.asarray(y_target, dtype=float)
+        Yt = Yt[:, None] if Yt.ndim == 1 else Yt
+        Rt = Yt - Pt
+        T, N = Rc.shape
+        M = Rt.shape[1]
+        use_x = X_cal is not None and np.isfinite(self.bandwidth)
+        if use_x:
+            Xc = np.asarray(X_cal, dtype=float).reshape(T, N, -1)
+            Xt = np.asarray(X_target, dtype=float).reshape(T, M, -1)
+        R = np.ones((T, M), dtype=bool) if revealed is None else np.asarray(revealed, dtype=bool)
+        R = np.broadcast_to(R[:, None] if R.ndim == 1 else R, (T, M))
+        self.start(N, M, Xc.shape[2] if use_x else 0)
+        Q = np.empty((T, M, self.levels.size))
+        B = np.empty_like(Q)
+        for t in range(T):
+            Q[t], B[t] = self.predict(Rc[t])
+            self.update(Q[t], B[t], Rt[t], R[t], Xc[t] if use_x else None, Xt[t] if use_x else None)
+        res = QuantileResult(Q + Pt[:, :, None], self.levels, Yt)
+        res.base_quantiles = B + Pt[:, :, None]
         return res
