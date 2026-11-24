@@ -96,3 +96,35 @@ def test_panel_predictive_system():
     q, b = live.predict(Y[0, :N] - P[0, :N])
     live.update(q, b, Y[0, N:] - P[0, N:], observed=np.ones(30, bool))
     assert q.shape == (30, 19)
+
+
+def test_cdf_is_a_distribution_function_and_interval_checks_levels():
+    from pyconformal import QuantileResult
+    r = QuantileResult(np.array([[[0.0, 1.0]]]), np.array([0.05, 0.95]), np.zeros((1, 1)))
+    assert r.cdf(-1e-9).item() == 0.0 and r.cdf(0.0).item() == 0.05 and abs(r.cdf(0.5).item() - 0.5) < 1e-12
+    assert r.cdf(1.0).item() == 1.0 and r.cdf(np.nextafter(1.0, np.inf)).item() == 1.0       # right-continuous at the top
+    tied = QuantileResult(np.array([[[2.0, 2.0, 2.0]]]), np.array([0.1, 0.5, 0.9]), np.zeros((1, 1)))
+    assert tied.cdf(2.0).item() == 1.0 and tied.cdf(1.999).item() == 0.0
+    lo, hi = r.cdf_bounds(0.5)
+    assert lo.item() == 0.05 and hi.item() == 0.95
+    lo, hi = r.cdf_bounds(5.0)
+    assert lo.item() == 0.95 and hi.item() == 1.0
+    assert r.interval(0.1).shape == (1, 1, 2)
+    with pytest.raises(ValueError):
+        r.interval(0.02)
+
+
+def test_static_features_and_empty_rounds_shortcuts_change_nothing():
+    from pyconformal import PanelPredictiveSystem
+    rng = np.random.default_rng(3)
+    T, N, M = 80, 60, 12
+    Xs = np.repeat(rng.normal(size=(1, N + M, 3)), T, axis=0)                 # static profiles
+    Xd = Xs + 0.1 * rng.normal(size=(T, N + M, 3))                            # moving profiles
+    y = rng.normal(size=(T, N + M)); R = rng.random(T) < 0.3
+    for X in (Xs, Xd):
+        p = PanelPredictiveSystem(); p.start(N, M, 3); Q = np.empty((T, M, 19))
+        for t in range(T):                                                    # long way: no shortcut taken
+            Q[t], b = p.predict(y[t, :N]); p._tracker.begin_round(); p._tracker.update(y[t, N:], Q[t], b, np.full(M, R[t])); p._tracker.end_round()
+            p._weights._mean_update(p._weights._mu_cal, p._weights._cnt_cal, X[t, :N]); p._weights._mean_update(p._weights._mu_tgt, p._weights._cnt_tgt, X[t, N:]); p._weights._refresh_kappa()
+        res = PanelPredictiveSystem().run(y_pred_cal=np.zeros((T, N)), y_cal=y[:, :N], y_pred_target=np.zeros((T, M)), y_target=y[:, N:], X_cal=X[:, :N], X_target=X[:, N:], revealed=R)
+        assert np.array_equal(res.quantiles, Q)

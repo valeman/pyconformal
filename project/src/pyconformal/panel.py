@@ -241,16 +241,20 @@ class WeightedTQA:
             self.alpha_t_ = np.where(rev, self.alpha_t_ + self.gamma * (self.alpha - np.nan_to_num(m)), self.alpha_t_)
             self.n_revealed_ += rev
         if self.n_features_ and X_cal is not None:
-            self._mean_update(self._mu_cal, self._cnt_cal, np.asarray(X_cal, dtype=float).reshape(self.n_cal_, -1))
-            self._mean_update(self._mu_tgt, self._cnt_tgt, np.asarray(X_target, dtype=float).reshape(self.n_targets_, -1))
-            self._refresh_kappa()
+            c1 = self._mean_update(self._mu_cal, self._cnt_cal, np.asarray(X_cal, dtype=float).reshape(self.n_cal_, -1))
+            c2 = self._mean_update(self._mu_tgt, self._cnt_tgt, np.asarray(X_target, dtype=float).reshape(self.n_targets_, -1))
+            if c1 or c2 or self._geom is None:    # unchanged means (static features): keep the weights
+                self._refresh_kappa()
         return self
 
     @staticmethod
     def _mean_update(mu, cnt, X):
         ok = ~np.isnan(X).any(axis=1)
+        same = bool(np.all(cnt[ok] >= 1.0)) and np.array_equal(X[ok], mu[ok])   # a mean of equal values does not move
         cnt[ok] += 1.0
-        mu[ok] += (X[ok] - mu[ok]) / cnt[ok][:, None]
+        if not same:
+            mu[ok] += (X[ok] - mu[ok]) / cnt[ok][:, None]
+        return not same
 
     def _refresh_kappa(self):
         if not np.isfinite(self.bandwidth):
@@ -351,13 +355,19 @@ class PanelPredictiveSystem:
     The base quantiles are confined to the range of the peers' errors in the
     round; the adjustment can move outside that range.
 
-    Guarantee: MultiQT's offsets move only on revealed rounds, so its
-    calibration result applies to the sequence of revealed rounds of each
-    target: with bounded errors, the share of revealed rounds with the
-    outcome at or below the level-q quantile tends to q, for every level and
-    any data. If which rounds are revealed does not depend on the outcomes,
-    the same holds on average over all rounds. Nothing is promised for a
-    target that is never revealed, beyond what its peers provide.
+    Guarantee, for a fixed step (``lr`` a number) and bounded errors:
+    MultiQT's offsets move only on revealed rounds, so its calibration
+    result applies to the sequence of revealed rounds of each target: the
+    share of revealed rounds with the outcome at or below the level-q
+    quantile tends to q as the number of revealed rounds grows, for every
+    level and any data. If each round is revealed with the same probability
+    whatever the outcome, the same holds over all rounds. Nothing is
+    promised for a target that is never revealed, beyond what its peers
+    provide. The default ``lr="adaptive"`` is the heuristic of the MultiQT
+    paper and carries no such guarantee: sequences exist on which it stays
+    miscalibrated. The output is a grid of ordered quantiles, not a full
+    distribution function; see :meth:`QuantileResult.cdf` for the convention
+    used to read probabilities off it.
 
     Examples
     --------
@@ -409,7 +419,7 @@ class PanelPredictiveSystem:
     def update(self, played, base, resid_target=None, observed=None, X_cal=None, X_target=None):
         """Close the round: feed the targets' own errors where revealed, and the features for the weights."""
         self._tracker.begin_round()
-        if resid_target is not None:
+        if resid_target is not None and (observed is None or np.any(observed)):   # nothing revealed: nothing to compute
             self._tracker.update(resid_target, played, base, observed)
         self._tracker.end_round()
         self._weights.update(X_cal, X_target)

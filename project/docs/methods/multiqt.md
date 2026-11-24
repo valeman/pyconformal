@@ -6,7 +6,7 @@ Takes quantile (or point) forecasts from any model and adjusts them after every 
 | | |
 |---|---|
 | **Use it when** | You issue quantile forecasts or a predictive distribution for a time series and the data drift. |
-| **Guarantee** | With bounded forecast errors, for any sequence: the share of rounds with the outcome at or below the level-q quantile tends to q, at every level; quantiles are ordered every round. |
+| **Guarantee** | With a fixed step (`lr=` a number) and bounded forecast errors, for any sequence: the share of rounds with the outcome at or below the level-q quantile tends to q, at every level. Quantiles are ordered every round with any step. The default adaptive step is the authors' heuristic and has no such guarantee. |
 | **In the library** | `MultiQT`, `QuantileResult` |
 | **Source** | Ding, Gibbs and Tibshirani (2025), arXiv:2512.23671 |
 | **Example needs** | pyconformal |

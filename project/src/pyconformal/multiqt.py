@@ -56,20 +56,41 @@ class QuantileResult:
         return np.nanmean(np.maximum(self.levels * d, (self.levels - 1) * d), axis=(0, 2))
 
     def interval(self, alpha: float = 0.1) -> np.ndarray:
-        """Central interval between the levels closest to alpha/2 and 1 - alpha/2: (n_rounds, n_series, 2)."""
+        """Central interval between the levels alpha/2 and 1 - alpha/2: (n_rounds, n_series, 2).
+        Both levels must be on the grid; otherwise a ``ValueError`` names the intervals that are available."""
         lo = int(np.argmin(np.abs(self.levels - alpha / 2)))
         hi = int(np.argmin(np.abs(self.levels - (1 - alpha / 2))))
+        if abs(self.levels[lo] - alpha / 2) > 1e-9 or abs(self.levels[hi] - (1 - alpha / 2)) > 1e-9:
+            ok = sorted({round(float(2 * a), 10) for a in self.levels if a < 0.5 and np.any(np.abs(self.levels - (1 - a)) < 1e-9)})
+            raise ValueError(f"levels {alpha / 2:g} and {1 - alpha / 2:g} are not both on the grid; available alpha: {ok}")
         return self.quantiles[:, :, [lo, hi]]
 
     def cdf(self, y) -> np.ndarray:
-        """Predictive probability that the outcome is at most ``y`` (scalar or (n_rounds, n_series)),
-        by linear interpolation between the quantile levels; 0 below the lowest and 1 above the highest."""
+        """Probability that the outcome is at most ``y`` (scalar or (n_rounds, n_series)), read off the quantile grid.
+
+        A grid of quantiles does not fix the tails, so a convention is needed: linear interpolation between the
+        quantiles, with the mass below the lowest level placed at the lowest quantile and the mass above the
+        highest level placed at the highest quantile. The result is a proper distribution function (right-continuous,
+        0 below the lowest quantile, 1 from the highest quantile on). :meth:`cdf_bounds` gives the range of
+        probabilities that the grid alone supports."""
         y = np.broadcast_to(np.asarray(y, dtype=float), self.quantiles.shape[:2])
-        out = np.empty(y.shape)
-        for t in range(y.shape[0]):
-            for i in range(y.shape[1]):
-                out[t, i] = np.interp(y[t, i], self.quantiles[t, i], self.levels, left=0.0, right=1.0)
-        return out
+        Q, L = self.quantiles, self.levels
+        K = L.size
+        k = (Q <= y[:, :, None]).sum(axis=2)                              # knots at or below y
+        a = np.clip(k - 1, 0, K - 1)
+        b = np.clip(k, 0, K - 1)
+        qa = np.take_along_axis(Q, a[:, :, None], 2)[:, :, 0]
+        qb = np.take_along_axis(Q, b[:, :, None], 2)[:, :, 0]
+        gap = np.where(qb > qa, qb - qa, 1.0)
+        mid = L[a] + (L[b] - L[a]) * (y - qa) / gap
+        return np.where(k == 0, 0.0, np.where(k == K, 1.0, mid))
+
+    def cdf_bounds(self, y):
+        """Lowest and highest probability of ``outcome <= y`` consistent with the grid: two arrays (n_rounds, n_series)."""
+        y = np.broadcast_to(np.asarray(y, dtype=float), self.quantiles.shape[:2])
+        k = (self.quantiles <= y[:, :, None]).sum(axis=2)
+        L = np.concatenate([[0.0], self.levels, [1.0]])
+        return L[k], L[k + 1]
 
 
 def _row_quantile(A, p):
@@ -114,10 +135,12 @@ class MultiQT:
 
     Notes
     -----
-    Guarantee (the paper's Theorem 2): if the errors of the base forecasts
-    are bounded, the share of rounds with ``y <= q_level`` converges to the
-    level, for every level, for any sequence; the quantiles are ordered at
-    every round. Outcomes that arrive late or never are handled: an offset
+    Guarantee (the paper's Theorems 1 and 2), for a fixed step: if the
+    errors of the base forecasts are bounded, the share of rounds with
+    ``y <= q_level`` converges to the level, for every level, for any
+    sequence. The adaptive step is the paper's heuristic and is not covered
+    by the theorems: sequences exist on which it stays miscalibrated. The
+    quantiles are ordered at every round with either step. Outcomes that arrive late or never are handled: an offset
     moves only when an outcome is observed, using the forecast that was
     issued for that round.
 
