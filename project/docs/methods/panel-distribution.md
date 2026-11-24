@@ -50,6 +50,7 @@ p_below_zero = res.cdf(0.0)                  # P(y <= 0), interpolated between t
 - The step must be on the scale of the forecast errors. The example sets it from the peers' errors in the first round.
 - The output is a grid of quantiles. `cdf` reads a probability off it by interpolation, with the mass beyond the outer levels placed at the outer quantiles; `cdf_bounds` gives the range the grid alone supports. `interval` accepts only levels on the grid.
 - Outcomes that arrive many rounds late make the correction overshoot.
+- For outcomes that cannot go below a bound (counts, or `log(1 + y)`), pass `lower=0.0` to `run`: no quantile is issued below it.
 
 ## On real panels
 

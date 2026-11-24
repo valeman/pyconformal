@@ -182,7 +182,7 @@ class MultiQT:
         self._errors.append(np.full((self.n_series_, self.levels.size), np.nan))   # slot for this round's own outcomes
         self._grads = []
 
-    def update(self, y, played, base, observed=None, age: int = 0):
+    def update(self, y, played, base, observed=None, age: int = 0, frozen=None):
         """Feed outcomes. ``y`` (n_series,); ``played`` and ``base`` are the arrays of the round the outcomes
         belong to, which was ``age`` rounds ago; ``observed``: bool per series (default: all that are not nan).
         Call between :meth:`begin_round` and :meth:`end_round`."""
@@ -192,7 +192,10 @@ class MultiQT:
         if age < len(self._errors):                       # the adaptive step looks at outcomes of the last lr_window rounds
             slot = self._errors[-1 - age]
             slot[obs] = np.abs(y[:, None] - b)[obs]
-        self._grads.append((obs, (y[:, None] <= played) - self.levels[None, :]))
+        g = (y[:, None] <= played) - self.levels[None, :]
+        if frozen is not None:                              # levels that carry no information this round (see PanelPredictiveSystem, ``lower``)
+            g = np.where(frozen, 0.0, g)
+        self._grads.append((obs, g))
 
     def end_round(self):
         """Apply the steps for the outcomes fed since :meth:`begin_round`."""

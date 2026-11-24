@@ -128,3 +128,16 @@ def test_static_features_and_empty_rounds_shortcuts_change_nothing():
             p._weights._mean_update(p._weights._mu_cal, p._weights._cnt_cal, X[t, :N]); p._weights._mean_update(p._weights._mu_tgt, p._weights._cnt_tgt, X[t, N:]); p._weights._refresh_kappa()
         res = PanelPredictiveSystem().run(y_pred_cal=np.zeros((T, N)), y_cal=y[:, :N], y_pred_target=np.zeros((T, M)), y_target=y[:, N:], X_cal=X[:, :N], X_target=X[:, N:], revealed=R)
         assert np.array_equal(res.quantiles, Q)
+
+
+def test_lower_bound_keeps_quantiles_in_the_support():
+    from pyconformal import PanelPredictiveSystem
+    rng = np.random.default_rng(5)
+    T, N, M = 200, 80, 15
+    y = np.maximum(rng.normal(0.3, 1.0, size=(T, N + M)), 0.0)                 # outcomes with an atom at zero
+    pred = np.full((T, N + M), 0.5); R = rng.random(T) < 0.3
+    kw = dict(y_pred_cal=pred[:, :N], y_cal=y[:, :N], y_pred_target=pred[:, N:], y_target=y[:, N:], revealed=R)
+    free = PanelPredictiveSystem(lr=0.2).run(**kw); kept = PanelPredictiveSystem(lr=0.2).run(lower=0.0, **kw)
+    assert free.quantiles.min() < 0 and kept.quantiles.min() >= 0
+    assert np.all(np.diff(kept.quantiles, axis=2) >= 0)
+    assert kept.pinball.mean() <= free.pinball.mean() + 1e-9

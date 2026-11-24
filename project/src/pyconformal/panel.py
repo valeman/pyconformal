@@ -411,23 +411,32 @@ class PanelPredictiveSystem:
         idx = np.searchsorted(flat, (need + 2.0 * np.arange(M)[:, None]).ravel(), side="left").reshape(M, K) - n * np.arange(M)[:, None]
         return rs[np.clip(idx, 0, n - 1)]
 
-    def predict(self, resid_cal):
-        """Ordered quantiles of each target's error for this round, and the base they were built from."""
+    def predict(self, resid_cal, lower=None):
+        """Ordered quantiles of each target's error for this round, and the base they were built from.
+        ``lower``: per target, the smallest error possible this round (outcome bound minus forecast); quantiles are kept above it."""
         base = self.base_quantiles(resid_cal)
-        return self._tracker.predict(base), base
+        played = self._tracker.predict(base)
+        if lower is not None:
+            played = np.maximum(played, np.asarray(lower, dtype=float).reshape(-1, 1))
+        return played, base
 
-    def update(self, played, base, resid_target=None, observed=None, X_cal=None, X_target=None):
+    def update(self, played, base, resid_target=None, observed=None, X_cal=None, X_target=None, lower=None):
         """Close the round: feed the targets' own errors where revealed, and the features for the weights."""
         self._tracker.begin_round()
         if resid_target is not None and (observed is None or np.any(observed)):   # nothing revealed: nothing to compute
-            self._tracker.update(resid_target, played, base, observed)
+            frozen = None
+            if lower is not None:                          # outcome and quantile both at the bound: the round says nothing about that level
+                lo = np.asarray(lower, dtype=float).reshape(-1, 1) + 1e-12
+                frozen = (played <= lo) & (np.asarray(resid_target, dtype=float).reshape(-1, 1) <= lo)
+            self._tracker.update(resid_target, played, base, observed, frozen=frozen)
         self._tracker.end_round()
         self._weights.update(X_cal, X_target)
         return self
 
-    def run(self, *, y_pred_cal, y_cal, y_pred_target, y_target, X_cal=None, X_target=None, revealed=None):
+    def run(self, *, y_pred_cal, y_cal, y_pred_target, y_target, X_cal=None, X_target=None, revealed=None, lower=None):
         """Replay a panel. Shapes as in :meth:`WeightedTQA.run`. Returns a :class:`QuantileResult` whose
-        quantiles are on the outcome scale (target forecast plus error quantile)."""
+        quantiles are on the outcome scale (target forecast plus error quantile). ``lower``: a lower bound of the
+        outcome on the scale of ``y_target`` (0 for counts and for ``log(1 + y)``); no quantile is issued below it."""
         Rc = np.asarray(y_cal, dtype=float) - np.asarray(y_pred_cal, dtype=float)
         Pt = np.asarray(y_pred_target, dtype=float)
         Pt = Pt[:, None] if Pt.ndim == 1 else Pt
@@ -446,8 +455,9 @@ class PanelPredictiveSystem:
         Q = np.empty((T, M, self.levels.size))
         B = np.empty_like(Q)
         for t in range(T):
-            Q[t], B[t] = self.predict(Rc[t])
-            self.update(Q[t], B[t], Rt[t], R[t], Xc[t] if use_x else None, Xt[t] if use_x else None)
+            lo = None if lower is None else float(lower) - Pt[t]
+            Q[t], B[t] = self.predict(Rc[t], lo)
+            self.update(Q[t], B[t], Rt[t], R[t], Xc[t] if use_x else None, Xt[t] if use_x else None, lower=lo)
         res = QuantileResult(Q + Pt[:, :, None], self.levels, Yt)
         res.base_quantiles = B + Pt[:, :, None]
         return res

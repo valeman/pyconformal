@@ -8,6 +8,7 @@
 - `PanelPredictiveSystem`: about 1.2 to 2 times faster with identical forecasts (nothing is computed for the tracker on rounds with no outcome revealed; weights are reused when the features have not changed).
 - `QuantileResult.cdf` is now a proper distribution function (it was not right-continuous at the highest quantile) and handles tied quantiles; new `cdf_bounds`; `interval` raises an error for levels that are not on the grid instead of silently using the nearest ones.
 - Docs and docstrings: the calibration guarantees of `MultiQT` and `PanelPredictiveSystem` are for a fixed step; the default adaptive step is a heuristic.
+- `PanelPredictiveSystem.run(lower=...)`: keeps the quantiles above a lower bound of the outcome.
 
 ## 0.1.4 (23 November 2026)
 
