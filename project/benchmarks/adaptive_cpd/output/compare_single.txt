@@ -1,0 +1,146 @@
+19 levels 0.05..0.95, window 200. Columns: worst calibration error over levels | mean calibration error | pinball loss | coverage of the central 90% interval | lowest coverage in any 250-step stretch | share of infinite quantiles
+Bound on the calibration error of any level for any sequence, T = 3000: gamma 0.005: 0.067, gamma 0.02: 0.017, gamma 0.05: 0.007
+
+i.i.d. errors
+  base (rolling CPS)                 0.006 | 0.002 | 0.2982 | 0.899 | 0.857 | 0.0000
+  adaptive, gamma 0.005              0.002 | 0.001 | 0.2993 | 0.900 | 0.867 | 0.0000
+  adaptive, gamma 0.02               0.001 | 0.001 | 0.3015 | 0.900 | 0.879 | 0.0007 | steps with crossed thresholds before sorting 0.056
+  adaptive, gamma 0.05               0.002 | 0.001 | 0.3067 | 0.901 | 0.884 | 0.0105 | steps with crossed thresholds before sorting 0.547
+  adaptive, gamma 0.02, not sorted   0.001 | 0.001 | 0.3015 | 0.900 | 0.879 | 0.0007 | steps with crossed thresholds before sorting 0.056
+
+noise x5 from the middle
+  base (rolling CPS)                 0.012 | 0.006 | 0.8970 | 0.885 | 0.725 | 0.0000
+  adaptive, gamma 0.005              0.002 | 0.001 | 0.8983 | 0.900 | 0.829 | 0.0000
+  adaptive, gamma 0.02               0.001 | 0.001 | 0.9028 | 0.900 | 0.876 | 0.0018 | steps with crossed thresholds before sorting 0.073
+  adaptive, gamma 0.05               0.002 | 0.001 | 0.9218 | 0.902 | 0.884 | 0.0139 | steps with crossed thresholds before sorting 0.550
+  adaptive, gamma 0.02, not sorted   0.001 | 0.001 | 0.9029 | 0.900 | 0.873 | 0.0018 | steps with crossed thresholds before sorting 0.073
+
+noise grows 0.1% a step
+  base (rolling CPS)                 0.028 | 0.016 | 2.3159 | 0.864 | 0.820 | 0.0000
+  adaptive, gamma 0.005              0.003 | 0.001 | 2.3197 | 0.898 | 0.865 | 0.0000
+  adaptive, gamma 0.02               0.002 | 0.001 | 2.3415 | 0.900 | 0.879 | 0.0031 | steps with crossed thresholds before sorting 0.049
+  adaptive, gamma 0.05               0.002 | 0.001 | 2.4162 | 0.902 | 0.887 | 0.0202 | steps with crossed thresholds before sorting 0.542
+  adaptive, gamma 0.02, not sorted   0.002 | 0.001 | 2.3415 | 0.900 | 0.879 | 0.0031 | steps with crossed thresholds before sorting 0.049
+
+forecast bias drifts (error mean +0.002 a step)
+  base (rolling CPS)                 0.083 | 0.060 | 0.3044 | 0.895 | 0.855 | 0.0000
+  adaptive, gamma 0.005              0.006 | 0.004 | 0.2995 | 0.901 | 0.864 | 0.0000
+  adaptive, gamma 0.02               0.002 | 0.001 | 0.3019 | 0.901 | 0.877 | 0.0020 | steps with crossed thresholds before sorting 0.088
+  adaptive, gamma 0.05               0.003 | 0.001 | 0.3086 | 0.903 | 0.883 | 0.0130 | steps with crossed thresholds before sorting 0.583
+  adaptive, gamma 0.02, not sorted   0.002 | 0.001 | 0.3019 | 0.900 | 0.877 | 0.0020 | steps with crossed thresholds before sorting 0.088
+
+random-walk error
+  base (rolling CPS)                 0.207 | 0.121 | 0.2518 | 0.689 | 0.409 | 0.0000
+  adaptive, gamma 0.005              0.007 | 0.004 | 0.1895 | 0.902 | 0.749 | 0.0217 | steps with crossed thresholds before sorting 0.131
+  adaptive, gamma 0.02               0.012 | 0.005 | 0.1288 | 0.911 | 0.821 | 0.0508 | steps with crossed thresholds before sorting 0.543
+  adaptive, gamma 0.05               0.037 | 0.023 | 0.1363 | 0.924 | 0.865 | 0.0915 | steps with crossed thresholds before sorting 0.845
+  adaptive, gamma 0.02, not sorted   0.005 | 0.003 | 0.1357 | 0.902 | 0.816 | 0.0508 | steps with crossed thresholds before sorting 0.543
+
+regime switches every 250 steps (scale 1 / 4)
+  base (rolling CPS)                 0.023 | 0.010 | 0.8023 | 0.866 | 0.728 | 0.0000
+  adaptive, gamma 0.005              0.004 | 0.002 | 0.7960 | 0.903 | 0.811 | 0.0001
+  adaptive, gamma 0.02               0.002 | 0.001 | 0.7755 | 0.903 | 0.839 | 0.0075 | steps with crossed thresholds before sorting 0.212
+  adaptive, gamma 0.05               0.003 | 0.001 | 0.7852 | 0.905 | 0.867 | 0.0252 | steps with crossed thresholds before sorting 0.645
+  adaptive, gamma 0.02, not sorted   0.002 | 0.001 | 0.7758 | 0.902 | 0.837 | 0.0075 | steps with crossed thresholds before sorting 0.212
+
+skew flips at the middle
+  base (rolling CPS)                 0.011 | 0.005 | 0.2623 | 0.900 | 0.859 | 0.0000
+  adaptive, gamma 0.005              0.002 | 0.001 | 0.2629 | 0.900 | 0.861 | 0.0000
+  adaptive, gamma 0.02               0.002 | 0.001 | 0.2645 | 0.900 | 0.875 | 0.0012 | steps with crossed thresholds before sorting 0.083
+  adaptive, gamma 0.05               0.002 | 0.001 | 0.2709 | 0.902 | 0.884 | 0.0116 | steps with crossed thresholds before sorting 0.556
+  adaptive, gamma 0.02, not sorted   0.001 | 0.001 | 0.2645 | 0.900 | 0.875 | 0.0012 | steps with crossed thresholds before sorting 0.083
+
+M5 CA_1 FOODS_3 daily total, seasonal-naive forecast (lag 7) (1734 steps)
+  base (rolling CPS)                 0.016 | 0.004 | 100.9971 | 0.897 | 0.848 | 0.0000
+  adaptive, gamma 0.005              0.004 | 0.002 | 101.3054 | 0.901 | 0.868 | 0.0000
+  adaptive, gamma 0.02               0.003 | 0.001 | 102.0895 | 0.903 | 0.872 | 0.0015
+  adaptive, gamma 0.05               0.004 | 0.002 | 103.5807 | 0.905 | 0.884 | 0.0113
+
+SGSC mean household load, half-hourly, forecast = same slot yesterday (4744 steps)
+  base (rolling CPS)                 0.020 | 0.012 | 0.0223 | 0.877 | 0.716 | 0.0000
+  adaptive, gamma 0.005              0.001 | 0.000 | 0.0219 | 0.901 | 0.764 | 0.0015
+  adaptive, gamma 0.02               0.001 | 0.001 | 0.0184 | 0.902 | 0.844 | 0.0085
+  adaptive, gamma 0.05               0.008 | 0.005 | 0.0134 | 0.911 | 0.872 | 0.0226
+Columns: worst-level calibration error | mean over levels | worst error of any level in any 250-step stretch | pinball loss | infinite quantiles | crossed quantile pairs
+
+i.i.d. errors
+  Base (rolling CPS)                                         0.006 | 0.002 | 0.085 | 0.2982 | 0.0000 | 0.0000
+  PIT tracker, one per level (ACI at each level)             0.001 | 0.001 | 0.048 | 0.3015 | 0.0007 | 0.0019
+  PIT tracker, sorted (first prototype)                      0.001 | 0.001 | 0.048 | 0.3015 | 0.0007 | 0.0000
+  PIT tracker, lazy isotonic (MultiQT rule on the PIT scale) 0.001 | 0.001 | 0.048 | 0.3015 | 0.0007 | 0.0000
+  Online recalibration (empirical PIT)                       0.009 | 0.005 | 0.085 | 0.2989 | 0.0000 | 0.0000
+  Betting enhancement (Vovk, Simple Jumper)                  0.008 | 0.003 | 0.071 | 0.2996 | 0.0000 | 0.0000
+  MultiQT (outcome scale, as published)                      0.002 | 0.001 | 0.027 | 0.3078 | 0.0000 | 0.0000
+
+noise x5 from the middle
+  a = op(a[slice1], a[slice2])
+  Base (rolling CPS)                                         0.012 | 0.006 | 0.126 | 0.8970 | 0.0000 | 0.0000
+  PIT tracker, one per level (ACI at each level)             0.001 | 0.001 | 0.057 | 0.9029 | 0.0018 | 0.0028
+  PIT tracker, sorted (first prototype)                      0.001 | 0.001 | 0.057 | 0.9028 | 0.0018 | 0.0000
+  PIT tracker, lazy isotonic (MultiQT rule on the PIT scale) 0.001 | 0.001 | 0.057 | 0.9029 | 0.0018 | 0.0000
+  Online recalibration (empirical PIT)                       0.009 | 0.005 | 0.123 | 0.8977 | 0.0000 | 0.0000
+  Betting enhancement (Vovk, Simple Jumper)                  0.016 | 0.009 | 0.133 | 0.9004 | 0.0000 | 0.0000
+  MultiQT (outcome scale, as published)                      0.003 | 0.002 | 0.044 | 0.9187 | 0.0000 | 0.0000
+
+noise grows 0.1% a step
+  Base (rolling CPS)                                         0.028 | 0.016 | 0.100 | 2.3159 | 0.0000 | 0.0000
+  PIT tracker, one per level (ACI at each level)             0.002 | 0.001 | 0.051 | 2.3415 | 0.0031 | 0.0017
+  PIT tracker, sorted (first prototype)                      0.002 | 0.001 | 0.051 | 2.3415 | 0.0031 | 0.0000
+  PIT tracker, lazy isotonic (MultiQT rule on the PIT scale) 0.002 | 0.001 | 0.051 | 2.3415 | 0.0030 | 0.0000
+  Online recalibration (empirical PIT)                       0.010 | 0.005 | 0.089 | 2.3132 | 0.0000 | 0.0000
+  Betting enhancement (Vovk, Simple Jumper)                  0.029 | 0.018 | 0.088 | 2.3246 | 0.0000 | 0.0000
+  MultiQT (outcome scale, as published)                      0.003 | 0.002 | 0.026 | 2.3778 | 0.0000 | 0.0000
+
+forecast bias drifts (error mean +0.002 a step)
+  Base (rolling CPS)                                         0.083 | 0.060 | 0.161 | 0.3044 | 0.0000 | 0.0000
+  PIT tracker, one per level (ACI at each level)             0.002 | 0.001 | 0.050 | 0.3019 | 0.0020 | 0.0031
+  PIT tracker, sorted (first prototype)                      0.002 | 0.001 | 0.050 | 0.3019 | 0.0020 | 0.0000
+  PIT tracker, lazy isotonic (MultiQT rule on the PIT scale) 0.002 | 0.001 | 0.050 | 0.3019 | 0.0019 | 0.0000
+  Online recalibration (empirical PIT)                       0.010 | 0.005 | 0.090 | 0.2989 | 0.0000 | 0.0000
+  Betting enhancement (Vovk, Simple Jumper)                  0.024 | 0.013 | 0.092 | 0.3004 | 0.0000 | 0.0000
+  MultiQT (outcome scale, as published)                      0.003 | 0.001 | 0.026 | 0.3079 | 0.0000 | 0.0000
+
+random-walk error
+  Base (rolling CPS)                                         0.207 | 0.121 | 0.715 | 0.2518 | 0.0000 | 0.0000
+  PIT tracker, one per level (ACI at each level)             0.005 | 0.003 | 0.195 | 0.1357 | 0.0508 | 0.0611
+  PIT tracker, sorted (first prototype)                      0.012 | 0.005 | 0.215 | 0.1288 | 0.0508 | 0.0000
+  PIT tracker, lazy isotonic (MultiQT rule on the PIT scale) 0.005 | 0.003 | 0.195 | 0.1333 | 0.0484 | 0.0000
+  Online recalibration (empirical PIT)                       0.103 | 0.069 | 0.626 | 0.2271 | 0.0561 | 0.0000
+  Betting enhancement (Vovk, Simple Jumper)                  0.160 | 0.101 | 0.651 | 0.2020 | 0.0000 | 0.0000
+  MultiQT (outcome scale, as published)                      0.009 | 0.005 | 0.095 | 0.0480 | 0.0000 | 0.0000
+
+regime switches every 250 steps (scale 1 / 4)
+  Base (rolling CPS)                                         0.023 | 0.010 | 0.165 | 0.8023 | 0.0000 | 0.0000
+  PIT tracker, one per level (ACI at each level)             0.002 | 0.001 | 0.081 | 0.7758 | 0.0075 | 0.0090
+  PIT tracker, sorted (first prototype)                      0.002 | 0.001 | 0.081 | 0.7755 | 0.0075 | 0.0000
+  PIT tracker, lazy isotonic (MultiQT rule on the PIT scale) 0.002 | 0.001 | 0.081 | 0.7756 | 0.0070 | 0.0000
+  Online recalibration (empirical PIT)                       0.022 | 0.013 | 0.179 | 0.8073 | 0.0000 | 0.0000
+  Betting enhancement (Vovk, Simple Jumper)                  0.021 | 0.008 | 0.151 | 0.8033 | 0.0000 | 0.0000
+  MultiQT (outcome scale, as published)                      0.016 | 0.008 | 0.081 | 0.7783 | 0.0000 | 0.0000
+
+skew flips at the middle
+  Base (rolling CPS)                                         0.011 | 0.005 | 0.139 | 0.2623 | 0.0000 | 0.0000
+  PIT tracker, one per level (ACI at each level)             0.001 | 0.001 | 0.056 | 0.2645 | 0.0012 | 0.0028
+  PIT tracker, sorted (first prototype)                      0.002 | 0.001 | 0.056 | 0.2645 | 0.0012 | 0.0000
+  PIT tracker, lazy isotonic (MultiQT rule on the PIT scale) 0.001 | 0.001 | 0.056 | 0.2645 | 0.0012 | 0.0000
+  Online recalibration (empirical PIT)                       0.012 | 0.006 | 0.136 | 0.2628 | 0.0000 | 0.0000
+  Betting enhancement (Vovk, Simple Jumper)                  0.011 | 0.004 | 0.098 | 0.2629 | 0.0000 | 0.0000
+  MultiQT (outcome scale, as published)                      0.002 | 0.001 | 0.033 | 0.2701 | 0.0000 | 0.0000
+
+M5 CA_1 FOODS_3 daily total, seasonal-naive forecast (lag 7)
+  Base (rolling CPS)                                         0.016 | 0.004 | 0.070 | 100.9971 | 0.0000 | 0.0000
+  PIT tracker, one per level (ACI at each level)             0.003 | 0.001 | 0.048 | 102.0915 | 0.0015 | 0.0033
+  PIT tracker, sorted (first prototype)                      0.003 | 0.001 | 0.048 | 102.0895 | 0.0015 | 0.0000
+  PIT tracker, lazy isotonic (MultiQT rule on the PIT scale) 0.003 | 0.001 | 0.048 | 102.0678 | 0.0015 | 0.0000
+  Online recalibration (empirical PIT)                       0.015 | 0.005 | 0.084 | 101.3168 | 0.0000 | 0.0000
+  Betting enhancement (Vovk, Simple Jumper)                  0.013 | 0.004 | 0.068 | 101.3803 | 0.0000 | 0.0000
+  MultiQT (outcome scale, as published)                      0.004 | 0.002 | 0.034 | 102.2625 | 0.0000 | 0.0000
+
+SGSC mean household load, half-hourly, forecast = same slot yesterday
+  Base (rolling CPS)                                         0.020 | 0.012 | 0.316 | 0.0223 | 0.0000 | 0.0000
+  PIT tracker, one per level (ACI at each level)             0.001 | 0.000 | 0.148 | 0.0184 | 0.0085 | 0.0164
+  PIT tracker, sorted (first prototype)                      0.001 | 0.001 | 0.148 | 0.0184 | 0.0085 | 0.0000
+  PIT tracker, lazy isotonic (MultiQT rule on the PIT scale) 0.001 | 0.000 | 0.148 | 0.0184 | 0.0085 | 0.0000
+  Online recalibration (empirical PIT)                       0.039 | 0.025 | 0.386 | 0.0224 | 0.0021 | 0.0000
+  Betting enhancement (Vovk, Simple Jumper)                  0.042 | 0.020 | 0.376 | 0.0201 | 0.0000 | 0.0000
+  MultiQT (outcome scale, as published)                      0.000 | 0.000 | 0.040 | 0.0101 | 0.0000 | 0.0000

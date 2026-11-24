@@ -1,5 +1,7 @@
 # Predictive distributions that stay calibrated under drift: research prototype
 
+**Read `LITERATURE.md` first (24 November 2026): the core idea was published as MultiQT (Ding, Gibbs and Tibshirani, arXiv:2512.23671), which matches or beats this prototype in our own tests. The "sorted" variant below is known to be able to fail. `LazyPIT` in `comparators.py` is the corrected rule.**
+
 23 November 2026. Code in this folder is a prototype, not part of the package API. Nothing here has been peer reviewed, and the literature check behind "new" was six searches, not a full review.
 
 ## The idea

@@ -1,0 +1,14 @@
+SGSC: 10 random splits, 148 s. Mean over splits.
+  weights, recalibrator | per-unit calibration error: mean | worst 10% of units | pinball: mean | worst 10% | central 90% coverage | worst 10% | 90% width | infinite quantiles | crossed pairs
+  equal weights, Base                                        | 0.109 | 0.236 | 0.0408 | 0.0884 | 0.903 | 0.619 | 0.520 | 0.0000 | 0.0000
+  equal weights, PIT tracker, one per level                  | 0.062 | 0.126 | 0.0382 | 0.0793 | 0.931 | 0.837 | 0.516 | 0.0017 | 0.0013
+  equal weights, PIT tracker, lazy isotonic                  | 0.062 | 0.126 | 0.0382 | 0.0793 | 0.931 | 0.837 | 0.516 | 0.0017 | 0.0000
+  equal weights, Online recalibration (empirical PIT)        | 0.046 | 0.104 | 0.0378 | 0.0779 | 0.859 | 0.781 | 0.410 | 0.0011 | 0.0000
+  equal weights, Betting enhancement (Vovk)                  | 0.089 | 0.200 | 0.0398 | 0.0859 | 0.905 | 0.635 | 0.509 | 0.0000 | 0.0000
+  equal weights, MultiQT (outcome scale)                     | 0.026 | 0.051 | 0.0392 | 0.0767 | 0.902 | 0.851 | 0.492 | 0.0000 | 0.0000
+  similarity weights, Base                                   | 0.103 | 0.239 | 0.0410 | 0.0894 | 0.930 | 0.719 | 0.595 | 0.0141 | 0.0000
+  similarity weights, PIT tracker, one per level             | 0.058 | 0.126 | 0.0384 | 0.0805 | 0.941 | 0.862 | 0.559 | 0.0108 | 0.0015
+  similarity weights, PIT tracker, lazy isotonic             | 0.058 | 0.126 | 0.0384 | 0.0805 | 0.941 | 0.862 | 0.559 | 0.0108 | 0.0000
+  similarity weights, Online recalibration (empirical PIT)   | 0.045 | 0.103 | 0.0377 | 0.0778 | 0.861 | 0.782 | 0.416 | 0.0023 | 0.0000
+  similarity weights, Betting enhancement (Vovk)             | 0.081 | 0.200 | 0.0401 | 0.0870 | 0.934 | 0.747 | 0.589 | 0.0146 | 0.0000
+  similarity weights, MultiQT (outcome scale)                | 0.026 | 0.051 | 0.0392 | 0.0766 | 0.907 | 0.859 | 0.521 | 0.0000 | 0.0000

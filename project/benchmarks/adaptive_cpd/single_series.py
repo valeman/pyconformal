@@ -26,22 +26,23 @@ def score(y, Q):
     lo, hi = np.nanmin(np.where(fin, Q, np.nan)), np.nanmax(np.where(fin, Q, np.nan)); Qc = np.clip(Q, lo, hi)     # infinite quantiles scored at the widest finite one
     c90 = ((y >= Q[:, 0]) & (y <= Q[:, -1])).mean(); roll = pd.Series(((y >= Q[:, 0]) & (y <= Q[:, -1])).astype(float)).rolling(250).mean().min()
     return cal.max(), cal.mean(), pinball(Qc, y, levels).mean(), c90, roll, 1 - fin.mean()
-R = int(sys.argv[1]); gammas = (0.005, 0.02, 0.05)
-print(f"19 levels 0.05..0.95, window {W}. Columns: worst calibration error over levels | mean calibration error | pinball loss | coverage of the central 90% interval | lowest coverage in any 250-step stretch | share of infinite quantiles")
-print(f"Bound on the calibration error of any level for any sequence, T = 3000: " + ", ".join(f"gamma {g}: {(1 + g) / (g * 3000):.3f}" for g in gammas))
-names = list(streams(0))
-for name in names:
-    print(f"\n{name}")
-    rows = {}
-    for seed in range(R):
-        e = streams(seed)[name]
+if __name__ == "__main__":
+    R = int(sys.argv[1]); gammas = (0.005, 0.02, 0.05)
+    print(f"19 levels 0.05..0.95, window {W}. Columns: worst calibration error over levels | mean calibration error | pinball loss | coverage of the central 90% interval | lowest coverage in any 250-step stretch | share of infinite quantiles")
+    print(f"Bound on the calibration error of any level for any sequence, T = 3000: " + ", ".join(f"gamma {g}: {(1 + g) / (g * 3000):.3f}" for g in gammas))
+    names = list(streams(0))
+    for name in names:
+        print(f"\n{name}")
+        rows = {}
+        for seed in range(R):
+            e = streams(seed)[name]
+            for g in gammas:
+                y, Qb, Qa, cr = run(e, g, "sorted"); rows.setdefault("base (rolling CPS)", []).append(score(y, Qb) + (0.0,)); rows.setdefault(f"adaptive, gamma {g}", []).append(score(y, Qa) + (cr,))
+            y, Qb, Qi, cr = run(e, 0.02, "independent"); rows.setdefault("adaptive, gamma 0.02, not sorted", []).append(score(y, Qi) + (cr,))
+        for k, v in rows.items():
+            m = np.mean(v, 0); print(f"  {k:34s} {m[0]:.3f} | {m[1]:.3f} | {m[2]:.4f} | {m[3]:.3f} | {m[4]:.3f} | {m[5]:.4f}" + (f" | steps with crossed thresholds before sorting {m[6]:.3f}" if m[6] else ""))
+    for name, e in real().items():
+        print(f"\n{name} ({e.size - W} steps)")
+        y, Qb, _, _ = run(e, 0.02, "sorted"); m = score(y, Qb); print(f"  {'base (rolling CPS)':34s} {m[0]:.3f} | {m[1]:.3f} | {m[2]:.4f} | {m[3]:.3f} | {m[4]:.3f} | {m[5]:.4f}")
         for g in gammas:
-            y, Qb, Qa, cr = run(e, g, "sorted"); rows.setdefault("base (rolling CPS)", []).append(score(y, Qb) + (0.0,)); rows.setdefault(f"adaptive, gamma {g}", []).append(score(y, Qa) + (cr,))
-        y, Qb, Qi, cr = run(e, 0.02, "independent"); rows.setdefault("adaptive, gamma 0.02, not sorted", []).append(score(y, Qi) + (cr,))
-    for k, v in rows.items():
-        m = np.mean(v, 0); print(f"  {k:34s} {m[0]:.3f} | {m[1]:.3f} | {m[2]:.4f} | {m[3]:.3f} | {m[4]:.3f} | {m[5]:.4f}" + (f" | steps with crossed thresholds before sorting {m[6]:.3f}" if m[6] else ""))
-for name, e in real().items():
-    print(f"\n{name} ({e.size - W} steps)")
-    y, Qb, _, _ = run(e, 0.02, "sorted"); m = score(y, Qb); print(f"  {'base (rolling CPS)':34s} {m[0]:.3f} | {m[1]:.3f} | {m[2]:.4f} | {m[3]:.3f} | {m[4]:.3f} | {m[5]:.4f}")
-    for g in gammas:
-        y, _, Qa, cr = run(e, g, "sorted"); m = score(y, Qa); print(f"  {f'adaptive, gamma {g}':34s} {m[0]:.3f} | {m[1]:.3f} | {m[2]:.4f} | {m[3]:.3f} | {m[4]:.3f} | {m[5]:.4f}")
+            y, _, Qa, cr = run(e, g, "sorted"); m = score(y, Qa); print(f"  {f'adaptive, gamma {g}':34s} {m[0]:.3f} | {m[1]:.3f} | {m[2]:.4f} | {m[3]:.3f} | {m[4]:.3f} | {m[5]:.4f}")
