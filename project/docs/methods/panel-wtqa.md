@@ -12,7 +12,7 @@ Prediction sets for one unit of a panel (a store, a household, a stock, a patien
 | **Example needs** | pyconformal |
 
 !!! note
-    New after version 0.1.4. Until the next release, install the development version: `pip install "pyconformal @ git+https://github.com/valeman/pyconformal"`.
+    Needs pyconformal 0.1.5 or later.
 
 ## Minimal example
 

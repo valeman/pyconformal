@@ -78,7 +78,7 @@ pip install "pyconformal[fast] @ git+https://github.com/valeman/pyconformal"
 | **Classification** | LAC · APS · RAPS · SAPS, randomised or not, marginal, per class or per category (Mondrian) |
 | **Probability calibration** | Venn-Abers and cross Venn-Abers, binary and multiclass |
 | **Distribution-valued outcomes** | Conformal sets for distribution-to-distribution regression, with a band for the distribution function |
-| **Panel data** | W-TQA and TQA: sets for one unit calibrated on its peers in the same round, with late or missing feedback · predictive quantiles on a grid of levels for each unit (`PanelPredictiveSystem`; in the development version, not yet in the PyPI release) |
+| **Panel data** | W-TQA and TQA: sets for one unit calibrated on its peers in the same round, with late or missing feedback · predictive quantiles on a grid of levels for each unit (`PanelPredictiveSystem`, from version 0.1.5) |
 | **Quantile forecasts under drift** | MultiQT: many levels kept calibrated online, never crossing |
 | **Predictive distributions** | Conformal predictive systems: quantiles, distribution function, intervals, exact CRPS |
 | **Time series, online** | ACI · DtACI · AgACI · NexCP · conformal PID |

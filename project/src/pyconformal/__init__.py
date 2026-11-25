@@ -33,7 +33,7 @@ from pyconformal.regression import SplitConformalRegressor
 from pyconformal.scores import APS, LAC, RAPS, SAPS
 from pyconformal.venn_abers import CrossVennAbers, VennAbers
 
-__version__ = "0.1.4"
+__version__ = "0.1.5"
 
 from .multiqt import MultiQT, QuantileResult
 from .panel import PanelPredictiveSystem, PanelResult, WeightedTQA

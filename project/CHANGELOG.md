@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.5 (25 November 2026)
 
 - Fix: a classifier's `calibrate` that fails (for example on a label that is not a class) now leaves the object exactly as it was. Before, a failed call with a different number of classes changed the class count and kept the old scores, so later `predict_set` calls answered with stale calibration. Found by an outside review, 25 November 2026.
 - Fix: `QuantileResult.frequencies` and `calibration_error` are `nan` for a series with no observed outcome (they were 0 and 0.5); new `n_observed`. `cdf` and `cdf_bounds` return `nan` for a `nan` query; `interval` rejects a level that is not a number between 0 and 1; `MultiQT` rejects non-finite levels.

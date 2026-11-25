@@ -12,7 +12,7 @@ A full predictive distribution for each unit of a panel, every round: built from
 | **Example needs** | pyconformal |
 
 !!! note
-    New after version 0.1.4. Until the next release: `pip install "pyconformal @ git+https://github.com/valeman/pyconformal"`.
+    Needs pyconformal 0.1.5 or later.
 
 ## Minimal example
 

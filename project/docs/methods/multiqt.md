@@ -12,7 +12,7 @@ Takes quantile (or point) forecasts from any model and adjusts them after every 
 | **Example needs** | pyconformal |
 
 !!! note
-    New after version 0.1.4. Until the next release: `pip install "pyconformal @ git+https://github.com/valeman/pyconformal"`.
+    Needs pyconformal 0.1.5 or later.
 
 ## Minimal example
 
