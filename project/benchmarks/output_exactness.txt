@@ -1,0 +1,8 @@
+1240 cases (n = 1..120, 199, 200, 999, 1000; alphas [0.01, 0.02, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.5, 0.9]); in 184 of them no finite interval is valid
+package                  exact finite     exact infinite refused infeasible         too narrow           too wide   refused feasible              error  example
+pyconformal                      1056                184                  0                  0                  0                  0                  0  
+mapie                            1056                  0                184                  0                  0                  0                  0  
+crepes                           1016                184                  0                  0                 40                  0                  0  n=4,a=0.2: got inf, exact 1.755
+puncc                            1054                  0                176                  0                  0                  0                 10  n=1,a=0.01: TypeError: object of type 'numpy.float64' has no len()
+conformalpy                       124                  0                  0                184                932                  0                  0  n=1,a=0.01: got 0.6799, exact inf
+conformalforecast                1046                  0                184                  0                  0                 10                  0  refused feasible n=1,a=0.5: InsufficientCalibrationSamples

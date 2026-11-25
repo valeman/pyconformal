@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Fix: a classifier's `calibrate` that fails (for example on a label that is not a class) now leaves the object exactly as it was. Before, a failed call with a different number of classes changed the class count and kept the old scores, so later `predict_set` calls answered with stale calibration. Found by an outside review, 25 November 2026.
+- Fix: `QuantileResult.frequencies` and `calibration_error` are `nan` for a series with no observed outcome (they were 0 and 0.5); new `n_observed`. `cdf` and `cdf_bounds` return `nan` for a `nan` query; `interval` rejects a level that is not a number between 0 and 1; `MultiQT` rejects non-finite levels.
+- Benchmarks: `exactness.py` now counts a refusal, an unexpected error and a package that is not installed separately (it counted all three as exact when no finite interval was valid). New `batch_invariance.py`.
 - New: `WeightedTQA`, online conformal prediction for panel data (W-TQA, Tu and Giesecke, arXiv:2605.17705; TQA as the equal-weight case). Identical to a line-by-line reference of the paper's Algorithm 1, reproduces the paper's M5 and SGSC tables, 250x to 370x faster than the reference loop. Infinite sets are kept by default (`finite=False`); `finite=True` gives the paper's finitization.
 - New: `MultiQT` (Ding, Gibbs and Tibshirani, arXiv:2512.23671): calibrated quantile forecasts at many levels at once, online, never crossing. Same forecasts as the authors' code to 1e-15, 15 times faster; many series in one call; missing outcomes.
 - New: `PanelPredictiveSystem`: a predictive distribution for each unit of a panel (W-TQA's weighted cross-section as the base, MultiQT as the online correction under partial feedback).

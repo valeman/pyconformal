@@ -131,6 +131,20 @@ class SplitConformalClassifier(_Conformal):
             groups = np.asarray(groups).ravel()
             if groups.shape[0] != y.shape[0]:
                 raise ValueError("groups has the wrong length.")
+        # A calibration that fails must leave the object as it was: keep the old state and put it back on error.
+        keep = ("_n_classes", "calibration_scores_", "_calibration_labels", "_calibration_groups", "_cache")
+        saved = {k: self.__dict__[k] for k in keep if k in self.__dict__}
+        try:
+            return self._calibrate(X, y, proba, groups)
+        except BaseException:
+            for k in keep:
+                if k in saved:
+                    self.__dict__[k] = saved[k]
+                else:
+                    self.__dict__.pop(k, None)
+            raise
+
+    def _calibrate(self, X, y, proba, groups):
         self._n_classes = None  # a new calibration may change the number of columns
         P = self._proba(X, proba)
         if P.shape[0] != y.shape[0]:

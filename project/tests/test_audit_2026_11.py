@@ -218,3 +218,50 @@ def test_acmcp_with_fixed_csat_does_not_depend_on_history_length():
     a = np.random.default_rng(3).normal(size=90)
     run = lambda T: pc.AcMCP(scorecast=False, Csat=1.0).run(y=a[:T], y_pred=np.zeros((T, 1))).intervals[:50]
     np.testing.assert_array_equal(run(50), run(90))
+
+
+# --- 25 November 2026: faults reported by an outside review ---------------------------------------------------
+
+def test_failed_recalibration_leaves_classifier_as_it_was():
+    from pyconformal import SplitConformalClassifier
+    P2 = np.tile([0.9, 0.1], (20, 1))
+    c = SplitConformalClassifier(score="lac", alpha=0.1).calibrate(proba=P2, y=np.zeros(20, int))
+    before = c.predict_set(proba=P2[:3]).copy()
+    scores = c.calibration_scores_.copy()
+    P3 = np.tile([0.8, 0.1, 0.1], (20, 1))
+    with pytest.raises(ValueError):
+        c.calibrate(proba=P3, y=np.full(20, 9))           # label 9 is not a class
+    assert np.array_equal(c.calibration_scores_, scores)
+    assert np.array_equal(c.predict_set(proba=P2[:3]), before)   # the two-class calibration still serves
+    with pytest.raises(ValueError):
+        c.predict_set(proba=P3[:1])                       # and three columns are refused, not answered with old scores
+
+
+def test_failed_first_calibration_leaves_classifier_uncalibrated():
+    from pyconformal import SplitConformalClassifier
+    c = SplitConformalClassifier(score="lac", alpha=0.1)
+    with pytest.raises(ValueError):
+        c.calibrate(proba=np.tile([0.8, 0.1, 0.1], (20, 1)), y=np.full(20, 9))
+    with pytest.raises(Exception):
+        c.predict_set(proba=np.tile([0.8, 0.1, 0.1], (2, 1)))
+
+
+def test_quantile_result_missing_inputs_are_not_numbers():
+    from pyconformal import QuantileResult, MultiQT
+    L = np.array([0.05, 0.5, 0.95])
+    Q = np.tile([-1.0, 0.0, 1.0], (4, 2, 1))
+    y = np.column_stack([np.array([0.2, -2.0, 0.5, 3.0]), np.full(4, np.nan)])   # second series never observed
+    r = QuantileResult(Q, L, y)
+    assert r.n_observed.tolist() == [4, 0]
+    assert np.all(np.isfinite(r.frequencies[0])) and np.all(np.isnan(r.frequencies[1]))
+    assert np.isfinite(r.calibration_error[0]) and np.isnan(r.calibration_error[1])
+    assert np.all(np.isnan(r.cdf(np.nan)))
+    lo, hi = r.cdf_bounds(np.nan)
+    assert np.all(np.isnan(lo)) and np.all(np.isnan(hi))
+    assert np.all(r.cdf(0.0) == 0.5)                      # ordinary queries unchanged
+    for bad in (np.nan, np.inf, 0.0, 1.0):
+        with pytest.raises(ValueError):
+            r.interval(bad)
+    assert r.interval(0.1).shape == (4, 2, 2)
+    with pytest.raises(ValueError):
+        MultiQT([0.1, np.nan, 0.9])

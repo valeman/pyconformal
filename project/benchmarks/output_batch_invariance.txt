@@ -1,0 +1,3 @@
+aps   coverage 0.9004 (s.e. 0.0008), mean set size 3.82; membership decisions that differ between one call and one row per call: 0 of 3000000
+raps  coverage 0.9003 (s.e. 0.0008), mean set size 3.82; membership decisions that differ between one call and one row per call: 0 of 3000000
+saps  coverage 0.9007 (s.e. 0.0008), mean set size 3.84; membership decisions that differ between one call and one row per call: 0 of 3000000

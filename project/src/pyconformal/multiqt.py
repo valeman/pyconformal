@@ -39,14 +39,22 @@ class QuantileResult:
 
     @property
     def frequencies(self) -> np.ndarray:
-        """Share of outcomes at or below each level's quantile, per series: (n_series, n_levels)."""
+        """Share of observed outcomes at or below each level's quantile, per series: (n_series, n_levels).
+        ``nan`` for a series with no observed outcome; :attr:`n_observed` has the counts."""
         ok = ~np.isnan(self.y)
         hit = (self.y[:, :, None] <= self.quantiles) & ok[:, :, None]
-        return hit.sum(axis=0) / np.maximum(ok.sum(axis=0), 1)[:, None]
+        n = ok.sum(axis=0).astype(float)
+        n[n == 0] = np.nan                                # no observed outcome: the frequency is undefined, not 0
+        return hit.sum(axis=0) / n[:, None]
+
+    @property
+    def n_observed(self) -> np.ndarray:
+        """Number of rounds with an observed outcome, per series."""
+        return (~np.isnan(self.y)).sum(axis=0)
 
     @property
     def calibration_error(self) -> np.ndarray:
-        """Mean over levels of |frequency - level|, per series."""
+        """Mean over levels of |frequency - level|, per series; ``nan`` for a series with no observed outcome."""
         return np.abs(self.frequencies - self.levels).mean(axis=1)
 
     @property
@@ -58,6 +66,8 @@ class QuantileResult:
     def interval(self, alpha: float = 0.1) -> np.ndarray:
         """Central interval between the levels alpha/2 and 1 - alpha/2: (n_rounds, n_series, 2).
         Both levels must be on the grid; otherwise a ``ValueError`` names the intervals that are available."""
+        if not (np.ndim(alpha) == 0 and np.isfinite(alpha) and 0 < alpha < 1):
+            raise ValueError(f"alpha must be a number strictly between 0 and 1; got {alpha!r}")
         lo = int(np.argmin(np.abs(self.levels - alpha / 2)))
         hi = int(np.argmin(np.abs(self.levels - (1 - alpha / 2))))
         if abs(self.levels[lo] - alpha / 2) > 1e-9 or abs(self.levels[hi] - (1 - alpha / 2)) > 1e-9:
@@ -83,14 +93,16 @@ class QuantileResult:
         qb = np.take_along_axis(Q, b[:, :, None], 2)[:, :, 0]
         gap = np.where(qb > qa, qb - qa, 1.0)
         mid = L[a] + (L[b] - L[a]) * (y - qa) / gap
-        return np.where(k == 0, 0.0, np.where(k == K, 1.0, mid))
+        out = np.where(k == 0, 0.0, np.where(k == K, 1.0, mid))
+        return np.where(np.isnan(y), np.nan, out)          # a missing query has no probability
 
     def cdf_bounds(self, y):
         """Lowest and highest probability of ``outcome <= y`` consistent with the grid: two arrays (n_rounds, n_series)."""
         y = np.broadcast_to(np.asarray(y, dtype=float), self.quantiles.shape[:2])
         k = (self.quantiles <= y[:, :, None]).sum(axis=2)
         L = np.concatenate([[0.0], self.levels, [1.0]])
-        return L[k], L[k + 1]
+        miss = np.isnan(y)
+        return np.where(miss, np.nan, L[k]), np.where(miss, np.nan, L[k + 1])
 
 
 def _row_quantile(A, p):
@@ -153,7 +165,7 @@ class MultiQT:
 
     def __init__(self, levels, lr="adaptive", lr_window: int = 50, lr_floor: float = 0.1, init=0.0):
         self.levels = np.asarray(levels, dtype=float).ravel()
-        if self.levels.size == 0 or np.any(self.levels <= 0) or np.any(self.levels >= 1) or np.any(np.diff(self.levels) <= 0):
+        if self.levels.size == 0 or not np.all(np.isfinite(self.levels)) or np.any(self.levels <= 0) or np.any(self.levels >= 1) or np.any(np.diff(self.levels) <= 0):
             raise ValueError("levels must be increasing and inside (0, 1).")
         if not (lr == "adaptive" or (isinstance(lr, (int, float)) and lr > 0)):
             raise ValueError('lr must be a positive number or "adaptive".')

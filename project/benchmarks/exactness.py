@@ -52,27 +52,42 @@ def hw_conformalforecast(s, a):
 PKGS = dict(pyconformal=hw_pyconformal, mapie=hw_mapie, crepes=hw_crepes,
             puncc=hw_puncc, conformalpy=hw_conformalpy, conformalforecast=hw_conformalforecast)
 
+IMPORTS = dict(pyconformal="pyconformal", mapie="mapie", crepes="crepes", puncc="deel.puncc",
+               conformalpy="conformalpy", conformalforecast="conformalforecast")
+# Exceptions that are a deliberate refusal of a level the calibration set cannot support. Anything else is an error.
+REFUSALS = ("Insufficient", "ValueError")
+
 rng = np.random.default_rng(0)
 alphas = [0.01, 0.02, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.5, 0.9]
 ns = list(range(1, 121)) + [199, 200, 999, 1000]
 cases = [(n, a, rng.exponential(size=n)) for n in ns for a in alphas]
-print(f"{len(cases)} cases (n = 1..120, 199, 200, 999, 1000; alphas {alphas})\n")
-print(f"{'package':18} {'exact':>6} {'too narrow':>10} {'too wide':>9} {'refused':>8} {'error':>6}  example")
+n_inf = sum(math.isinf(exact(s, a)) for _, a, s in cases)
+print(f"{len(cases)} cases (n = 1..120, 199, 200, 999, 1000; alphas {alphas}); "
+      f"in {n_inf} of them no finite interval is valid\n")
+cols = ("exact finite", "exact infinite", "refused infeasible", "too narrow", "too wide", "refused feasible", "error")
+print(f"{'package':18} " + " ".join(f"{c:>18}" for c in cols) + "  example")
 for name, f in PKGS.items():
-    ok = narrow = wide = refused = err = 0; ex = ""
+    try:
+        __import__(IMPORTS[name])
+    except Exception as x:                                 # a package that is not installed scores nothing
+        print(f"{name:18} not installed ({type(x).__name__}); skipped"); continue
+    c = dict.fromkeys(cols, 0); ex = ""
     for n, a, s in cases:
         e = exact(s, a)
         try:
             h = f(s, a)
         except Exception as x:
             msg = type(x).__name__
-            if math.isinf(e): ok += 1  # refusing an infeasible level is fine
-            elif any(t in msg for t in ("Insufficient", "Value")): refused += 1; ex = ex or f"refused feasible n={n},a={a}: {msg}"
-            else: err += 1; ex = ex or f"n={n},a={a}: {msg}: {str(x)[:60]}"
+            if any(t in msg for t in REFUSALS):
+                c["refused infeasible" if math.isinf(e) else "refused feasible"] += 1
+                if not math.isinf(e): ex = ex or f"refused feasible n={n},a={a}: {msg}"
+            else:
+                c["error"] += 1; ex = ex or f"n={n},a={a}: {msg}: {str(x)[:60]}"
             continue
         if h is None or (isinstance(h, float) and math.isnan(h)):
-            err += 1; continue
-        if (math.isinf(e) and math.isinf(h)) or (not math.isinf(e) and abs(h - e) <= 1e-12 * max(1, abs(e))): ok += 1
-        elif h < e: narrow += 1; ex = ex or f"n={n},a={a}: got {h:.4g}, exact {e:.4g}"
-        else: wide += 1; ex = ex or f"n={n},a={a}: got {h:.4g}, exact {e:.4g}"
-    print(f"{name:18} {ok:6} {narrow:10} {wide:9} {refused:8} {err:6}  {ex}")
+            c["error"] += 1; ex = ex or f"n={n},a={a}: returned {h}"; continue
+        if math.isinf(e) and h == math.inf: c["exact infinite"] += 1          # the upper end must be +inf, not -inf
+        elif not math.isinf(e) and abs(h - e) <= 1e-12 * max(1, abs(e)): c["exact finite"] += 1
+        elif h < e: c["too narrow"] += 1; ex = ex or f"n={n},a={a}: got {h:.4g}, exact {e:.4g}"
+        else: c["too wide"] += 1; ex = ex or f"n={n},a={a}: got {h:.4g}, exact {e:.4g}"
+    print(f"{name:18} " + " ".join(f"{c[k]:18d}" for k in cols) + f"  {ex}")
