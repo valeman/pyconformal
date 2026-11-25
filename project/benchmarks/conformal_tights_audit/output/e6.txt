@@ -1,0 +1,5 @@
+fit                      cov@90  width@90  cov@95  width@95   (mean of 20 trials; se of coverage below)
+weighted                 0.9972   14.544   0.9999   26.367    se 0.0005 0.0000
+clean rows only          0.8981    4.831   0.9484    6.107    se 0.0022 0.0016
+unweighted, all rows     0.9944   18.232   0.9984   30.970    se 0.0005 0.0003
+level-2 shift, 90% interval, absolute residuals, weighted fit: lower end unweighted -4.883 (weighted would be 0.019); upper end unweighted 5.966 (weighted would be -0.005); share of zero-weight rows in level 2: 0.21

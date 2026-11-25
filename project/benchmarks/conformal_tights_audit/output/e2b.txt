@@ -1,0 +1,3 @@
+coverage 0.5, quantiles (0.25, 0.75): keys equal: 13 of 20 fits changed; largest change 0.1825 standard deviations of y
+coverage 0.9, quantiles (0.05, 0.95): keys differ: 0 of 20 fits changed; largest change 0.0000 standard deviations of y
+coverage 0.9, same floating-point quantiles as predict_interval: 15 of 20 fits changed; largest change 0.6468 standard deviations of y
