@@ -24,6 +24,7 @@ cp.predict_interval(X_test)                      # (n, 2): lower and upper, 90% 
 | Know what has to be installed | [FAQ](faq.md) |
 | Read the long walk-through | [User guide](guide.md) |
 | See results on real series | [Case studies](case_studies.md) |
+| See what we found when we audited other libraries | [Audits of other libraries](audits.md) |
 | Look up an argument | [API reference](api.md) |
 
 ## The pattern is always the same

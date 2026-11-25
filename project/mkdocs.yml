@@ -70,4 +70,5 @@ nav:
   - FAQ: faq.md
   - User guide: guide.md
   - Case studies: case_studies.md
+  - "Audits of other libraries": audits.md
   - API reference: api.md
