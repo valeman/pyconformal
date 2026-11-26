@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased (0.1.6)
+## 0.1.6 (26 November 2026)
 
-- New: `ConformalPredictiveSystem` accepts weights (`calibrate(..., weights=)`, then `weights=` for the test points in `predict_quantile`, `predict_interval` and `predict_cdf`): the weighted conformal predictive system of Jonkers et al. (2024) for covariate shift. Works with `sigma` and `groups`; CRPS uses the weighted masses. Equal weights reproduce the unweighted system exactly. One million weighted intervals from 100,000 calibration points take 0.1 seconds.
+- New: `ConformalPredictiveSystem` accepts weights (`calibrate(..., weights=)`, then `weights=` for the test points in `predict_quantile`, `predict_interval` and `predict_cdf`): the weighted conformal predictive system of Jonkers et al. (2024) for covariate shift. Works with `sigma` and `groups`; CRPS uses the weighted masses. Equal weights reproduce the unweighted system exactly. One million weighted intervals from 100,000 calibration points take 0.1 seconds. Checked against crepes-weighted 0.1.3 (`benchmarks/weighted_cps/`): the distribution functions agree to 9e-16; the quantile rule here reduces exactly to the unweighted one, theirs is one to two ranks more conservative.
 
 ## 0.1.5 (25 November 2026)
 

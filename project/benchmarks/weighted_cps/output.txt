@@ -1,0 +1,15 @@
+1. Distribution function Q(y, tau), same random tau
+   largest difference over 50 problems (half of them with ties): 8.88e-16
+2. Quantiles with equal weights: does each reduce to the unweighted system (crepes 0.9.1)?
+   n = 99, percentiles 5/95: rank of lower and upper end among the sorted scores: crepes 5/95, pyconformal 5/95, crepes-weighted 3/96
+   n = 99, percentiles 2.5/97.5: rank of lower and upper end among the sorted scores: crepes 2/98, pyconformal 2/98, crepes-weighted 1/None
+   n = 99, percentiles 10/90: rank of lower and upper end among the sorted scores: crepes 10/90, pyconformal 10/90, crepes-weighted 9/91
+3. Guarantee under a known covariate shift (calibration x ~ N(0,1), test x ~ N(1,1), weights = true likelihood ratio)
+   n =   20 ours   : coverage 0.9726 (s.e. 0.0004), below 0.0140, above 0.0134, median width of finite intervals 6.306, infinite intervals 68.1%
+   n =   20 theirs : coverage 0.9934 (s.e. 0.0002), below 0.0043, above 0.0023, median width of finite intervals 5.973, infinite intervals 98.7%
+   n =   50 ours   : coverage 0.9553 (s.e. 0.0005), below 0.0225, above 0.0221, median width of finite intervals 7.809, infinite intervals 32.7%
+   n =   50 theirs : coverage 0.9808 (s.e. 0.0004), below 0.0112, above 0.0080, median width of finite intervals 7.023, infinite intervals 88.1%
+   n =  200 ours   : coverage 0.9212 (s.e. 0.0006), below 0.0389, above 0.0399, median width of finite intervals 8.044, infinite intervals 3.3%
+   n =  200 theirs : coverage 0.9383 (s.e. 0.0006), below 0.0311, above 0.0307, median width of finite intervals 8.212, infinite intervals 25.3%
+   n = 1000 ours   : coverage 0.9026 (s.e. 0.0009), below 0.0492, above 0.0482, median width of finite intervals 7.603, infinite intervals 0.0%
+   n = 1000 theirs : coverage 0.9057 (s.e. 0.0009), below 0.0477, above 0.0466, median width of finite intervals 7.698, infinite intervals 0.2%
