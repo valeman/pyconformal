@@ -7,6 +7,9 @@ based on conformal prediction. Machine Learning 108.
 
 Vovk, Petej, Nouretdinov, Manokhin and Gammerman (2020). Computationally
 efficient versions of conformal predictive distributions. Neurocomputing 397.
+
+Jonkers, Van Wallendael, Duchateau and Van Hoecke (2024). Conformal predictive
+systems under covariate shift. COPA, PMLR 230 (the weighted version).
 """
 
 from __future__ import annotations
@@ -32,8 +35,16 @@ def _rank(n: int, q: float, side: str) -> int:
 class _Scores:
     """Sorted calibration scores of one group, with what CRPS needs."""
 
-    def __init__(self, a):
-        self.a = np.sort(a)
+    def __init__(self, a, w=None):
+        if w is None:
+            self.a = np.sort(a)
+        else:
+            keep = w > 0                                  # a point of weight zero carries no mass
+            if not np.any(keep):
+                raise ValueError("All calibration weights (of a group) are zero.")
+            order = np.argsort(a[keep], kind="stable")
+            self.a = a[keep][order]
+            w = w[keep][order]
         n = self.a.size
         self.n = n
         # Sums are taken around a central score, so that adding a large
@@ -52,6 +63,15 @@ class _Scores:
         # nothing cancels. Gap k separates k scores from the other n - k.
         k = np.arange(1, n)
         self.gmd = 2.0 * float(np.dot(np.diff(self.a), k * (n - k.astype(float)))) / (n * n)
+        self.cw = None
+        if w is not None:
+            # cw[j]: total weight of the j smallest scores, j = 0 .. n (not normalised: the
+            # normalising constant includes the weight of the test point and so differs per point)
+            self.cw = np.concatenate([[0.0], np.cumsum(w)])
+            p = w / self.cw[-1]
+            self.pc = np.concatenate([[0.0], np.cumsum(p)])            # mass of the j smallest, for CRPS
+            self.prefix = np.concatenate([[0.0], np.cumsum(p * (self.a - self.centre))])
+            self.gmd = 2.0 * float(np.dot(np.diff(self.a), self.pc[1:-1] * (1.0 - self.pc[1:-1])))
 
 
 class ConformalPredictiveSystem(_Conformal):
@@ -83,6 +103,23 @@ class ConformalPredictiveSystem(_Conformal):
     * Mondrian: ``groups`` gives a category per sample, and each category is
       calibrated separately.
 
+    Weights. ``calibrate(..., weights=w)`` gives each calibration point a
+    non-negative weight, and every ``predict_*`` call then needs the weight
+    of each test point (``weights=``). With total calibration weight ``W``
+    and test weight ``w`` the distribution function becomes
+
+        Q(y, tau) = (sum of w_i over C_i < y
+                     + tau * (sum of w_i over C_i = y  +  w)) / (W + w),
+
+    which is the predictive system of Jonkers et al. (2024). If the weights
+    are the likelihood ratio between the test and the calibration
+    distribution of the features (covariate shift), ``Q(y_true, tau)`` is
+    again uniform and the intervals keep their coverage. With estimated
+    weights this holds approximately; with any other weights (similarity,
+    recency) there is no guarantee. Equal weights give the unweighted
+    system. Weighted ranks are computed in floating point with a relative
+    tolerance of 1e-12, not in exact arithmetic.
+
     Works from predictions (``calibrate(y_pred=..., y=...)``, then
     ``predict_*(y_pred=...)``) or from a model (``ConformalPredictiveSystem(
     model)``, then ``calibrate(X_cal, y_cal)`` and ``predict_*(X)``).
@@ -113,8 +150,19 @@ class ConformalPredictiveSystem(_Conformal):
             raise ValueError(f"{name} must be finite and strictly positive.")
         return s
 
-    def calibrate(self, X=None, y=None, *, y_pred=None, sigma=None, groups=None):
-        """Calibrate on data not used to train the model."""
+    @staticmethod
+    def _w(weights, n, name):
+        w = np.asarray(weights, dtype=float)
+        w = np.full(n, float(w)) if w.ndim == 0 else w.ravel()
+        if w.shape[0] != n:
+            raise ValueError(f"{name} has the wrong length.")
+        if not np.all(np.isfinite(w)) or np.any(w < 0):
+            raise ValueError(f"{name} must be finite and non-negative.")
+        return w
+
+    def calibrate(self, X=None, y=None, *, y_pred=None, sigma=None, groups=None, weights=None):
+        """Calibrate on data not used to train the model. ``weights``: one
+        non-negative weight per calibration point (see the class notes)."""
         if y is None:
             raise TypeError("calibrate() needs the outcomes y.")
         sigma_cal, groups_cal = sigma, groups
@@ -128,19 +176,33 @@ class ConformalPredictiveSystem(_Conformal):
             raise ValueError("Predictions and y must be finite.")
         s = self._sigma(sigma_cal, y.size, "sigma")
         a = (y - p) if s is None else (y - p) / s
+        w = None if weights is None else self._w(weights, y.size, "weights")
+        if w is not None and not np.any(w > 0):
+            raise ValueError("All calibration weights are zero.")
         self.normalized_ = s is not None
         self.mondrian_ = groups_cal is not None
+        self.weighted_ = w is not None
         if groups_cal is None:
-            self._groups = {None: _Scores(a)}
+            self._groups = {None: _Scores(a, w)}
         else:
             g = np.asarray(groups_cal).ravel()
             if g.shape[0] != y.size:
                 raise ValueError("groups has the wrong length.")
             self._keys = np.unique(g)
-            self._groups = {k: _Scores(a[g == k]) for k in self._keys.tolist()}
+            self._groups = {k: _Scores(a[g == k], None if w is None else w[g == k]) for k in self._keys.tolist()}
         return self
 
     # ------------------------------------------------------------- plumbing
+
+    def _test_weights(self, weights, n):
+        """Weight of each test point, or None for an unweighted system."""
+        if not getattr(self, "weighted_", False):
+            if weights is not None:
+                raise ValueError("This system was calibrated without weights; do not pass weights.")
+            return None
+        if weights is None:
+            raise ValueError("This system was calibrated with weights; pass the weight of each test point.")
+        return self._w(weights, n, "weights")
 
     def _prepare(self, X, y_pred, sigma, groups):
         if self._groups is None:
@@ -185,7 +247,7 @@ class ConformalPredictiveSystem(_Conformal):
 
     # ------------------------------------------------------------ quantiles
 
-    def predict_quantile(self, X=None, q=0.5, *, y_pred=None, sigma=None, groups=None, side="higher"):
+    def predict_quantile(self, X=None, q=0.5, *, y_pred=None, sigma=None, groups=None, weights=None, side="higher"):
         """Quantiles of the predictive distributions.
 
         ``side="lower"`` returns ``C_(floor(q (n + 1)))`` and ``side="higher"``
@@ -193,6 +255,11 @@ class ConformalPredictiveSystem(_Conformal):
         ``C_(n + 1) = +inf``. The two differ by at most one calibration score;
         use "lower" for lower bounds and "higher" for upper bounds to keep the
         coverage guarantee.
+
+        With weights the ranks become weighted: "higher" is the smallest
+        support point with weight at or below it of at least ``q (W + w)``,
+        and "lower" the largest one with weight at or above it of at least
+        ``(1 - q) (W + w)``.
 
         Returns an array of shape (n_samples, n_quantiles), or (n_samples,)
         when ``q`` is a single number.
@@ -204,8 +271,21 @@ class ConformalPredictiveSystem(_Conformal):
         if np.any(qs < 0) or np.any(qs > 1) or not np.all(np.isfinite(qs)):
             raise ValueError("q must be between 0 and 1.")
         p, s, parts = self._prepare(X, y_pred, sigma, groups)
+        wt = self._test_weights(weights, p.size)
         out = np.empty((p.size, qs.size))
         for sc, rows in parts:
+            if wt is not None:
+                tot = sc.cw[-1] + wt[rows]                             # W + w, one per test point
+                t = qs[None, :] * tot[:, None]; tol = 1e-12 * tot[:, None]
+                if side == "higher":                                   # smallest k with cw[k] >= q (W + w)
+                    k = np.searchsorted(sc.cw, (t - tol).ravel(), "left").reshape(t.shape)
+                else:                                                  # largest k with cw[k - 1] + w <= q (W + w)
+                    k = np.searchsorted(sc.cw, (t - wt[rows][:, None] + tol).ravel(), "right").reshape(t.shape)
+                ext = np.concatenate([[-np.inf], sc.a, [np.inf]])      # C_(0) and C_(n + 1)
+                a_q = ext[k]
+                with np.errstate(invalid="ignore"):
+                    out[rows] = p[rows, None] + s[rows, None] * a_q
+                continue
             # C_(0) = -inf and C_(n + 1) = +inf, read without copying the scores
             r = [_rank(sc.n, t, side) for t in qs]
             a_q = np.array([-np.inf if k <= 0 else (np.inf if k > sc.n else sc.a[k - 1]) for k in r])
@@ -213,7 +293,7 @@ class ConformalPredictiveSystem(_Conformal):
                 out[rows] = p[rows, None] + s[rows, None] * a_q[None, :]
         return out[:, 0] if scalar else out
 
-    def predict_interval(self, X=None, alpha=None, *, y_pred=None, sigma=None, groups=None):
+    def predict_interval(self, X=None, alpha=None, *, y_pred=None, sigma=None, groups=None, weights=None):
         """Central prediction intervals of shape (n_samples, 2).
 
         Covers with probability at least ``1 - alpha``. A bound is infinite
@@ -222,7 +302,7 @@ class ConformalPredictiveSystem(_Conformal):
         """
         alphas, single = self._alphas(alpha)
         p = self._output(X, y_pred).ravel()  # call the model once
-        kw = dict(y_pred=p, sigma=sigma, groups=groups)
+        kw = dict(y_pred=p, sigma=sigma, groups=groups, weights=weights)
         out = np.empty((p.size, 2, len(alphas)))
         out[:, 0, :] = self.predict_quantile(q=[a / 2.0 for a in alphas], side="lower", **kw)
         out[:, 1, :] = self.predict_quantile(q=[1.0 - a / 2.0 for a in alphas], side="higher", **kw)
@@ -230,7 +310,7 @@ class ConformalPredictiveSystem(_Conformal):
 
     # ------------------------------------------------------------------ cdf
 
-    def predict_cdf(self, X=None, y=None, *, y_pred=None, sigma=None, groups=None, tau=0.5):
+    def predict_cdf(self, X=None, y=None, *, y_pred=None, sigma=None, groups=None, weights=None, tau=0.5):
         """Value ``Q(y, tau)`` of each predictive distribution at ``y``.
 
         ``y`` is one threshold per sample, or a single number for all.
@@ -247,11 +327,17 @@ class ConformalPredictiveSystem(_Conformal):
         if np.any(tv < 0) or np.any(tv > 1):
             raise ValueError("tau must be between 0 and 1.")
         z = (yv - p) / s
+        wt = self._test_weights(weights, p.size)
         out = np.empty(p.size)
         for sc, rows in parts:
             zz = z[rows]
             lt = search(sc.a, zz, "left")
             at = np.minimum(lt, sc.n - 1)
+            if wt is not None:                                         # weights in place of counts
+                hi = np.where(sc.a[at] == zz, sc.run_end[at], lt)
+                with np.errstate(invalid="ignore", divide="ignore"):
+                    out[rows] = (sc.cw[lt] + tv[rows] * (sc.cw[hi] - sc.cw[lt] + wt[rows])) / (sc.cw[-1] + wt[rows])
+                continue
             # number of calibration scores equal to z, from one search
             eq = np.where(sc.a[at] == zz, sc.run_end[at] - lt, 0)
             out[rows] = (lt + tv[rows] * (eq + 1)) / (sc.n + 1)
@@ -261,7 +347,9 @@ class ConformalPredictiveSystem(_Conformal):
     def predict_distribution(self, X=None, *, y_pred=None, sigma=None):
         """Support points ``C_1 <= ... <= C_n`` of each distribution, as an
         array of shape (n_samples, n_calibration). Not available for Mondrian
-        systems, whose groups can differ in size."""
+        systems, whose groups can differ in size. For a weighted system the
+        points of weight zero are left out and the points do not carry equal
+        mass; use predict_quantile or predict_cdf."""
         if self._groups is not None and self.mondrian_:
             raise NotImplementedError(
                 "predict_distribution is not available for Mondrian systems; "
@@ -276,7 +364,8 @@ class ConformalPredictiveSystem(_Conformal):
         """Continuous ranked probability score per sample (lower is better).
 
         Scores the distribution that puts mass ``1 / n`` on each support
-        point (not the randomised distribution ``Q(y, tau)``). Computed in
+        point, or mass ``w_i / W`` for a weighted system (not the randomised
+        distribution ``Q(y, tau)``, so no test weight is needed). Computed in
         closed form from prefix sums, in O(log n) per sample, without
         building the distributions. A missing outcome (NaN) gives NaN.
         """
@@ -294,6 +383,10 @@ class ConformalPredictiveSystem(_Conformal):
             below = sc.prefix[k]
             zc = zz - sc.centre
             # sum over i of |a_i - z|, with everything measured from the centre
+            if sc.cw is not None:                                      # masses w_i / W in place of 1 / n
+                mean_abs = zc * sc.pc[k] - below + (sc.prefix[-1] - below) - zc * (1.0 - sc.pc[k])
+                out[rows] = s[rows] * (mean_abs - 0.5 * sc.gmd)
+                continue
             abs_sum = zc * k - below + (sc.prefix[-1] - below) - zc * (sc.n - k)
             out[rows] = s[rows] * (abs_sum / sc.n - 0.5 * sc.gmd)
         return out

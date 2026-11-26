@@ -70,7 +70,7 @@ Every method in pyconformal. Click a name for a minimal example you can run.
 | Class-conditional, label-conditional | [Mondrian classification](methods/mondrian-classification.md) (`class_conditional=True`) |
 | Inductive conformal prediction (ICP) | [Split conformal regression](methods/split-regression.md), [classification](methods/classification.md) |
 | Locally adaptive, normalized, difficulty estimate | [Normalized intervals](methods/normalized.md) |
-| Covariate shift, importance weights | [Weighted conformal prediction](methods/weighted.md) |
+| Covariate shift, importance weights | [Weighted conformal prediction](methods/weighted.md); for whole distributions, [Conformal predictive systems](methods/predictive-systems.md) |
 | CV+, jackknife+, cross-conformal | [Jackknife+ and CV+](methods/jackknife-plus.md) |
 | CQR, quantile regression | [CQR](methods/cqr.md), [CIR](methods/cir.md), [CTI](methods/cti.md) |
 | CatBoost, XGBoost, LightGBM | [Quantile models from boosting libraries](methods/quantile-booster.md) |

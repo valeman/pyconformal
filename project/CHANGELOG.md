@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased (0.1.6)
+
+- New: `ConformalPredictiveSystem` accepts weights (`calibrate(..., weights=)`, then `weights=` for the test points in `predict_quantile`, `predict_interval` and `predict_cdf`): the weighted conformal predictive system of Jonkers et al. (2024) for covariate shift. Works with `sigma` and `groups`; CRPS uses the weighted masses. Equal weights reproduce the unweighted system exactly. One million weighted intervals from 100,000 calibration points take 0.1 seconds.
+
 ## 0.1.5 (25 November 2026)
 
 - Fix: a classifier's `calibrate` that fails (for example on a label that is not a class) now leaves the object exactly as it was. Before, a failed call with a different number of classes changed the class count and kept the old scores, so later `predict_set` calls answered with stale calibration. Found by an outside review, 25 November 2026.

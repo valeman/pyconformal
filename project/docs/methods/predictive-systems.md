@@ -34,6 +34,26 @@ medians = cps.predict_quantile(X_test, 0.5)
 p_below = cps.predict_cdf(X_test, 0.0)             # P(y <= 0) for each sample
 ```
 
+## With weights (covariate shift)
+
+From version 0.1.6. Give each calibration point a weight in `calibrate`, and each test point its weight in every `predict_*` call. If the weights are the likelihood ratio between the test and the calibration distribution of the inputs, the distributions stay calibrated on the shifted data (Jonkers, Van Wallendael, Duchateau and Van Hoecke, 2024). With estimated weights that holds approximately; with other weights, such as similarity or recency, there is no guarantee.
+
+```python
+import numpy as np
+from pyconformal import ConformalPredictiveSystem
+
+rng = np.random.default_rng(0)
+n = 20_000
+x_cal, x_test = rng.normal(0, 1, n), rng.normal(1, 1, n)             # the test inputs have moved
+noise = lambda x: (1 + np.abs(x)) * rng.normal(size=x.size)          # and the outcome is noisier there
+y_cal, y_test = noise(x_cal), noise(x_test)
+ratio = lambda x: np.exp(x - 0.5)                                    # density of N(1, 1) over N(0, 1)
+
+cps = ConformalPredictiveSystem().calibrate(y_pred=np.zeros(n), y=y_cal, weights=ratio(x_cal))
+lo, hi = cps.predict_interval(y_pred=np.zeros(n), alpha=0.1, weights=ratio(x_test)).T
+print(np.mean((lo <= y_test) & (y_test <= hi)))                      # 0.894; 0.838 without weights
+```
+
 ## More
 
 - Full argument list: [API reference](../api.md)
